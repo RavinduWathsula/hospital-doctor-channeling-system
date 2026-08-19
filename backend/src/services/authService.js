@@ -1,0 +1,89 @@
+const pool = require('../config/database');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+};
+
+exports.registerPatient = async (patientData) => {
+    const { firstName, lastName, email, password, nic, dateOfBirth, gender, phone, address, emergencyContact } = patientData;
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // Check for duplicate email or nic
+        const [existingUsers] = await connection.query('SELECT id FROM users WHERE email = ? OR nic = ?', [email, nic]);
+        if (existingUsers.length > 0) {
+            throw new Error('User with this email or NIC already exists');
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Insert into users
+        const [userResult] = await connection.query(
+            'INSERT INTO users (first_name, last_name, email, password_hash, nic, role, phone) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [firstName, lastName, email, hashedPassword, nic, 'PATIENT', phone]
+        );
+
+        const userId = userResult.insertId;
+
+        // Insert into patients
+        await connection.query(
+            'INSERT INTO patients (user_id, date_of_birth, gender, address, emergency_contact) VALUES (?, ?, ?, ?, ?)',
+            [userId, dateOfBirth || null, gender || null, address || null, emergencyContact || null]
+        );
+
+        await connection.commit();
+
+        return {
+            id: userId,
+            firstName,
+            lastName,
+            email,
+            role: 'PATIENT',
+            token: generateToken(userId, 'PATIENT')
+        };
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
+exports.loginUser = async (email, password) => {
+    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (users.length === 0) {
+        throw new Error('Invalid email or password');
+    }
+
+    const user = users[0];
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+        throw new Error('Invalid email or password');
+    }
+
+    return {
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user.id, user.role)
+    };
+};
+
+exports.getUserById = async (id) => {
+    const [users] = await pool.query('SELECT id, first_name, last_name, email, nic, role, phone FROM users WHERE id = ?', [id]);
+    if (users.length === 0) {
+        throw new Error('User not found');
+    }
+    return users[0];
+};
