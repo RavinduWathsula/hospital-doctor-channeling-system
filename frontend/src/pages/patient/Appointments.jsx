@@ -3,6 +3,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, XCircle, Search, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
+import StateWrapper from '../../components/ui/StateWrapper';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 
 const Appointments = () => {
     const { token } = useContext(AuthContext);
@@ -11,6 +13,8 @@ const Appointments = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, completed, cancelled
     const [searchQuery, setSearchQuery] = useState('');
+    
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, id: null });
 
     useEffect(() => {
         fetchAppointments();
@@ -32,8 +36,13 @@ const Appointments = () => {
         }
     };
 
-    const handleCancel = async (id) => {
-        if (!window.confirm('Are you sure you want to cancel this appointment? This action cannot be undone.')) return;
+    const requestCancel = (id) => {
+        setConfirmDialog({ isOpen: true, id });
+    };
+
+    const handleCancel = async () => {
+        const id = confirmDialog.id;
+        if (!id) return;
 
         try {
             const res = await fetch(`http://localhost:5000/api/appointments/${id}/cancel`, {
@@ -113,24 +122,11 @@ const Appointments = () => {
 
                 {/* List */}
                 <div className="p-0">
-                    {isLoading ? (
-                        <div className="flex justify-center items-center py-20">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        </div>
-                    ) : filteredAppointments.length === 0 ? (
-                        <div className="text-center py-20">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-4">
-                                <Calendar size={32} />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-1">No {activeTab} appointments</h3>
-                            <p className="text-gray-500 text-sm">You don't have any {activeTab} appointments at the moment.</p>
-                            {activeTab === 'upcoming' && (
-                                <Link to="/patient/doctors" className="inline-block mt-4 text-blue-600 font-semibold hover:underline">
-                                    Book a new appointment
-                                </Link>
-                            )}
-                        </div>
-                    ) : (
+                    <StateWrapper 
+                        loading={isLoading} 
+                        empty={filteredAppointments.length === 0 && !isLoading}
+                        emptyMessage={`No ${activeTab} appointments`}
+                    >
                         <div className="divide-y divide-gray-100">
                             {filteredAppointments.map(apt => (
                                 <div key={apt.id} className="p-6 hover:bg-gray-50/50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -168,7 +164,7 @@ const Appointments = () => {
                                         
                                         {(apt.status === 'PENDING' || apt.status === 'CONFIRMED') && (
                                             <button 
-                                                onClick={() => handleCancel(apt.id)}
+                                                onClick={() => requestCancel(apt.id)}
                                                 className="px-4 py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 font-semibold rounded-xl flex items-center justify-center transition-colors text-sm flex-1 md:flex-none"
                                             >
                                                 <XCircle size={16} className="mr-1.5" /> Cancel
@@ -178,9 +174,19 @@ const Appointments = () => {
                                 </div>
                             ))}
                         </div>
-                    )}
+                    </StateWrapper>
                 </div>
             </div>
+
+            <ConfirmDialog 
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false, id: null })}
+                onConfirm={handleCancel}
+                title="Cancel Appointment"
+                message="Are you sure you want to cancel this appointment? This action cannot be undone."
+                confirmText="Yes, Cancel it"
+                isDestructive={true}
+            />
         </div>
     );
 };

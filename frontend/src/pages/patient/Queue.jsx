@@ -115,10 +115,15 @@ const Queue = () => {
                             
                             <div className="text-center absolute z-10 flex flex-col items-center justify-center">
                                 <span className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-1">Your Turn</span>
-                                {appointment_status === 'CHECKED_IN' || appointment_status === 'IN_CONSULTATION' ? (
-                                    <div className="text-blue-600 flex flex-col items-center">
+                                {appointment_status === 'CALLED' ? (
+                                    <div className="text-blue-600 flex flex-col items-center animate-pulse">
                                         <CheckCircle size={40} className="mb-2" />
-                                        <span className="font-bold">IT'S TIME</span>
+                                        <span className="font-bold">PLEASE ENTER</span>
+                                    </div>
+                                ) : appointment_status === 'IN_CONSULTATION' ? (
+                                    <div className="text-green-600 flex flex-col items-center">
+                                        <Activity size={40} className="mb-2" />
+                                        <span className="font-bold">IN PROGRESS</span>
                                     </div>
                                 ) : (
                                     <span className="text-6xl font-black text-gray-900">{my_queue_number}</span>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Bell, Users, ArrowRight, Activity, ActivityIcon, PlusCircle, FileText } from 'lucide-react';
+import { Calendar, Clock, Bell, Users, ArrowRight, Activity, ActivityIcon, PlusCircle, FileText, ChevronRight } from 'lucide-react';
+import StateWrapper from '../../components/ui/StateWrapper';
+import { motion } from 'framer-motion';
 
 const Dashboard = () => {
     const { token, user } = useContext(AuthContext);
@@ -61,216 +63,222 @@ const Dashboard = () => {
         fetchDashboardData();
     }, [token]);
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-full min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
+    if (isLoading && upcomingAppointments.length === 0) {
+        return <StateWrapper loading={true} />;
     }
 
     const nextAppointment = upcomingAppointments.length > 0 ? upcomingAppointments[0] : null;
     const isToday = nextAppointment && new Date(nextAppointment.appointment_date).toDateString() === new Date().toDateString();
 
+    // Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    };
+
     return (
-        <div className="space-y-6 max-w-7xl mx-auto">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.firstName}! 👋</h1>
-                <p className="text-gray-500 mt-2">Here is a summary of your healthcare journey.</p>
-            </div>
+        <motion.div 
+            className="space-y-8 max-w-7xl mx-auto pb-10"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={itemVariants} className="pt-2">
+                <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight">
+                    Welcome back, <span className="text-teal-600">{user?.first_name || 'Patient'}</span>! 👋
+                </h1>
+                <p className="text-slate-500 mt-2 text-lg font-medium">Here is a summary of your healthcare journey.</p>
+            </motion.div>
 
-            {/* Top Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <Calendar size={24} />
+            {/* Top Stats Cards with Glassmorphism */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+                {[
+                    { title: 'Upcoming Appt', value: upcomingAppointments.length, icon: Calendar, color: 'text-teal-600', bg: 'bg-teal-50/80', ring: 'ring-teal-100' },
+                    { title: "Today's Appt", value: todaysAppointmentsCount, icon: Clock, color: 'text-indigo-600', bg: 'bg-indigo-50/80', ring: 'ring-indigo-100' },
+                    { title: 'Queue Number', value: queueData?.my_queue_number || '--', icon: Users, color: 'text-orange-600', bg: 'bg-orange-50/80', ring: 'ring-orange-100' },
+                    { title: 'Current Queue', value: queueData?.current_queue || '--', icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50/80', ring: 'ring-emerald-100' },
+                    { title: 'Unread Alerts', value: unreadCount, icon: Bell, color: 'text-rose-600', bg: 'bg-rose-50/80', ring: 'ring-rose-100', dot: unreadCount > 0 }
+                ].map((stat, idx) => (
+                    <motion.div 
+                        key={idx}
+                        whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                        className="bg-white/70 backdrop-blur-xl rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col justify-center transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative overflow-hidden group"
+                    >
+                        <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${stat.bg}`}></div>
+                        <div className="flex items-center justify-between mb-3 relative z-10">
+                            <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center ring-1 ${stat.ring} shadow-inner`}>
+                                <stat.icon size={22} strokeWidth={2.5} />
+                                {stat.dot && <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full ring-2 ring-white"></span>}
+                            </div>
+                            <p className="text-3xl font-black text-slate-800 tracking-tight">{stat.value}</p>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{upcomingAppointments.length}</p>
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium">Upcoming Appointment</p>
-                </div>
+                        <p className="text-sm text-slate-500 font-bold tracking-wide uppercase">{stat.title}</p>
+                    </motion.div>
+                ))}
+            </motion.div>
 
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                            <Clock size={24} />
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{todaysAppointmentsCount}</p>
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium">Today's Appointment</p>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                            <Users size={24} />
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{queueData?.my_queue_number || '--'}</p>
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium">Queue Number</p>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-                            <Activity size={24} />
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{queueData?.current_queue || '--'}</p>
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium">Current Queue</p>
-                </div>
-
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center relative">
-                            <Bell size={24} />
-                            {unreadCount > 0 && <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-red-50"></span>}
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{unreadCount}</p>
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium">Unread Notifications</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Content Area */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-8">
                     
-                    {/* Next Appointment Hero */}
-                    {nextAppointment ? (
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-10">
-                                <ActivityIcon size={120} />
-                            </div>
-                            <div className="relative z-10">
-                                <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold tracking-wider uppercase mb-4">
-                                    {isToday ? "Today's Appointment" : "Upcoming Appointment"}
-                                </span>
-                                <h2 className="text-3xl font-bold mb-2">Dr. {nextAppointment.doctor_first_name} {nextAppointment.doctor_last_name}</h2>
-                                <p className="text-blue-100 mb-6">{nextAppointment.department_name} Department</p>
+                    {/* Next Appointment Premium Hero */}
+                    <motion.div variants={itemVariants}>
+                        {nextAppointment ? (
+                            <div className="bg-gradient-to-br from-teal-600 via-teal-700 to-indigo-800 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-teal-500/20 relative overflow-hidden group">
+                                {/* Decorative animated background elements */}
+                                <div className="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+                                <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-400 opacity-20 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
                                 
-                                <div className="flex flex-wrap gap-6 text-sm">
-                                    <div className="flex items-center">
-                                        <Calendar className="mr-2 opacity-80" size={18} />
-                                        <span className="font-medium">{new Date(nextAppointment.appointment_date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Clock className="mr-2 opacity-80" size={18} />
-                                        <span className="font-medium">{nextAppointment.appointment_time}</span>
-                                    </div>
+                                <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                                    <ActivityIcon size={160} strokeWidth={1} />
                                 </div>
 
-                                <div className="mt-8">
-                                    <Link to={`/patient/appointments`} className="inline-flex items-center px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-sm">
-                                        View Details <ArrowRight size={18} className="ml-2" />
-                                    </Link>
+                                <div className="relative z-10">
+                                    <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
+                                        {isToday ? "Today's Appointment" : "Upcoming Appointment"}
+                                    </span>
+                                    <h2 className="text-4xl sm:text-5xl font-black mb-3 tracking-tight">Dr. {nextAppointment.doctor_first_name} {nextAppointment.doctor_last_name}</h2>
+                                    <p className="text-teal-100 font-medium text-lg mb-8 flex items-center">
+                                        <span className="w-2 h-2 bg-teal-300 rounded-full mr-3"></span>
+                                        {nextAppointment.department_name} Department
+                                    </p>
+                                    
+                                    <div className="flex flex-wrap gap-6 text-base font-semibold bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 w-fit">
+                                        <div className="flex items-center text-white">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-3">
+                                                <Calendar size={18} />
+                                            </div>
+                                            {new Date(nextAppointment.appointment_date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                                        </div>
+                                        <div className="w-px bg-white/20 hidden sm:block"></div>
+                                        <div className="flex items-center text-white">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-3">
+                                                <Clock size={18} />
+                                            </div>
+                                            {nextAppointment.appointment_time}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-10">
+                                        <Link to={`/patient/appointments`} className="inline-flex items-center px-8 py-4 bg-white text-teal-700 font-extrabold rounded-2xl hover:bg-teal-50 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:scale-[1.02]">
+                                            View Details <ArrowRight size={20} className="ml-3" />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100 flex flex-col items-center justify-center">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6">
-                                <Calendar size={40} />
+                        ) : (
+                            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-16 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col items-center justify-center h-[28rem]">
+                                <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-50 rounded-[2rem] shadow-inner flex items-center justify-center text-teal-600 mb-8 rotate-3">
+                                    <Calendar size={48} strokeWidth={1.5} />
+                                </div>
+                                <h2 className="text-3xl font-black text-slate-800 mb-4 tracking-tight">No upcoming appointments</h2>
+                                <p className="text-slate-500 mb-10 max-w-md text-lg">You don't have any appointments scheduled. Book a consultation with our top specialists today.</p>
+                                <Link to="/patient/doctors" className="px-10 py-4 bg-teal-600 text-white font-bold rounded-2xl hover:bg-teal-500 transition-all shadow-lg shadow-teal-500/30 hover:shadow-teal-500/40 hover:-translate-y-1">
+                                    Find a Doctor
+                                </Link>
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">No upcoming appointments</h2>
-                            <p className="text-gray-500 mb-8 max-w-md">You don't have any appointments scheduled. Book a consultation with our top specialists today.</p>
-                            <Link to="/patient/doctors" className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20">
-                                Find a Doctor
-                            </Link>
-                        </div>
-                    )}
+                        )}
+                    </motion.div>
 
                     {/* Recent Appointments */}
-                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-gray-900">Recent Appointments</h3>
-                            <Link to="/patient/appointments" className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">
-                                View all
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-2xl font-black text-slate-800 tracking-tight">Recent Appointments</h3>
+                            <Link to="/patient/appointments" className="flex items-center text-sm font-bold text-teal-600 hover:text-teal-700 transition-colors bg-teal-50 px-4 py-2 rounded-full">
+                                View all <ChevronRight size={16} className="ml-1" />
                             </Link>
                         </div>
                         
                         {recentAppointments.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                No recent appointments found.
+                            <div className="text-center py-12 text-slate-400 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                                <FileText size={32} className="mx-auto mb-3 opacity-20" />
+                                <span className="font-medium">No recent appointments found.</span>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {recentAppointments.map(apt => (
-                                    <div key={apt.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                                {recentAppointments.map((apt, i) => (
+                                    <motion.div 
+                                        key={apt.id} 
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.1 * i }}
+                                        className="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-teal-200 hover:shadow-md transition-all group"
+                                    >
                                         <div className="flex items-center">
-                                            <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center text-gray-600 font-bold mr-4">
+                                            <div className="w-14 h-14 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center text-slate-700 font-black text-xl mr-5 group-hover:from-teal-50 group-hover:to-teal-100 group-hover:text-teal-700 transition-colors border border-slate-200 group-hover:border-teal-200 shadow-sm">
                                                 {new Date(apt.appointment_date).getDate()}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-gray-900">Dr. {apt.doctor_first_name} {apt.doctor_last_name}</h4>
-                                                <p className="text-sm text-gray-500">{apt.department_name}</p>
+                                                <h4 className="font-bold text-slate-800 text-lg group-hover:text-teal-700 transition-colors">Dr. {apt.doctor_first_name} {apt.doctor_last_name}</h4>
+                                                <p className="text-sm font-medium text-slate-500">{apt.department_name}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                                                apt.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 
-                                                'bg-red-100 text-red-800'
+                                            <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                                                apt.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' : 
+                                                'bg-rose-100 text-rose-700 ring-1 ring-rose-200'
                                             }`}>
+                                                {apt.status === 'COMPLETED' ? <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></div> : null}
                                                 {apt.status}
                                             </span>
-                                            <p className="text-xs text-gray-500 mt-1">{new Date(apt.appointment_date).toLocaleDateString()}</p>
+                                            <p className="text-xs font-semibold text-slate-400 mt-2">{new Date(apt.appointment_date).toLocaleDateString()}</p>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         )}
-                    </div>
+                    </motion.div>
 
                 </div>
 
                 {/* Sidebar Content Area */}
-                <div className="lg:col-span-1 space-y-6">
+                <div className="lg:col-span-1 space-y-8">
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-bold text-gray-900 mb-6">Quick Actions</h3>
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full blur-3xl -z-10 opacity-60"></div>
+                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-6">Quick Actions</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <Link to="/patient/doctors" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-colors group">
-                                <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-600 mb-3 transition-colors">
-                                    <Users size={20} />
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 text-center">Find Doctor</span>
-                            </Link>
-                            <Link to="/patient/doctors" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-colors group">
-                                <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-600 mb-3 transition-colors">
-                                    <PlusCircle size={20} />
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 text-center">Book Appt</span>
-                            </Link>
-                            <Link to="/patient/appointments" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-colors group">
-                                <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-600 mb-3 transition-colors">
-                                    <FileText size={20} />
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 text-center">My Appts</span>
-                            </Link>
-                            <Link to="/patient/queue" className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-colors group">
-                                <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:text-blue-600 mb-3 transition-colors">
-                                    <Activity size={20} />
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 text-center">View Queue</span>
-                            </Link>
+                            {[
+                                { to: '/patient/doctors', icon: Users, label: 'Find Doctor', color: 'text-blue-500', bg: 'bg-blue-50', hover: 'hover:border-blue-200 hover:shadow-blue-500/10' },
+                                { to: '/patient/doctors', icon: PlusCircle, label: 'Book Appt', color: 'text-teal-500', bg: 'bg-teal-50', hover: 'hover:border-teal-200 hover:shadow-teal-500/10' },
+                                { to: '/patient/appointments', icon: FileText, label: 'My Appts', color: 'text-indigo-500', bg: 'bg-indigo-50', hover: 'hover:border-indigo-200 hover:shadow-indigo-500/10' },
+                                { to: '/patient/queue', icon: Activity, label: 'View Queue', color: 'text-orange-500', bg: 'bg-orange-50', hover: 'hover:border-orange-200 hover:shadow-orange-500/10' },
+                            ].map((action, idx) => (
+                                <Link key={idx} to={action.to} className={`flex flex-col items-center justify-center p-5 bg-white border border-slate-100 rounded-3xl transition-all hover:-translate-y-1 shadow-sm hover:shadow-lg group ${action.hover}`}>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${action.bg} ${action.color}`}>
+                                        <action.icon size={24} strokeWidth={2.5} />
+                                    </div>
+                                    <span className="text-sm font-bold text-slate-700 text-center tracking-wide">{action.label}</span>
+                                </Link>
+                            ))}
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Support Banner */}
-                    <div className="bg-indigo-50 rounded-3xl p-6 border border-indigo-100 text-center">
-                        <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center text-indigo-500 mx-auto mb-4">
-                            <Activity size={32} />
+                    <motion.div variants={itemVariants} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2.5rem] p-8 text-center text-white relative overflow-hidden shadow-2xl shadow-slate-900/20">
+                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-500/20 rounded-full blur-2xl"></div>
+                        
+                        <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-[1.5rem] border border-white/20 flex items-center justify-center text-teal-300 mx-auto mb-6 relative z-10 shadow-inner">
+                            <Activity size={36} strokeWidth={1.5} />
                         </div>
-                        <h4 className="font-bold text-indigo-900 mb-2">Need Medical Help?</h4>
-                        <p className="text-indigo-700 text-sm mb-4">Our support team is available 24/7 to assist you with any inquiries.</p>
-                        <button className="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+                        <h4 className="text-2xl font-black mb-3 tracking-tight relative z-10">Need Medical Help?</h4>
+                        <p className="text-slate-300 text-sm mb-8 font-medium leading-relaxed relative z-10">Our support team is available 24/7 to assist you with any inquiries or emergencies.</p>
+                        <button className="w-full py-4 bg-teal-500 text-white font-extrabold text-sm uppercase tracking-wider rounded-2xl hover:bg-teal-400 transition-all shadow-[0_0_15px_rgba(20,184,166,0.4)] hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] relative z-10">
                             Contact Support
                         </button>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

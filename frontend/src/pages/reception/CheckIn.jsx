@@ -54,7 +54,7 @@ const ReceptionCheckIn = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}` 
                 },
-                body: JSON.stringify({ status: 'CHECKED_IN' })
+                body: JSON.stringify({ status: 'WAITING' })
             });
             const data = await res.json();
             if (data.success) {

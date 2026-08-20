@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Users, UserPlus, Play, CheckCircle, Phone, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import StateWrapper from '../../components/ui/StateWrapper';
 
 const DoctorQueue = () => {
     const { token } = useContext(AuthContext);
@@ -55,12 +56,8 @@ const DoctorQueue = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-            </div>
-        );
+    if (loading && !queueData.currentPatient && !queueData.nextPatient && (!queueData.waitingPatients || queueData.waitingPatients.length === 0)) {
+        return <StateWrapper loading={true} />;
     }
 
     return (
@@ -95,12 +92,29 @@ const DoctorQueue = () => {
                                         </p>
                                     </div>
                                     <div className="flex gap-3 w-full md:w-auto">
-                                        <button 
-                                            onClick={() => handleStatusUpdate(queueData.currentPatient.id, 'COMPLETED')}
-                                            className="flex-1 md:flex-none flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg"
-                                        >
-                                            <CheckCircle className="mr-2" size={20} /> Complete
-                                        </button>
+                                        {queueData.currentPatient.status === 'CALLED' ? (
+                                            <button 
+                                                onClick={() => handleStatusUpdate(queueData.currentPatient.id, 'IN_CONSULTATION')}
+                                                className="flex-1 md:flex-none flex items-center justify-center px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg"
+                                            >
+                                                <Play className="mr-2" size={20} /> Start
+                                            </button>
+                                        ) : (
+                                            <>
+                                                <button 
+                                                    onClick={() => handleStatusUpdate(queueData.currentPatient.id, 'COMPLETED')}
+                                                    className="flex-1 md:flex-none flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg"
+                                                >
+                                                    <CheckCircle className="mr-2" size={20} /> Complete
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleStatusUpdate(queueData.currentPatient.id, 'NO_SHOW')}
+                                                    className="flex-1 md:flex-none flex items-center justify-center px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-bold transition-all shadow-md hover:shadow-lg"
+                                                >
+                                                    No Show
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             ) : (
@@ -130,11 +144,11 @@ const DoctorQueue = () => {
                                     </div>
                                 </div>
                                 <button 
-                                    onClick={() => handleStatusUpdate(queueData.nextPatient.id, 'IN_PROGRESS')}
+                                    onClick={() => handleStatusUpdate(queueData.nextPatient.id, 'CALLED')}
                                     disabled={!!queueData.currentPatient}
                                     className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-colors shadow-sm flex items-center"
                                 >
-                                    <Play className="mr-2" size={18} /> Start
+                                    <Phone className="mr-2" size={18} /> Call Next
                                 </button>
                             </div>
                         ) : (

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import StateWrapper from '../../components/ui/StateWrapper';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 
 const Departments = () => {
     const { token } = useContext(AuthContext);
@@ -10,6 +11,7 @@ const Departments = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentDept, setCurrentDept] = useState(null);
     const [formData, setFormData] = useState({ name: '', description: '', isActive: true });
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, id: null });
 
     useEffect(() => {
         fetchDepartments();
@@ -56,8 +58,13 @@ const Departments = () => {
         } catch { toast.error('Error saving department'); }
     };
 
-    const handleDelete = async (id) => {
-        if(!window.confirm('Are you sure you want to delete this department?')) return;
+    const requestDelete = (id) => {
+        setConfirmDialog({ isOpen: true, id });
+    };
+
+    const handleDelete = async () => {
+        const id = confirmDialog.id;
+        if(!id) return;
         try {
             const res = await fetch(`http://localhost:5000/api/departments/${id}`, {
                 method: 'DELETE',
@@ -99,7 +106,13 @@ const Departments = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filtered.map(d => (
+                        {filtered.length === 0 ? (
+                            <tr>
+                                <td colSpan="5" className="p-8 text-center">
+                                    <StateWrapper loading={false} empty={true} emptyMessage="No departments found" />
+                                </td>
+                            </tr>
+                        ) : filtered.map(d => (
                             <tr key={d.id} className="border-b hover:bg-gray-50">
                                 <td className="px-4 py-3 font-medium text-gray-900">#{d.id}</td>
                                 <td className="px-4 py-3 font-medium text-gray-900">{d.name}</td>
@@ -111,7 +124,7 @@ const Departments = () => {
                                 </td>
                                 <td className="px-4 py-3 flex space-x-3">
                                     <button onClick={() => openModal(d)} className="text-blue-600 hover:text-blue-900"><Edit2 size={18} /></button>
-                                    <button onClick={() => handleDelete(d.id)} className="text-red-600 hover:text-red-900"><Trash2 size={18} /></button>
+                                    <button onClick={() => requestDelete(d.id)} className="text-red-600 hover:text-red-900"><Trash2 size={18} /></button>
                                 </td>
                             </tr>
                         ))}
@@ -148,6 +161,16 @@ const Departments = () => {
                     </div>
                 </div>
             )}
+            
+            <ConfirmDialog 
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false, id: null })}
+                onConfirm={handleDelete}
+                title="Delete Department"
+                message="Are you sure you want to delete this department? This action cannot be undone."
+                confirmText="Yes, Delete"
+                isDestructive={true}
+            />
         </div>
     );
 };

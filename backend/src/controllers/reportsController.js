@@ -12,3 +12,19 @@ exports.getDashboardStats = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getAnalytics = async (req, res, next) => {
+    try {
+        const filters = {
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            doctorId: req.query.doctorId,
+            departmentId: req.query.departmentId,
+            status: req.query.status
+        };
+        const data = await reportsService.getAnalytics(filters);
+        res.status(200).json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+};

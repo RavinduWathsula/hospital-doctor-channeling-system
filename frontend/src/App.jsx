@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 
+// Public Pages
+import Landing from './pages/public/Landing';
+
 // Auth Pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -32,7 +35,7 @@ import Booking from './pages/patient/Booking';
 import BookingConfirmation from './pages/patient/BookingConfirmation';
 import Appointments from './pages/patient/Appointments';
 import Queue from './pages/patient/Queue';
-import Notifications from './pages/patient/Notifications';
+import Notifications from './pages/Notifications';
 import Profile from './pages/patient/Profile';
 
 // Doctor Pages
@@ -59,7 +62,7 @@ function App() {
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -77,6 +80,7 @@ function App() {
                 <Route path="/admin/appointments" element={<AdminAppointments />} />
                 <Route path="/admin/reports" element={<AdminReports />} />
                 <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/notifications" element={<Notifications />} />
               </Route>
             </Route>
 
@@ -104,6 +108,7 @@ function App() {
                 <Route path="/doctor/schedules" element={<DoctorSchedules />} />
                 <Route path="/doctor/patients" element={<DoctorPatients />} />
                 <Route path="/doctor/profile" element={<DoctorProfile />} />
+                <Route path="/doctor/notifications" element={<Notifications />} />
               </Route>
             </Route>
 
@@ -115,6 +120,7 @@ function App() {
                 <Route path="/reception/appointments" element={<ReceptionAppointments />} />
                 <Route path="/reception/check-in" element={<ReceptionCheckIn />} />
                 <Route path="/reception/queue" element={<ReceptionQueue />} />
+                <Route path="/reception/notifications" element={<Notifications />} />
               </Route>
             </Route>
 

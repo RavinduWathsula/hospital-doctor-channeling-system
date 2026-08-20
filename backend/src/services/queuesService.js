@@ -1,7 +1,46 @@
 const pool = require('../config/database');
 
 exports.getAll = async () => {
-    return [];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get all today's appointments
+    const [appointments] = await pool.query(`
+        SELECT a.id, a.doctor_id, a.queue_number, a.status, a.appointment_time, 
+        u.first_name, u.last_name, 
+        du.first_name as doc_first, du.last_name as doc_last, d.specialization
+        FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        JOIN users u ON p.user_id = u.id
+        JOIN doctors d ON a.doctor_id = d.id
+        JOIN users du ON d.user_id = du.id
+        WHERE a.appointment_date = ? AND a.status NOT IN ('CANCELLED', 'NO_SHOW', 'COMPLETED')
+        ORDER BY a.queue_number ASC
+    `, [today]);
+
+    // Group by doctor
+    const doctorQueues = {};
+    appointments.forEach(a => {
+        if (!doctorQueues[a.doctor_id]) {
+            doctorQueues[a.doctor_id] = {
+                doctorId: a.doctor_id,
+                doctorName: `${a.doc_first} ${a.doc_last}`,
+                specialization: a.specialization,
+                currentPatient: null,
+                waitingPatients: []
+            };
+        }
+        
+        if (a.status === 'IN_CONSULTATION' || a.status === 'CALLED') {
+            // Only set if not already set (if there's a data anomaly)
+            if (!doctorQueues[a.doctor_id].currentPatient) {
+                doctorQueues[a.doctor_id].currentPatient = a;
+            }
+        } else if (a.status === 'WAITING' || a.status === 'CHECKED_IN') {
+            doctorQueues[a.doctor_id].waitingPatients.push(a);
+        }
+    });
+
+    return Object.values(doctorQueues);
 };
 
 exports.getPatientQueue = async (userId) => {
@@ -17,7 +56,7 @@ exports.getPatientQueue = async (userId) => {
         JOIN users u ON d.user_id = u.id
         JOIN doctor_schedules ds ON a.schedule_id = ds.id
         WHERE p.user_id = ? AND a.appointment_date = ? 
-        AND a.status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN')
+        AND a.status IN ('PENDING', 'CONFIRMED', 'WAITING', 'CALLED')
         ORDER BY a.appointment_time ASC
         LIMIT 1
     `, [userId, today]);
@@ -33,7 +72,7 @@ exports.getPatientQueue = async (userId) => {
     const [currentQueueRes] = await pool.query(`
         SELECT MIN(queue_number) as current_queue
         FROM appointments
-        WHERE doctor_id = ? AND appointment_date = ? AND status IN ('CHECKED_IN', 'IN_CONSULTATION')
+        WHERE doctor_id = ? AND appointment_date = ? AND status IN ('CALLED', 'IN_CONSULTATION')
     `, [appointment.doctor_id, today]);
 
     // If no one is checked in or in consultation, current queue might be the next pending
@@ -42,7 +81,7 @@ exports.getPatientQueue = async (userId) => {
         const [nextPending] = await pool.query(`
             SELECT MIN(queue_number) as next_q
             FROM appointments
-            WHERE doctor_id = ? AND appointment_date = ? AND status IN ('PENDING', 'CONFIRMED')
+            WHERE doctor_id = ? AND appointment_date = ? AND status IN ('PENDING', 'CONFIRMED', 'WAITING')
         `, [appointment.doctor_id, today]);
         current_queue = nextPending[0].next_q || 0;
     }
@@ -53,7 +92,7 @@ exports.getPatientQueue = async (userId) => {
         SELECT COUNT(*) as count
         FROM appointments
         WHERE doctor_id = ? AND appointment_date = ? 
-        AND status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'IN_CONSULTATION')
+        AND status IN ('WAITING')
         AND queue_number < ?
     `, [appointment.doctor_id, today, appointment.queue_number]);
 
@@ -91,8 +130,8 @@ exports.getDoctorQueue = async (userId) => {
         ORDER BY a.queue_number ASC
     `, [doctor_id, today]);
 
-    const currentPatient = appointments.find(a => a.status === 'IN_CONSULTATION') || appointments.find(a => a.status === 'CHECKED_IN');
-    const waitingPatients = appointments.filter(a => a.status === 'PENDING' || a.status === 'CONFIRMED' || (a.status === 'CHECKED_IN' && a.id !== currentPatient?.id));
+    const currentPatient = appointments.find(a => a.status === 'IN_CONSULTATION' || a.status === 'CALLED');
+    const waitingPatients = appointments.filter(a => a.status === 'WAITING' || a.status === 'CHECKED_IN');
     const nextPatient = waitingPatients.length > 0 ? waitingPatients[0] : null;
 
     return {

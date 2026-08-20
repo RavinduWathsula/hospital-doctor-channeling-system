@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { CalendarCheck, Users, Activity, CheckCircle, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import StateWrapper from '../../components/ui/StateWrapper';
 
 const DoctorDashboard = () => {
     const { token, user } = useContext(AuthContext);
@@ -85,12 +86,8 @@ const DoctorDashboard = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-            </div>
-        );
+    if (loading && !todaySchedule && !currentPatient && stats.todayAppointments === 0) {
+        return <StateWrapper loading={true} />;
     }
 
     return (

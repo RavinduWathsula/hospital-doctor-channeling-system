@@ -54,9 +54,12 @@ const DoctorAppointments = () => {
         }
     };
 
-    const handleCall = (patientName) => {
-        // Placeholder for future calling feature
-        toast.success(`Calling ${patientName}...`);
+    const handleCall = async (id) => {
+        try {
+            await handleUpdateStatus(id, 'CALLED');
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const filteredAppointments = appointments.filter(app => 
@@ -66,13 +69,17 @@ const DoctorAppointments = () => {
 
     const getStatusBadge = (status) => {
         const styles = {
-            'SCHEDULED': 'bg-blue-100 text-blue-800',
-            'IN_PROGRESS': 'bg-orange-100 text-orange-800',
+            'PENDING': 'bg-yellow-100 text-yellow-800',
+            'CONFIRMED': 'bg-blue-100 text-blue-800',
+            'CHECKED_IN': 'bg-indigo-100 text-indigo-800',
+            'WAITING': 'bg-purple-100 text-purple-800',
+            'CALLED': 'bg-pink-100 text-pink-800',
+            'IN_CONSULTATION': 'bg-orange-100 text-orange-800',
             'COMPLETED': 'bg-green-100 text-green-800',
             'NO_SHOW': 'bg-red-100 text-red-800',
             'CANCELLED': 'bg-gray-100 text-gray-800'
         };
-        return <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${styles[status] || styles['SCHEDULED']}`}>{status}</span>;
+        return <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${styles[status] || 'bg-gray-100 text-gray-800'}`}>{status}</span>;
     };
 
     return (
@@ -144,26 +151,29 @@ const DoctorAppointments = () => {
                                                     <Eye size={18} />
                                                 </button>
                                                 
-                                                {app.status === 'SCHEDULED' && (
+                                                {['PENDING', 'CONFIRMED', 'CHECKED_IN', 'WAITING'].includes(app.status) && (
                                                     <>
                                                         <button 
                                                             title="Call Patient" 
-                                                            onClick={() => handleCall(`${app.patient_first_name} ${app.patient_last_name}`)}
+                                                            onClick={() => handleCall(app.id)}
                                                             className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
                                                         >
                                                             <Phone size={18} />
                                                         </button>
-                                                        <button 
-                                                            title="Start Consultation" 
-                                                            onClick={() => handleUpdateStatus(app.id, 'IN_PROGRESS')}
-                                                            className="p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
-                                                        >
-                                                            <PlayCircle size={18} />
-                                                        </button>
                                                     </>
                                                 )}
 
-                                                {app.status === 'IN_PROGRESS' && (
+                                                {app.status === 'CALLED' && (
+                                                    <button 
+                                                        title="Start Consultation" 
+                                                        onClick={() => handleUpdateStatus(app.id, 'IN_CONSULTATION')}
+                                                        className="p-2 text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+                                                    >
+                                                        <PlayCircle size={18} />
+                                                    </button>
+                                                )}
+
+                                                {app.status === 'IN_CONSULTATION' && (
                                                     <button 
                                                         title="Complete Consultation" 
                                                         onClick={() => handleUpdateStatus(app.id, 'COMPLETED')}
@@ -173,7 +183,7 @@ const DoctorAppointments = () => {
                                                     </button>
                                                 )}
 
-                                                {(app.status === 'SCHEDULED' || app.status === 'IN_PROGRESS') && (
+                                                {['PENDING', 'CONFIRMED', 'CHECKED_IN', 'WAITING', 'CALLED', 'IN_CONSULTATION'].includes(app.status) && (
                                                     <button 
                                                         title="Mark No Show" 
                                                         onClick={() => handleUpdateStatus(app.id, 'NO_SHOW')}

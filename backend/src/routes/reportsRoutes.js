@@ -9,4 +9,7 @@ router.use(requireRole('ADMIN'));
 // @route   GET /api/reports/dashboard-stats
 router.get('/dashboard-stats', reportsController.getDashboardStats);
 
+// @route   GET /api/reports/analytics
+router.get('/analytics', reportsController.getAnalytics);
+
 module.exports = router;

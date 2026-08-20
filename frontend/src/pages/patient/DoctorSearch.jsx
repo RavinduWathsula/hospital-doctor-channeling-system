@@ -3,6 +3,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MapPin, Briefcase, DollarSign } from 'lucide-react';
 import toast from 'react-hot-toast';
+import StateWrapper from '../../components/ui/StateWrapper';
 
 const DoctorSearch = () => {
     const { token } = useContext(AuthContext);
@@ -96,19 +97,11 @@ const DoctorSearch = () => {
             </div>
 
             {/* Results Grid */}
-            {isLoading ? (
-                <div className="flex justify-center items-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-            ) : doctors.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">No Doctors Found</h3>
-                    <p className="text-gray-500">Try adjusting your search criteria or clearing filters.</p>
-                    <button onClick={() => {setSearchTerm(''); setSelectedDept(''); setSelectedSpec(''); setTimeout(fetchDoctors, 100);}} className="mt-4 text-blue-600 font-semibold hover:underline">
-                        Clear all filters
-                    </button>
-                </div>
-            ) : (
+            <StateWrapper 
+                loading={isLoading} 
+                empty={doctors.length === 0 && !isLoading}
+                emptyMessage="No Doctors Found"
+            >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {doctors.map(doctor => (
                         <div key={doctor.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden flex flex-col">
@@ -142,14 +135,14 @@ const DoctorSearch = () => {
                             </div>
                             
                             <div className="p-4 bg-gray-50">
-                                <Link to={`/doctors/${doctor.id}`} className="block w-full py-2.5 text-center bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 rounded-xl font-semibold text-gray-700 transition-colors">
+                                <Link to={`/patient/doctors/${doctor.id}`} className="block w-full py-2.5 text-center bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 rounded-xl font-semibold text-gray-700 transition-colors shadow-sm">
                                     View Profile
                                 </Link>
                             </div>
                         </div>
                     ))}
                 </div>
-            )}
+            </StateWrapper>
         </div>
     );
 };

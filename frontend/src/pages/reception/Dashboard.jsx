@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { CalendarCheck, Users, CheckCircle, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
+import StateWrapper from '../../components/ui/StateWrapper';
 
 const ReceptionDashboard = () => {
     const { token, user } = useContext(AuthContext);
@@ -35,7 +37,7 @@ const ReceptionDashboard = () => {
             if (appData.success && appData.data) {
                 const todays = appData.data.filter(a => a.appointment_date.split('T')[0] === today);
                 todayApps = todays.length;
-                checkedIn = todays.filter(a => a.status === 'CHECKED_IN').length;
+                checkedIn = todays.filter(a => a.status === 'WAITING' || a.status === 'CHECKED_IN').length;
                 completed = todays.filter(a => a.status === 'COMPLETED').length;
             }
 
@@ -65,12 +67,8 @@ const ReceptionDashboard = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
-        );
+    if (loading && stats.todayAppointments === 0) {
+        return <StateWrapper loading={true} />;
     }
 
     return (

@@ -21,8 +21,19 @@ exports.markAsRead = async (id, userId) => {
 
 // Helper to create notifications internally
 exports.createNotification = async (userId, title, message) => {
+    // 1. Database In-App Notification
     await pool.query(`
         INSERT INTO notifications (user_id, title, message)
         VALUES (?, ?, ?)
     `, [userId, title, message]);
+
+    // 2. Future Architecture: Email Integration
+    // if (userHasEmailPreferences(userId)) {
+    //     await sendEmail(user.email, title, message);
+    // }
+
+    // 3. Future Architecture: SMS Integration
+    // if (userHasSmsPreferences(userId)) {
+    //     await sendSMS(user.phone, message);
+    // }
 };

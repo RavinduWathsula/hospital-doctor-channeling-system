@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const notificationsService = require('./notificationsService');
 
 exports.getAll = async () => {
     const [rows] = await pool.query(`
@@ -133,6 +134,17 @@ exports.createAppointment = async (userId, data) => {
 
         await connection.commit();
         
+        // Trigger Notification
+        const [doctorDetails] = await pool.query('SELECT first_name, last_name FROM users JOIN doctors ON users.id = doctors.user_id WHERE doctors.id = ?', [doctor_id]);
+        if (doctorDetails.length > 0) {
+            const docName = `Dr. ${doctorDetails[0].first_name} ${doctorDetails[0].last_name}`;
+            await notificationsService.createNotification(
+                userId,
+                'Appointment Booked',
+                `Your appointment with ${docName} on ${new Date(appointment_date).toLocaleDateString()} at ${appointment_time} (Queue #${queue_number}) has been booked successfully.`
+            );
+        }
+
         return result.insertId;
     } catch (error) {
         await connection.rollback();
@@ -151,7 +163,16 @@ exports.cancelAppointment = async (id, userId) => {
         WHERE a.id = ? AND p.user_id = ? AND a.status IN ('PENDING', 'CONFIRMED')
     `, [id, userId]);
 
-    return result.affectedRows > 0;
+    if (result.affectedRows > 0) {
+        await notificationsService.createNotification(
+            userId,
+            'Appointment Cancelled',
+            `Your appointment (ID: ${id}) has been cancelled successfully.`
+        );
+        return true;
+    }
+
+    return false;
 };
 
 exports.getDoctorAppointments = async (userId) => {
@@ -180,7 +201,32 @@ exports.updateAppointmentStatus = async (id, userId, status) => {
         WHERE a.id = ? AND d.user_id = ?
     `, [status, id, userId]);
     
-    return result.affectedRows > 0;
+    if (result.affectedRows > 0) {
+        // Fetch patient user_id to notify them
+        const [appDetails] = await pool.query(`
+            SELECT p.user_id, a.queue_number, u.first_name, u.last_name 
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN doctors d ON a.doctor_id = d.id
+            JOIN users u ON d.user_id = u.id
+            WHERE a.id = ?
+        `, [id]);
+
+        if (appDetails.length > 0) {
+            const patientUserId = appDetails[0].user_id;
+            const docName = `Dr. ${appDetails[0].first_name} ${appDetails[0].last_name}`;
+            
+            if (status === 'CALLED') {
+                await notificationsService.createNotification(patientUserId, 'Queue Update', `${docName} is calling Queue #${appDetails[0].queue_number}. It is your turn!`);
+            } else if (status === 'IN_CONSULTATION') {
+                await notificationsService.createNotification(patientUserId, 'Consultation Started', `Your consultation with ${docName} has started.`);
+            } else if (status === 'COMPLETED') {
+                await notificationsService.createNotification(patientUserId, 'Consultation Completed', `Your consultation with ${docName} is complete. Thank you!`);
+            }
+        }
+        return true;
+    }
+    return false;
 };
 
 exports.updateAppointmentStatusAdmin = async (id, status) => {
@@ -190,6 +236,34 @@ exports.updateAppointmentStatusAdmin = async (id, status) => {
         WHERE id = ?
     `, [status, id]);
     
-    return result.affectedRows > 0;
+    if (result.affectedRows > 0) {
+        // Fetch patient user_id
+        const [appDetails] = await pool.query(`
+            SELECT p.user_id, a.appointment_date, a.appointment_time, a.queue_number 
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            WHERE a.id = ?
+        `, [id]);
+
+        if (appDetails.length > 0) {
+            const patientUserId = appDetails[0].user_id;
+            
+            if (status === 'CONFIRMED') {
+                await notificationsService.createNotification(
+                    patientUserId, 
+                    'Appointment Confirmed', 
+                    `Your appointment on ${new Date(appDetails[0].appointment_date).toLocaleDateString()} at ${appDetails[0].appointment_time} has been confirmed.`
+                );
+            } else if (status === 'WAITING') {
+                await notificationsService.createNotification(
+                    patientUserId, 
+                    'Patient Checked In', 
+                    `You have been checked in for your appointment. Your Queue Number is #${appDetails[0].queue_number}.`
+                );
+            }
+        }
+        return true;
+    }
+    return false;
 };
 

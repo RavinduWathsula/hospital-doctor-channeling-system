@@ -64,12 +64,14 @@ const ReceptionAppointments = () => {
             'PENDING': 'bg-yellow-100 text-yellow-800',
             'CONFIRMED': 'bg-blue-100 text-blue-800',
             'CHECKED_IN': 'bg-indigo-100 text-indigo-800',
-            'IN_PROGRESS': 'bg-orange-100 text-orange-800',
+            'WAITING': 'bg-purple-100 text-purple-800',
+            'CALLED': 'bg-pink-100 text-pink-800',
+            'IN_CONSULTATION': 'bg-orange-100 text-orange-800',
             'COMPLETED': 'bg-green-100 text-green-800',
-            'CANCELLED': 'bg-gray-100 text-gray-800',
-            'NO_SHOW': 'bg-red-100 text-red-800'
+            'NO_SHOW': 'bg-red-100 text-red-800',
+            'CANCELLED': 'bg-gray-100 text-gray-800'
         };
-        return <span className={`px-2 py-1 rounded text-xs font-bold shadow-sm ${styles[status]}`}>{status}</span>;
+        return <span className={`px-2 py-1 rounded text-xs font-bold shadow-sm ${styles[status] || 'bg-gray-100 text-gray-800'}`}>{status}</span>;
     };
 
     return (
