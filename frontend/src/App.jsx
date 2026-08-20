@@ -37,6 +37,11 @@ import Appointments from './pages/patient/Appointments';
 import Queue from './pages/patient/Queue';
 import Notifications from './pages/Notifications';
 import Profile from './pages/patient/Profile';
+import Prescriptions from './pages/patient/Prescriptions';
+import LabResults from './pages/patient/LabResults';
+import Billing from './pages/patient/Billing';
+import FamilyMembers from './pages/patient/FamilyMembers';
+import Telemedicine from './pages/patient/Telemedicine';
 
 // Doctor Pages
 import DoctorLayout from './layouts/DoctorLayout';
@@ -96,6 +101,11 @@ function App() {
                 <Route path="/patient/queue" element={<Queue />} />
                 <Route path="/patient/notifications" element={<Notifications />} />
                 <Route path="/patient/profile" element={<Profile />} />
+                <Route path="/patient/prescriptions" element={<Prescriptions />} />
+                <Route path="/patient/labs" element={<LabResults />} />
+                <Route path="/patient/billing" element={<Billing />} />
+                <Route path="/patient/family" element={<FamilyMembers />} />
+                <Route path="/patient/telemedicine" element={<Telemedicine />} />
               </Route>
             </Route>
 

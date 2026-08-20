@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, Users, Calendar, Clock, Bell, UserCircle, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Clock, Bell, UserCircle, LogOut, Menu, X, Pill, FileBarChart, CreditCard, UserPlus, Video } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
@@ -19,7 +19,12 @@ const PatientLayout = () => {
         { name: 'Dashboard', path: '/patient/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'Find Doctors', path: '/patient/doctors', icon: <Users size={20} /> },
         { name: 'Appointments', path: '/patient/appointments', icon: <Calendar size={20} /> },
+        { name: 'Telemedicine', path: '/patient/telemedicine', icon: <Video size={20} /> },
+        { name: 'Prescriptions', path: '/patient/prescriptions', icon: <Pill size={20} /> },
+        { name: 'Lab Results', path: '/patient/labs', icon: <FileBarChart size={20} /> },
         { name: 'Live Queue', path: '/patient/queue', icon: <Clock size={20} /> },
+        { name: 'Billing', path: '/patient/billing', icon: <CreditCard size={20} /> },
+        { name: 'Family', path: '/patient/family', icon: <UserPlus size={20} /> },
         { name: 'Notifications', path: '/patient/notifications', icon: <Bell size={20} /> },
         { name: 'Profile', path: '/patient/profile', icon: <UserCircle size={20} /> },
     ];

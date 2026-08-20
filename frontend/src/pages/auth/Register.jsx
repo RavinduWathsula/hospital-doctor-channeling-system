@@ -2,11 +2,14 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const Register = () => {
     const { register, error, isLoading, user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [localError, setLocalError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     const [formData, setFormData] = useState({
         firstName: '',
@@ -40,22 +43,43 @@ const Register = () => {
 
         try {
             await register(formData);
+            // Redirect to login page to sign in manually
+            navigate('/login');
         } catch (err) {
             setLocalError(err.message || 'Registration failed');
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 py-12 relative font-sans selection:bg-blue-200">
+            {/* Global Background Blurs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/40 blur-[100px] animate-pulse"></div>
+                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-400/40 blur-[100px]"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-cyan-400/40 blur-[100px] animate-pulse"></div>
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNFMkU4RjAiIGZpbGwtb3BhY2l0eT0iMC4yIi8+PC9zdmc+')] opacity-60"></div>
+            </div>
+            <Link to="/" className="absolute top-6 left-6 md:top-10 md:left-10 text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 font-semibold z-20 bg-white/70 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-lg border border-white hover:shadow-xl hover:-translate-y-1 duration-300">
+                <ArrowLeft size={18} />
+                <span>Back to Home</span>
+            </Link>
+
             <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-4xl bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden border border-white/40"
+                className="w-full max-w-3xl relative z-10 group"
             >
-                <div className="p-8 md:p-12">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Create an Account</h2>
+                {/* Pulsing glow behind the box */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 animate-pulse"></div>
+                
+                {/* Gradient Border Wrapper */}
+                <div className="relative p-[2px] bg-gradient-to-br from-white via-blue-200 to-indigo-300 rounded-[2.5rem] shadow-2xl shadow-blue-900/20">
+                    {/* Inner content box */}
+                    <div className="bg-white/80 backdrop-blur-2xl rounded-[2.4rem] overflow-hidden w-full h-full relative z-10">
+                        <div className="p-8 md:p-10">
+                            <div className="text-center mb-10">
+                                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Create an Account</h2>
                         <p className="text-gray-500 mt-2">Register as a patient to book appointments</p>
                     </div>
 
@@ -117,11 +141,21 @@ const Register = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                                        <input type="password" name="password" minLength="6" required value={formData.password} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        <div className="relative">
+                                            <input type={showPassword ? "text" : "password"} name="password" minLength="6" required value={formData.password} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
-                                        <input type="password" name="confirmPassword" minLength="6" required value={formData.confirmPassword} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        <div className="relative">
+                                            <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" minLength="6" required value={formData.confirmPassword} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -157,9 +191,11 @@ const Register = () => {
                     <div className="mt-8 text-center text-sm text-gray-500">
                         Already have an account? <Link to="/login" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">Sign In here</Link>
                     </div>
+                    </div>
                 </div>
-            </motion.div>
-        </div>
+            </div>
+        </motion.div>
+    </div>
     );
 };
 

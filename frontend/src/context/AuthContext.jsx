@@ -92,16 +92,8 @@ export const AuthProvider = ({ children }) => {
                 throw new Error(data.message || 'Registration failed');
             }
 
-            localStorage.setItem('token', data.data.token);
-            setToken(data.data.token);
-            setUser({
-                id: data.data.id,
-                firstName: data.data.firstName,
-                lastName: data.data.lastName,
-                email: data.data.email,
-                role: data.data.role
-            });
-            return data.data;
+            // Successfully registered, but we don't automatically log them in
+            return true;
         } catch (err) {
             setError(err.message);
             throw err;

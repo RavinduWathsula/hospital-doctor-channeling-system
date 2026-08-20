@@ -2,10 +2,12 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [localError, setLocalError] = useState('');
     const { login, error, isLoading, user } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -40,16 +42,35 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 relative font-sans selection:bg-blue-200">
+            {/* Global Background Blurs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/40 blur-[100px] animate-pulse"></div>
+                <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-400/40 blur-[100px]"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-cyan-400/40 blur-[100px] animate-pulse"></div>
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNFMkU4RjAiIGZpbGwtb3BhY2l0eT0iMC4yIi8+PC9zdmc+')] opacity-60"></div>
+            </div>
+            <Link to="/" className="absolute top-6 left-6 md:top-10 md:left-10 text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-2 font-semibold z-20 bg-white/70 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-lg border border-white hover:shadow-xl hover:-translate-y-1 duration-300">
+                <ArrowLeft size={18} />
+                <span>Back to Home</span>
+            </Link>
+            
             <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-md bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden border border-white/40"
+                className="w-full max-w-lg relative z-10 group"
             >
-                <div className="p-8">
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome Back</h2>
+                {/* Pulsing glow behind the box */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 animate-pulse"></div>
+                
+                {/* Gradient Border Wrapper */}
+                <div className="relative p-[2px] bg-gradient-to-br from-white via-blue-200 to-indigo-300 rounded-[2.5rem] shadow-2xl shadow-blue-900/20">
+                    {/* Inner content box */}
+                    <div className="bg-white/80 backdrop-blur-2xl rounded-[2.4rem] overflow-hidden w-full h-full relative z-10">
+                        <div className="p-10 md:p-14">
+                            <div className="text-center mb-8">
+                                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome Back</h2>
                         <p className="text-gray-500 mt-2">Sign in to your Smart Hospital account</p>
                     </div>
 
@@ -79,15 +100,24 @@ const Login = () => {
                                 <label className="block text-sm font-medium text-gray-700">Password</label>
                                 <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">Forgot password?</Link>
                             </div>
-                            <input 
-                                type="password" 
-                                required 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                autoComplete="new-password"
-                                className="w-full px-5 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input 
+                                    type={showPassword ? "text" : "password"}
+                                    required 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    autoComplete="new-password"
+                                    className="w-full pl-5 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                                    placeholder="••••••••"
+                                />
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
 
                         <button 
@@ -109,7 +139,9 @@ const Login = () => {
                     
                     <div className="mt-8 text-center text-sm text-gray-500">
                         Don't have an account? <Link to="/register" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">Register as a Patient</Link>
+                        </div>
                     </div>
+                </div>
                 </div>
             </motion.div>
         </div>

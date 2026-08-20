@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Bell, Users, ArrowRight, Activity, ActivityIcon, PlusCircle, FileText, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Bell, Users, ArrowRight, Activity, ActivityIcon, PlusCircle, FileText, ChevronRight, Video, Pill, FileBarChart, CreditCard, HeartPulse, UserPlus, Download } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import StateWrapper from '../../components/ui/StateWrapper';
 import { motion } from 'framer-motion';
 
@@ -69,6 +70,34 @@ const Dashboard = () => {
 
     const nextAppointment = upcomingAppointments.length > 0 ? upcomingAppointments[0] : null;
     const isToday = nextAppointment && new Date(nextAppointment.appointment_date).toDateString() === new Date().toDateString();
+
+    // --- MOCK DATA FOR NEW FEATURES ---
+    const vitalsData = [
+        { name: 'Jan', bp: 120, heartRate: 72 },
+        { name: 'Feb', bp: 118, heartRate: 70 },
+        { name: 'Mar', bp: 122, heartRate: 75 },
+        { name: 'Apr', bp: 115, heartRate: 68 },
+        { name: 'May', bp: 112, heartRate: 71 },
+        { name: 'Jun', bp: 116, heartRate: 72 },
+    ];
+
+    const mockPrescriptions = [
+        { id: 1, name: 'Amoxicillin 500mg', instruction: '1 Pill - After Breakfast', daysLeft: 4, type: 'Antibiotic' },
+        { id: 2, name: 'Loratadine 10mg', instruction: '1 Pill - Before Bed', daysLeft: 12, type: 'Allergy' }
+    ];
+
+    const mockLabs = [
+        { id: 1, test: 'Complete Blood Count', date: 'Aug 10, 2026', status: 'Available' },
+        { id: 2, test: 'Lipid Panel', date: 'Aug 10, 2026', status: 'Available' }
+    ];
+
+    const mockBilling = { outstanding: 0, lastPayment: 4500, lastPaymentDate: 'Aug 15, 2026' };
+
+    const mockDependents = [
+        { id: 1, name: 'Sarah (Daughter)', age: 8, avatar: 'Molly' },
+        { id: 2, name: 'John (Father)', age: 65, avatar: 'Felix' }
+    ];
+    // ----------------------------------
 
     // Animation Variants
     const containerVariants = {
@@ -167,8 +196,14 @@ const Dashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-10">
-                                        <Link to={`/patient/appointments`} className="inline-flex items-center px-8 py-4 bg-white text-teal-700 font-extrabold rounded-2xl hover:bg-teal-50 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:scale-[1.02]">
+                                    <div className="mt-10 flex flex-wrap gap-4">
+                                        {isToday && (
+                                            <button className="inline-flex items-center px-8 py-4 bg-rose-500 text-white font-extrabold rounded-2xl hover:bg-rose-400 transition-all shadow-[0_0_20px_rgba(244,63,94,0.4)] hover:shadow-[0_0_30px_rgba(244,63,94,0.6)] hover:-translate-y-0.5 group/btn">
+                                                <Video size={20} className="mr-3 group-hover/btn:animate-pulse" />
+                                                Join Video Call
+                                            </button>
+                                        )}
+                                        <Link to={`/patient/appointments`} className="inline-flex items-center px-8 py-4 bg-white/20 backdrop-blur-md text-white font-extrabold rounded-2xl hover:bg-white/30 transition-all border border-white/30 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                             View Details <ArrowRight size={20} className="ml-3" />
                                         </Link>
                                     </div>
@@ -187,6 +222,93 @@ const Dashboard = () => {
                             </div>
                         )}
                     </motion.div>
+
+                    {/* Health Vitals Chart (Recharts) */}
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center">
+                                <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mr-4">
+                                    <HeartPulse size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black text-slate-800 tracking-tight">Health Vitals</h3>
+                                    <p className="text-sm font-semibold text-slate-500">Blood Pressure (Last 6 Months)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="h-72 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={vitalsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorBp" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#0d9488" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#0d9488" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} domain={['auto', 'auto']} />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold' }}
+                                        itemStyle={{ color: '#0f172a' }}
+                                    />
+                                    <Area type="monotone" dataKey="bp" stroke="#0d9488" strokeWidth={4} fillOpacity={1} fill="url(#colorBp)" activeDot={{ r: 8, strokeWidth: 0, fill: '#0d9488' }} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </motion.div>
+
+                    {/* Prescriptions & Lab Results Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Active Prescriptions */}
+                        <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-black text-slate-800 tracking-tight">Active Meds</h3>
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Pill size={20} />
+                                </div>
+                            </div>
+                            <div className="space-y-4 flex-1">
+                                {mockPrescriptions.map(med => (
+                                    <div key={med.id} className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center group hover:border-indigo-200 transition-colors">
+                                        <div>
+                                            <h4 className="font-bold text-slate-800">{med.name}</h4>
+                                            <p className="text-xs text-slate-500 font-semibold">{med.instruction}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded-md">{med.daysLeft}d left</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="w-full mt-6 py-3 bg-white border-2 border-indigo-100 text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-sm">
+                                Request Refill
+                            </button>
+                        </motion.div>
+
+                        {/* Recent Lab Results */}
+                        <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-black text-slate-800 tracking-tight">Lab Results</h3>
+                                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                                    <FileBarChart size={20} />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                {mockLabs.map(lab => (
+                                    <div key={lab.id} className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center group hover:border-blue-200 transition-colors">
+                                        <div>
+                                            <h4 className="font-bold text-slate-800">{lab.test}</h4>
+                                            <p className="text-xs text-slate-500 font-semibold">{lab.date}</p>
+                                        </div>
+                                        <button className="w-9 h-9 bg-white border border-slate-200 text-slate-400 rounded-lg flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors shadow-sm">
+                                            <Download size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
 
                     {/* Recent Appointments */}
                     <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white">
@@ -258,6 +380,54 @@ const Dashboard = () => {
                                     </div>
                                     <span className="text-sm font-bold text-slate-700 text-center tracking-wide">{action.label}</span>
                                 </Link>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    {/* Billing & Payments */}
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -z-10 opacity-60"></div>
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-black text-slate-800 tracking-tight">Billing & Payments</h3>
+                            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                                <CreditCard size={20} />
+                            </div>
+                        </div>
+                        <div className="mb-6">
+                            <p className="text-sm font-semibold text-slate-500 mb-1">Outstanding Balance</p>
+                            <h2 className="text-4xl font-black text-slate-800 tracking-tight">LKR {mockBilling.outstanding.toLocaleString()}</h2>
+                        </div>
+                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center mb-6">
+                            <div>
+                                <p className="text-xs text-slate-500 font-semibold">Last Payment</p>
+                                <h4 className="font-bold text-slate-800">LKR {mockBilling.lastPayment.toLocaleString()}</h4>
+                            </div>
+                            <span className="text-xs font-bold text-slate-400">{mockBilling.lastPaymentDate}</span>
+                        </div>
+                        <button className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
+                            Make a Payment
+                        </button>
+                    </motion.div>
+
+                    {/* Family Members / Dependents */}
+                    <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-black text-slate-800 tracking-tight">Family Members</h3>
+                            <button className="text-sm font-bold text-teal-600 hover:text-teal-700 bg-teal-50 px-3 py-1.5 rounded-full flex items-center transition-colors">
+                                <UserPlus size={16} className="mr-1" /> Add
+                            </button>
+                        </div>
+                        <div className="space-y-4">
+                            {mockDependents.map(dep => (
+                                <div key={dep.id} className="flex items-center p-3 hover:bg-slate-50 rounded-2xl transition-colors cursor-pointer group">
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 font-bold text-lg mr-4 border border-indigo-200 shadow-sm group-hover:scale-105 transition-transform">
+                                        {dep.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-800 text-sm">{dep.name}</h4>
+                                        <p className="text-xs font-semibold text-slate-500">{dep.age} years old</p>
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </motion.div>
