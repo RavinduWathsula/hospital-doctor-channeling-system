@@ -24,13 +24,33 @@ import AdminReports from './pages/admin/Reports';
 import AdminSettings from './pages/admin/Settings';
 
 // Patient Pages
+import PatientLayout from './layouts/PatientLayout';
+import Dashboard from './pages/patient/Dashboard';
 import PatientDoctorSearch from './pages/patient/DoctorSearch';
 import PatientDoctorProfile from './pages/patient/DoctorProfile';
+import Booking from './pages/patient/Booking';
+import BookingConfirmation from './pages/patient/BookingConfirmation';
+import Appointments from './pages/patient/Appointments';
+import Queue from './pages/patient/Queue';
+import Notifications from './pages/patient/Notifications';
+import Profile from './pages/patient/Profile';
 
-// Dummy Dashboard Components for other roles
-const PatientDashboard = () => <div className="p-8 text-2xl font-bold text-center">Patient Dashboard</div>;
-const DoctorDashboard = () => <div className="p-8 text-2xl font-bold text-center">Doctor Dashboard</div>;
-const ReceptionDashboard = () => <div className="p-8 text-2xl font-bold text-center">Reception Dashboard</div>;
+// Doctor Pages
+import DoctorLayout from './layouts/DoctorLayout';
+import DoctorDashboard from './pages/doctor/Dashboard';
+import DoctorAppointments from './pages/doctor/Appointments';
+import DoctorQueue from './pages/doctor/Queue';
+import DoctorPatients from './pages/doctor/Patients';
+import DoctorProfile from './pages/doctor/Profile';
+import DoctorSchedules from './pages/doctor/Schedules';
+
+// Reception Pages
+import ReceptionLayout from './layouts/ReceptionLayout';
+import ReceptionDashboard from './pages/reception/Dashboard';
+import ReceptionPatients from './pages/reception/Patients';
+import ReceptionAppointments from './pages/reception/Appointments';
+import ReceptionCheckIn from './pages/reception/CheckIn';
+import ReceptionQueue from './pages/reception/Queue';
 
 function App() {
   return (
@@ -62,19 +82,40 @@ function App() {
 
             {/* Protected Patient Routes */}
             <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
-              <Route path="/patient/dashboard" element={<PatientDashboard />} />
-              <Route path="/patient/doctors" element={<PatientDoctorSearch />} />
-              <Route path="/patient/doctors/:id" element={<PatientDoctorProfile />} />
+              <Route element={<PatientLayout />}>
+                <Route path="/patient/dashboard" element={<Dashboard />} />
+                <Route path="/patient/doctors" element={<PatientDoctorSearch />} />
+                <Route path="/patient/doctors/:id" element={<PatientDoctorProfile />} />
+                <Route path="/book/:id" element={<Booking />} />
+                <Route path="/confirmation/:id" element={<BookingConfirmation />} />
+                <Route path="/patient/appointments" element={<Appointments />} />
+                <Route path="/patient/queue" element={<Queue />} />
+                <Route path="/patient/notifications" element={<Notifications />} />
+                <Route path="/patient/profile" element={<Profile />} />
+              </Route>
             </Route>
 
             {/* Protected Doctor Routes */}
             <Route element={<ProtectedRoute allowedRoles={['DOCTOR']} />}>
-              <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+              <Route element={<DoctorLayout />}>
+                <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+                <Route path="/doctor/appointments" element={<DoctorAppointments />} />
+                <Route path="/doctor/queue" element={<DoctorQueue />} />
+                <Route path="/doctor/schedules" element={<DoctorSchedules />} />
+                <Route path="/doctor/patients" element={<DoctorPatients />} />
+                <Route path="/doctor/profile" element={<DoctorProfile />} />
+              </Route>
             </Route>
 
             {/* Protected Reception Routes */}
             <Route element={<ProtectedRoute allowedRoles={['RECEPTIONIST']} />}>
-              <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
+              <Route element={<ReceptionLayout />}>
+                <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
+                <Route path="/reception/patients" element={<ReceptionPatients />} />
+                <Route path="/reception/appointments" element={<ReceptionAppointments />} />
+                <Route path="/reception/check-in" element={<ReceptionCheckIn />} />
+                <Route path="/reception/queue" element={<ReceptionQueue />} />
+              </Route>
             </Route>
 
             {/* Catch All */}

@@ -13,10 +13,10 @@ const daysOfWeek = [
     { id: 7, name: 'Sunday' }
 ];
 
-const Schedules = () => {
+const DoctorSchedules = () => {
     const { token } = useContext(AuthContext);
     const [schedules, setSchedules] = useState([]);
-    const [doctors, setDoctors] = useState([]);
+    const [doctorId, setDoctorId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editId, setEditId] = useState(null);
@@ -32,22 +32,36 @@ const Schedules = () => {
     });
 
     useEffect(() => {
-        fetchSchedules();
-        fetchDoctors();
+        fetchDoctorProfile();
     }, []);
 
-    const fetchSchedules = () => {
-        fetch('http://localhost:5000/api/schedules', { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(res => res.json())
-            .then(data => { if(data.success) setSchedules(data.data); })
-            .catch(() => toast.error('Error fetching schedules'));
+    useEffect(() => {
+        if (doctorId) {
+            fetchSchedules();
+        }
+    }, [doctorId]);
+
+    const fetchDoctorProfile = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/doctors/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success && data.data) {
+                setDoctorId(data.data.id);
+            } else {
+                toast.error('Could not load doctor profile');
+            }
+        } catch {
+            toast.error('Error fetching profile');
+        }
     };
 
-    const fetchDoctors = () => {
-        fetch('http://localhost:5000/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } })
+    const fetchSchedules = () => {
+        fetch(`http://localhost:5000/api/schedules/doctor/${doctorId}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
-            .then(data => { if(data.success) setDoctors(data.data); })
-            .catch(() => toast.error('Error fetching doctors'));
+            .then(data => { if (data.success) setSchedules(data.data); })
+            .catch(() => toast.error('Error fetching schedules'));
     };
 
     const handleInputChange = (e) => {
@@ -59,7 +73,7 @@ const Schedules = () => {
         setIsEditMode(false);
         setEditId(null);
         setFormData({
-            doctor_id: doctors.length > 0 ? doctors[0].id : '',
+            doctor_id: doctorId,
             day_of_week: 1,
             start_time: '09:00',
             end_time: '17:00',
@@ -137,9 +151,9 @@ const Schedules = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-6xl mx-auto mt-8">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Schedules Management</h2>
+                <h2 className="text-2xl font-bold text-gray-800">My Weekly Schedules</h2>
                 <button onClick={openCreateModal} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     <Plus size={18} className="mr-2" /> Add Schedule
                 </button>
@@ -149,7 +163,6 @@ const Schedules = () => {
                 <table className="w-full text-left text-sm text-gray-600">
                     <thead className="bg-gray-50 text-gray-700 uppercase border-b">
                         <tr>
-                            <th className="px-4 py-3">Doctor</th>
                             <th className="px-4 py-3">Day</th>
                             <th className="px-4 py-3">Time</th>
                             <th className="px-4 py-3">Duration</th>
@@ -161,7 +174,6 @@ const Schedules = () => {
                     <tbody>
                         {schedules.map(s => (
                             <tr key={s.id} className="border-b hover:bg-gray-50">
-                                <td className="px-4 py-3 font-medium text-gray-900">Dr. {s.first_name} {s.last_name}</td>
                                 <td className="px-4 py-3 font-semibold">{getDayName(s.day_of_week)}</td>
                                 <td className="px-4 py-3">{s.start_time} - {s.end_time}</td>
                                 <td className="px-4 py-3">{s.slot_duration_minutes} min</td>
@@ -183,7 +195,7 @@ const Schedules = () => {
                         ))}
                         {schedules.length === 0 && (
                             <tr>
-                                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">No schedules found.</td>
+                                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">No schedules found.</td>
                             </tr>
                         )}
                     </tbody>
@@ -203,15 +215,6 @@ const Schedules = () => {
                         
                         <div className="p-6">
                             <form id="scheduleForm" onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Doctor *</label>
-                                    <select name="doctor_id" required value={formData.doctor_id} onChange={handleInputChange} disabled={isEditMode} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
-                                        <option value="">Select Doctor</option>
-                                        {doctors.map(d => (
-                                            <option key={d.id} value={d.id}>Dr. {d.first_name} {d.last_name}</option>
-                                        ))}
-                                    </select>
-                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Day of Week *</label>
                                     <select name="day_of_week" required value={formData.day_of_week} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -262,4 +265,4 @@ const Schedules = () => {
         </div>
     );
 };
-export default Schedules;
+export default DoctorSchedules;

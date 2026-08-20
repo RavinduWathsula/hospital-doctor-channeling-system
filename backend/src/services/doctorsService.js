@@ -22,6 +22,17 @@ exports.getById = async (id) => {
     return rows[0] || null;
 };
 
+exports.getByUserId = async (userId) => {
+    const [rows] = await pool.query(`
+        SELECT d.*, u.first_name, u.last_name, u.email, u.phone, u.nic, u.profile_image, dept.name as department_name 
+        FROM doctors d
+        JOIN users u ON d.user_id = u.id
+        JOIN departments dept ON d.department_id = dept.id
+        WHERE d.user_id = ?
+    `, [userId]);
+    return rows[0] || null;
+};
+
 exports.create = async (doctorData) => {
     const connection = await pool.getConnection();
     await connection.beginTransaction();

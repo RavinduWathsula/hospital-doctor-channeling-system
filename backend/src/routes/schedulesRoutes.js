@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const schedulesController = require('../controllers/schedulesController');
-const { protect } = require('../middleware/authMiddleware');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
 
-// Define routes
-router.get('/', schedulesController.getAll);
+router.use(authenticateToken);
+
+// Admin and Doctor routes
+router.get('/', requireRole('ADMIN'), schedulesController.getAll);
+router.get('/doctor/:doctorId', requireRole('ADMIN', 'DOCTOR'), schedulesController.getByDoctor);
+router.post('/', requireRole('ADMIN', 'DOCTOR'), schedulesController.create);
+router.put('/:id', requireRole('ADMIN', 'DOCTOR'), schedulesController.update);
+router.delete('/:id', requireRole('ADMIN', 'DOCTOR'), schedulesController.delete);
 
 module.exports = router;

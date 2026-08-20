@@ -80,7 +80,7 @@ const DoctorProfile = () => {
                                 </div>
                             </div>
                             <div className="mt-6 md:mt-0">
-                                <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 w-full md:w-auto flex items-center justify-center">
+                                <button onClick={() => navigate(`/book/${doctor.id}`)} className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 w-full md:w-auto flex items-center justify-center">
                                     <Calendar size={18} className="mr-2" /> Book Appointment
                                 </button>
                             </div>
