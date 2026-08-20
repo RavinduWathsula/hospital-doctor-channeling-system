@@ -15,12 +15,28 @@ router.get('/:id', doctorsController.getById);
 router.get('/:id/availability', doctorsController.getAvailability);
 router.get('/:id/slots', doctorsController.getSlots);
 
+const multer = require('multer');
+const path = require('path');
+
+// Configure multer for profile image uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
 // Admin only routes
 router.use(authenticateToken);
 router.use(requireRole('ADMIN'));
 
 router.get('/', doctorsController.getAll);
-router.post('/', doctorsController.create);
+router.post('/', upload.single('profileImage'), doctorsController.create);
+router.put('/:id', upload.single('profileImage'), doctorsController.update);
 router.patch('/:id/status', doctorsController.updateStatus);
 
 module.exports = router;

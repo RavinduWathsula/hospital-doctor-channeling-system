@@ -16,16 +16,21 @@ const Login = () => {
     useEffect(() => {
         if (user) {
             // Redirect based on role
-            const from = location.state?.from?.pathname;
+            let from = location.state?.from?.pathname;
+            // Prevent redirecting back to auth pages
+            if (from === '/login' || from === '/register') {
+                from = null;
+            }
+
             if (from) {
-                navigate(from);
+                navigate(from, { replace: true });
             } else {
                 switch (user.role) {
-                    case 'PATIENT': navigate('/patient/dashboard'); break;
-                    case 'DOCTOR': navigate('/doctor/dashboard'); break;
-                    case 'RECEPTIONIST': navigate('/reception/dashboard'); break;
-                    case 'ADMIN': navigate('/admin/dashboard'); break;
-                    default: navigate('/');
+                    case 'PATIENT': navigate('/patient/dashboard', { replace: true }); break;
+                    case 'DOCTOR': navigate('/doctor/dashboard', { replace: true }); break;
+                    case 'RECEPTIONIST': navigate('/reception/dashboard', { replace: true }); break;
+                    case 'ADMIN': navigate('/admin/dashboard', { replace: true }); break;
+                    default: navigate('/', { replace: true });
                 }
             }
         }

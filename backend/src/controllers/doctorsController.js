@@ -33,10 +33,29 @@ exports.getMe = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
+        if (req.file) {
+            req.body.profileImage = 'http://localhost:5000/uploads/' + req.file.filename;
+        }
         const insertId = await doctorsService.create(req.body);
         res.status(201).json({ success: true, data: { id: insertId }, message: 'Doctor created successfully' });
     } catch (error) {
         // If email or registration number already exists, catch it
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ success: false, message: 'Email or Registration Number already exists' });
+        }
+        next(error);
+    }
+};
+
+exports.update = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        if (req.file) {
+            req.body.profileImage = 'http://localhost:5000/uploads/' + req.file.filename;
+        }
+        await doctorsService.update(id, req.body);
+        res.status(200).json({ success: true, message: 'Doctor updated successfully' });
+    } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ success: false, message: 'Email or Registration Number already exists' });
         }

@@ -79,6 +79,58 @@ exports.create = async (doctorData) => {
     }
 };
 
+exports.update = async (id, doctorData) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+    try {
+        const [rows] = await connection.query('SELECT user_id FROM doctors WHERE id = ?', [id]);
+        if (rows.length === 0) throw new Error('Doctor not found');
+        const userId = rows[0].user_id;
+
+        // 1. Update User
+        let userQuery = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?';
+        let userParams = [doctorData.firstName, doctorData.lastName, doctorData.email, doctorData.phone];
+        
+        if (doctorData.password) {
+            const hashedPassword = await bcrypt.hash(doctorData.password, 10);
+            userQuery += ', password_hash = ?';
+            userParams.push(hashedPassword);
+        }
+        if (doctorData.profileImage) {
+            userQuery += ', profile_image = ?';
+            userParams.push(doctorData.profileImage);
+        }
+        userQuery += ' WHERE id = ?';
+        userParams.push(userId);
+        
+        await connection.query(userQuery, userParams);
+
+        // 2. Update Doctor
+        await connection.query(`
+            UPDATE doctors 
+            SET department_id = ?, specialization = ?, qualification = ?, experience_years = ?, consultation_fee = ?, registration_number = ?, biography = ?
+            WHERE id = ?
+        `, [
+            doctorData.departmentId,
+            doctorData.specialization,
+            doctorData.qualification,
+            doctorData.experienceYears || 0,
+            doctorData.consultationFee,
+            doctorData.registrationNumber,
+            doctorData.biography || null,
+            id
+        ]);
+
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 exports.updateStatus = async (id, isActive) => {
     // Optionally, could update the linked user as well. We'll stick to doctor table for now.
     await pool.query('UPDATE doctors SET is_active = ? WHERE id = ?', [isActive, id]);

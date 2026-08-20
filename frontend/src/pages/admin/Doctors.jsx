@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Plus, X, Search, ShieldCheck, UserPlus, FileText, ChevronRight, CheckCircle, XCircle } from 'lucide-react';
-import StateWrapper from '../../components/ui/StateWrapper';
+import { Plus, X, Search, ShieldCheck, UserPlus, Stethoscope, BadgeDollarSign, Building2, CheckCircle, XCircle, Sparkles, Star, HeartPulse } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,6 +11,9 @@ const Doctors = () => {
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentDocId, setCurrentDocId] = useState(null);
+    const [profileImageFile, setProfileImageFile] = useState(null);
+    const [profileImagePreview, setProfileImagePreview] = useState(null);
     
     // Form state
     const [formData, setFormData] = useState({
@@ -56,30 +58,71 @@ const Doctors = () => {
         } catch { toast.error('Error updating status'); }
     };
 
+    const openModal = (doc = null) => {
+        if (doc) {
+            setCurrentDocId(doc.id);
+            setProfileImagePreview(doc.profile_image || null);
+            setProfileImageFile(null);
+            setFormData({
+                firstName: doc.first_name || '', lastName: doc.last_name || '', email: doc.email || '', 
+                password: '', phone: doc.phone || '', profileImage: doc.profile_image || '',
+                registrationNumber: doc.registration_number || '', specialization: doc.specialization || '', 
+                departmentId: doc.department_id || '', qualification: doc.qualification || '',
+                experienceYears: doc.experience_years || '', consultationFee: doc.consultation_fee || '', biography: doc.biography || ''
+            });
+        } else {
+            setCurrentDocId(null);
+            setProfileImagePreview(null);
+            setProfileImageFile(null);
+            setFormData({
+                firstName: '', lastName: '', email: '', password: '', phone: '', profileImage: '',
+                registrationNumber: '', specialization: '', departmentId: '', qualification: '',
+                experienceYears: '', consultationFee: '', biography: ''
+            });
+        }
+        setIsModalOpen(true);
+    };
+
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfileImageFile(file);
+            setProfileImagePreview(URL.createObjectURL(file));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/doctors', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(formData)
+            const method = currentDocId ? 'PUT' : 'POST';
+            const url = currentDocId ? `http://localhost:5000/api/doctors/${currentDocId}` : 'http://localhost:5000/api/doctors';
+            
+            const payload = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (key === 'password' && currentDocId && !formData[key]) return; // Skip empty password on update
+                if (key !== 'profileImage') payload.append(key, formData[key]);
+            });
+            
+            if (profileImageFile) {
+                payload.append('profileImage', profileImageFile);
+            }
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Authorization': `Bearer ${token}` }, // Browser automatically sets Content-Type to multipart/form-data with boundary
+                body: payload
             });
             const data = await res.json();
             if(data.success) {
-                toast.success('Doctor created successfully');
+                toast.success(`Doctor ${currentDocId ? 'updated' : 'created'} successfully`);
                 setIsModalOpen(false);
                 fetchDoctors();
-                setFormData({
-                    firstName: '', lastName: '', email: '', password: '', phone: '', profileImage: '',
-                    registrationNumber: '', specialization: '', departmentId: '', qualification: '',
-                    experienceYears: '', consultationFee: '', biography: ''
-                });
             } else {
-                toast.error(data.message || 'Error creating doctor');
+                toast.error(data.message || `Error ${currentDocId ? 'updating' : 'creating'} doctor`);
             }
         } catch {
             toast.error('Server error');
@@ -88,26 +131,28 @@ const Doctors = () => {
 
     const filtered = doctors.filter(d => (d.first_name + ' ' + d.last_name + ' ' + d.specialization + ' ' + d.registration_number).toLowerCase().includes(search.toLowerCase()));
 
-    const tableVariants = {
+    const containerVariants = {
         hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05 }
-        }
+        show: { opacity: 1, transition: { staggerChildren: 0.1 } }
     };
 
-    const rowVariants = {
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.4 } }
     };
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-8 pb-10">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Doctors Directory</h1>
-                    <p className="text-slate-500 font-medium mt-1">Manage hospital medical staff, specialties, and access.</p>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tight flex items-center">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 mr-4">
+                            <Stethoscope size={24} />
+                        </div>
+                        Medical Staff Directory
+                    </h1>
+                    <p className="text-slate-500 font-medium mt-2">Manage hospital medical professionals, specialties, and access.</p>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
@@ -120,11 +165,11 @@ const Doctors = () => {
                             placeholder="Search doctors..." 
                             value={search} 
                             onChange={e => setSearch(e.target.value)} 
-                            className="w-full sm:w-64 pl-11 pr-4 py-3 bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm" 
+                            className="w-full sm:w-80 pl-11 pr-4 py-3 bg-white/70 backdrop-blur-xl border border-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)]" 
                         />
                     </div>
                     <button 
-                        onClick={() => setIsModalOpen(true)} 
+                        onClick={() => openModal()} 
                         className="flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
                     >
                         <UserPlus size={20} className="mr-2" /> Add Doctor
@@ -132,206 +177,251 @@ const Doctors = () => {
                 </div>
             </div>
 
-            {/* Main Table Container */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white overflow-hidden relative">
-                
-                {isLoading ? (
-                    <div className="p-12 text-center">
-                        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-slate-500 font-medium">Loading doctors directory...</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm text-slate-600">
-                            <thead className="bg-slate-50/50 backdrop-blur-md text-slate-500 uppercase tracking-widest text-xs font-bold border-b border-slate-100">
-                                <tr>
-                                    <th className="px-6 py-5">Profile</th>
-                                    <th className="px-6 py-5">Name & Specialization</th>
-                                    <th className="px-6 py-5">Reg. No</th>
-                                    <th className="px-6 py-5">Department</th>
-                                    <th className="px-6 py-5">Fee</th>
-                                    <th className="px-6 py-5">Status</th>
-                                    <th className="px-6 py-5 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <motion.tbody 
-                                variants={tableVariants}
-                                initial="hidden"
-                                animate="show"
-                            >
-                                {filtered.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="7" className="px-6 py-16 text-center">
-                                            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-inner rotate-3">
-                                                <Search size={32} className="text-slate-400" />
-                                            </div>
-                                            <h3 className="text-xl font-bold text-slate-800 mb-1">No doctors found</h3>
-                                            <p className="text-slate-500">There are no doctors matching your current search criteria.</p>
-                                        </td>
-                                    </tr>
-                                ) : filtered.map(d => (
-                                    <motion.tr variants={rowVariants} key={d.id} className="border-b border-slate-50 hover:bg-indigo-50/30 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-50 overflow-hidden shadow-sm border border-indigo-50 flex items-center justify-center">
-                                                {d.profile_image ? (
-                                                    <img src={d.profile_image} alt="Profile" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-lg font-black text-indigo-700">{d.first_name.charAt(0)}</span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-bold text-slate-800 text-base mb-0.5 group-hover:text-indigo-600 transition-colors">Dr. {d.first_name} {d.last_name}</div>
-                                            <div className="text-slate-500 text-xs font-semibold">{d.specialization}</div>
-                                        </td>
-                                        <td className="px-6 py-4 font-medium text-slate-600">
-                                            <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs border border-slate-200">{d.registration_number}</span>
-                                        </td>
-                                        <td className="px-6 py-4 font-semibold text-slate-700">{d.department_name}</td>
-                                        <td className="px-6 py-4 font-bold text-emerald-600">${parseFloat(d.consultation_fee).toFixed(2)}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold tracking-wide ${
-                                                d.is_active 
-                                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-[0_0_10px_rgba(16,185,129,0.1)]' 
-                                                : 'bg-rose-50 text-rose-600 border border-rose-200'
-                                            }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full mr-2 ${d.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                                                {d.is_active ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button 
-                                                onClick={() => toggleStatus(d.id, d.is_active)} 
-                                                className={`inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                                                    d.is_active 
-                                                    ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 hover:shadow-md' 
-                                                    : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:shadow-md'
-                                                }`}
-                                            >
-                                                {d.is_active ? (
-                                                    <><XCircle size={16} className="mr-1.5" /> Deactivate</>
-                                                ) : (
-                                                    <><CheckCircle size={16} className="mr-1.5" /> Activate</>
-                                                )}
-                                            </button>
-                                        </td>
-                                    </motion.tr>
-                                ))}
-                            </motion.tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
+            {/* Doctors Grid */}
+            {isLoading ? (
+                <div className="p-20 text-center">
+                    <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-500 font-bold tracking-wide">Loading directory...</p>
+                </div>
+            ) : (
+                <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filtered.length === 0 ? (
+                        <div className="col-span-full py-20 text-center bg-white/50 backdrop-blur-xl border border-white border-dashed rounded-[3rem] shadow-sm">
+                            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Stethoscope size={32} className="text-slate-400" />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-700 tracking-tight mb-2">No Doctors Found</h3>
+                            <p className="text-slate-500 font-medium">Try adjusting your search criteria.</p>
+                        </div>
+                    ) : filtered.map(doctor => (
+                        <motion.div variants={cardVariants} key={doctor.id} className="bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all group flex flex-col relative overflow-hidden">
+                            {/* Decorative Background */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-indigo-500/10 transition-colors"></div>
+                            
+                            {/* Header: Avatar & Name */}
+                            <div className="flex items-start justify-between mb-6 relative z-10">
+                                <div className="flex items-center">
+                                    <div className="relative">
+                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-50 flex items-center justify-center text-indigo-600 font-black text-2xl shadow-inner border border-indigo-100 mr-4 overflow-hidden">
+                                            {doctor.profile_image ? (
+                                                <img src={doctor.profile_image} alt="Doctor" className="w-full h-full object-cover" />
+                                            ) : (
+                                                doctor.first_name.charAt(0)
+                                            )}
+                                        </div>
+                                        <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center ${doctor.is_active ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black text-slate-800 tracking-tight">Dr. {doctor.first_name} {doctor.last_name}</h3>
+                                        <p className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block mt-1 border border-indigo-100">{doctor.specialization}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Doctor Details Grid */}
+                            <div className="grid grid-cols-2 gap-4 mb-6 relative z-10 flex-1">
+                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                                    <Building2 size={16} className="text-slate-400 mr-2" />
+                                    {doctor.department_name || 'N/A'}
+                                </div>
+                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                                    <BadgeDollarSign size={16} className="text-emerald-500 mr-2" />
+                                    ${parseFloat(doctor.consultation_fee).toFixed(2)}
+                                </div>
+                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 col-span-2">
+                                    <ShieldCheck size={16} className="text-slate-400 mr-2" />
+                                    Reg No: <span className="text-slate-500 font-medium ml-1 bg-white px-2 py-0.5 rounded border border-slate-200">{doctor.registration_number}</span>
+                                </div>
+                            </div>
 
-            {/* Premium Add Doctor Modal */}
+                            {/* Actions Footer */}
+                            <div className="pt-4 border-t border-slate-100 relative z-10 flex justify-between items-center">
+                                <span className={`text-xs font-black uppercase tracking-widest ${doctor.is_active ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                    {doctor.is_active ? 'Account Active' : 'Account Suspended'}
+                                </span>
+                                <div className="flex space-x-2">
+                                    <button 
+                                        onClick={() => openModal(doctor)}
+                                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => toggleStatus(doctor.id, doctor.is_active)}
+                                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center ${
+                                            doctor.is_active 
+                                            ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100' 
+                                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'
+                                        }`}
+                                    >
+                                        {doctor.is_active ? (
+                                            <><XCircle size={16} className="mr-1.5" /> Deactivate</>
+                                        ) : (
+                                            <><CheckCircle size={16} className="mr-1.5" /> Activate</>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            )}
+
+            {/* Split-Layout Premium Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-0">
-                        {/* Backdrop */}
-                        <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsModalOpen(false)}
-                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                        ></motion.div>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></motion.div>
                         
-                        {/* Modal Dialog */}
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            transition={{ type: "spring", duration: 0.5, bounce: 0 }}
-                            className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden relative z-10 border border-slate-100"
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+                            className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-6xl flex flex-col md:flex-row relative z-10 overflow-hidden h-[90vh] md:h-[80vh]"
                         >
-                            <div className="flex justify-between items-center p-8 border-b border-slate-100 bg-slate-50/50">
-                                <div>
-                                    <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 shadow-inner">
-                                            <UserPlus size={20} />
+                            {/* Left Side: Gradient Banner */}
+                            <div className="w-full md:w-2/5 bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800 p-12 text-white flex flex-col relative overflow-hidden hidden md:flex">
+                                <div className="absolute -top-32 -left-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+                                <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+                                
+                                <div className="relative z-10">
+                                    <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/20 shadow-lg">
+                                        <Sparkles size={32} className="text-white" />
+                                    </div>
+                                    <h2 className="text-4xl font-black mb-4 tracking-tight leading-tight">Onboard a New Specialist</h2>
+                                    <p className="text-indigo-100 font-medium text-lg mb-12">Expand your hospital's capabilities by adding top-tier medical talent to the directory.</p>
+                                    
+                                    <div className="space-y-6">
+                                        <div className="flex items-start">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-4 shrink-0">
+                                                <ShieldCheck size={18} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">Instant System Access</h4>
+                                                <p className="text-sm text-indigo-200 mt-1">They will securely receive their credentials via email.</p>
+                                            </div>
                                         </div>
-                                        Add New Doctor
-                                    </h2>
-                                    <p className="text-slate-500 text-sm mt-1 ml-13">Create a new medical staff profile and grant portal access.</p>
+                                        <div className="flex items-start">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-4 shrink-0">
+                                                <UserPlus size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">Global Directory Sync</h4>
+                                                <p className="text-sm text-indigo-200 mt-1">Their profile instantly appears on the patient booking portal.</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shadow-sm">
-                                    <X size={20} />
-                                </button>
                             </div>
-                            
-                            <div className="p-8 overflow-y-auto custom-scrollbar">
-                                <form id="doctorForm" onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                                    {/* Personal Info */}
-                                    <div className="space-y-5">
-                                        <h3 className="font-bold text-indigo-900 uppercase tracking-widest text-xs flex items-center">
-                                            <span className="w-6 h-px bg-indigo-200 mr-2"></span> Personal Details
-                                        </h3>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">First Name *</label>
-                                                <input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Last Name *</label>
-                                                <input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Email Address *</label>
-                                            <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Initial Password *</label>
-                                            <input type="password" name="password" required value={formData.password} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Phone Number</label>
-                                            <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                        </div>
-                                    </div>
 
-                                    {/* Professional Info */}
-                                    <div className="space-y-5">
-                                        <h3 className="font-bold text-indigo-900 uppercase tracking-widest text-xs flex items-center">
-                                            <span className="w-6 h-px bg-indigo-200 mr-2"></span> Professional Details
-                                        </h3>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Registration Number *</label>
-                                            <input type="text" name="registrationNumber" required value={formData.registrationNumber} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Department *</label>
-                                            <select name="departmentId" required value={formData.departmentId} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none">
-                                                <option value="">Select Department</option>
-                                                {departments.map(dep => (
-                                                    <option key={dep.id} value={dep.id}>{dep.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Specialization & Qualification *</label>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <input type="text" name="specialization" required value={formData.specialization} onChange={handleInputChange} placeholder="Cardiology" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                                <input type="text" name="qualification" required value={formData.qualification} onChange={handleInputChange} placeholder="MBBS, MD" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Experience (Years) *</label>
-                                                <input type="number" name="experienceYears" required min="0" value={formData.experienceYears} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Consultation Fee ($) *</label>
-                                                <input type="number" name="consultationFee" required min="0" step="0.01" value={formData.consultationFee} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none" />
-                                            </div>
-                                        </div>
+                            {/* Right Side: Form */}
+                            <div className="w-full md:w-3/5 flex flex-col bg-white">
+                                <div className="flex justify-between items-center p-8 border-b border-slate-100 bg-white sticky top-0 z-20">
+                                    <h2 className="text-2xl font-black text-slate-800 tracking-tight md:hidden">Onboard Specialist</h2>
+                                    <div className="hidden md:block">
+                                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Step 1 of 1</p>
+                                        <p className="text-lg font-black text-slate-800">Complete Profile Details</p>
                                     </div>
-                                </form>
-                            </div>
-                            
-                            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end space-x-4">
-                                <button onClick={() => setIsModalOpen(false)} className="px-6 py-3 text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-colors shadow-sm">Cancel</button>
-                                <button type="submit" form="doctorForm" className="px-8 py-3 text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 font-bold shadow-lg shadow-indigo-600/30 transition-all hover:-translate-y-0.5">Create Profile</button>
+                                    <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shadow-sm">
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                
+                                <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+                                    <form id="addDoctorForm" onSubmit={handleSubmit} className="space-y-8">
+                                        
+                                        {/* Avatar Preview Upload Section */}
+                                        <div className="flex items-center space-x-6 pb-8 border-b border-slate-100">
+                                            <label className="w-24 h-24 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center flex-col cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors group overflow-hidden relative">
+                                                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                                {profileImagePreview ? (
+                                                    <img src={profileImagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <>
+                                                        <UserPlus size={24} className="text-slate-400 group-hover:text-indigo-500 mb-1" />
+                                                        <span className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 uppercase tracking-wider">Upload</span>
+                                                    </>
+                                                )}
+                                            </label>
+                                            <div>
+                                                <h3 className="font-black text-slate-800 text-lg">Profile Picture</h3>
+                                                <p className="text-sm font-medium text-slate-500 mb-2">A professional photo helps patients trust their doctor.</p>
+                                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Optional</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Core Details */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">First Name *</label>
+                                                <input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="John" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Last Name *</label>
+                                                <input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="Doe" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Email (Login ID) *</label>
+                                                <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="dr.doe@hospital.com" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Contact Phone *</label>
+                                                <input type="text" name="phone" required value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="+1 (555) 000-0000" />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">
+                                                    {currentDocId ? 'New Password (leave blank to keep current)' : 'Temporary Password *'}
+                                                </label>
+                                                <input type="password" name="password" required={!currentDocId} value={formData.password} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder={currentDocId ? "Enter new password..." : "Provide a secure initial password..."} />
+                                            </div>
+                                        </div>
+
+                                        {/* Professional Details */}
+                                        <div className="pt-6 border-t border-slate-100">
+                                            <div className="flex items-center mb-6">
+                                                <HeartPulse className="text-indigo-500 mr-2" size={20} />
+                                                <h3 className="font-black text-slate-800 text-lg">Professional Credentials</h3>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="md:col-span-2">
+                                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Department *</label>
+                                                    <select name="departmentId" required value={formData.departmentId} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
+                                                        <option value="">Select Department...</option>
+                                                        {departments.filter(d => d.is_active).map(dept => (
+                                                            <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Specialization *</label>
+                                                    <input type="text" name="specialization" required value={formData.specialization} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="e.g. Chief Surgeon" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Medical Reg No. *</label>
+                                                    <input type="text" name="registrationNumber" required value={formData.registrationNumber} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="MED-12345" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Consult Fee ($) *</label>
+                                                    <input type="number" name="consultationFee" required min="0" step="0.01" value={formData.consultationFee} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Years Experience</label>
+                                                    <input type="number" name="experienceYears" min="0" value={formData.experienceYears} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <div className="p-6 border-t border-slate-100 bg-white flex justify-end space-x-4 sticky bottom-0 z-20">
+                                    <button onClick={() => setIsModalOpen(false)} className="px-6 py-4 text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 font-bold transition-colors">Cancel</button>
+                                    <button type="submit" form="addDoctorForm" className="px-8 py-4 text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 font-bold shadow-xl shadow-indigo-600/30 transition-all hover:-translate-y-1">
+                                        {currentDocId ? 'Save Changes' : 'Register Doctor'}
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
@@ -340,4 +430,5 @@ const Doctors = () => {
         </div>
     );
 };
+
 export default Doctors;
