@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Calendar as CalendarIcon, Clock, User, CheckCircle, XCircle, Search, Filter, MoreHorizontal, Activity } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User, CheckCircle, XCircle, Search, Filter, MoreHorizontal, Activity, Stethoscope, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,6 +9,12 @@ const Appointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -47,11 +53,11 @@ const Appointments = () => {
 
     const getStatusTheme = (status) => {
         switch (status) {
-            case 'CONFIRMED': return { bg: 'bg-emerald-500/10', text: 'text-emerald-600', border: 'border-emerald-200', dot: 'bg-emerald-500' };
-            case 'PENDING': return { bg: 'bg-amber-500/10', text: 'text-amber-600', border: 'border-amber-200', dot: 'bg-amber-500' };
-            case 'COMPLETED': return { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-200', dot: 'bg-blue-500' };
-            case 'CANCELLED': return { bg: 'bg-rose-500/10', text: 'text-rose-600', border: 'border-rose-200', dot: 'bg-rose-500' };
-            default: return { bg: 'bg-slate-500/10', text: 'text-slate-600', border: 'border-slate-200', dot: 'bg-slate-500' };
+            case 'CONFIRMED': return { bg: 'bg-emerald-500/10', text: 'text-emerald-600', border: 'border-emerald-200', dot: 'bg-emerald-500', gradient: 'from-emerald-400 via-teal-400 to-emerald-400' };
+            case 'PENDING': return { bg: 'bg-amber-500/10', text: 'text-amber-600', border: 'border-amber-200', dot: 'bg-amber-500', gradient: 'from-amber-400 via-orange-400 to-amber-400' };
+            case 'COMPLETED': return { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-200', dot: 'bg-blue-500', gradient: 'from-blue-400 via-indigo-400 to-blue-400' };
+            case 'CANCELLED': return { bg: 'bg-rose-500/10', text: 'text-rose-600', border: 'border-rose-200', dot: 'bg-rose-500', gradient: 'from-rose-400 via-pink-400 to-rose-400' };
+            default: return { bg: 'bg-slate-500/10', text: 'text-slate-600', border: 'border-slate-200', dot: 'bg-slate-500', gradient: 'from-slate-400 via-gray-400 to-slate-400' };
         }
     };
 
@@ -60,6 +66,11 @@ const Appointments = () => {
         apt.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
         apt.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentAppointments = filteredAppointments.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -137,16 +148,24 @@ const Appointments = () => {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     <AnimatePresence>
-                        {filteredAppointments.length > 0 ? (
-                            filteredAppointments.map((apt) => {
+                        {currentAppointments.length > 0 ? (
+                            currentAppointments.map((apt) => {
                                 const theme = getStatusTheme(apt.status);
                                 return (
                                     <motion.div 
                                         variants={cardVariants}
                                         layout
                                         key={apt.id} 
-                                        className="group relative bg-white rounded-[2.5rem] p-8 shadow-[0_10px_40px_rgb(0,0,0,0.04)] border border-slate-100 hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                                        className="group relative rounded-[2.5rem] p-[2px] hover:-translate-y-2 transition-all duration-300"
                                     >
+                                        {/* Glowing shadow effect on hover */}
+                                        <div className={`absolute -inset-1 bg-gradient-to-r ${theme.gradient} rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-40 transition duration-500`}></div>
+                                        
+                                        {/* Dynamic Gradient Border matching status */}
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} rounded-[2.5rem] opacity-30 group-hover:opacity-100 transition duration-500`}></div>
+                                        
+                                        {/* Inner Card Content */}
+                                        <div className="relative bg-white rounded-[2.4rem] p-8 shadow-sm flex flex-col h-full z-10 w-full">
                                         {/* Status Badge & ID */}
                                         <div className="flex justify-between items-center mb-8">
                                             <div className="flex flex-col">
@@ -194,6 +213,7 @@ const Appointments = () => {
                                                 <span className="text-sm font-bold">{apt.time}</span>
                                             </div>
                                         </div>
+                                        </div>
                                     </motion.div>
                                 );
                             })
@@ -208,6 +228,43 @@ const Appointments = () => {
                         )}
                     </AnimatePresence>
                 </motion.div>
+            )}
+            
+            {/* Pagination Controls */}
+            {!isLoading && totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-4 mt-12 mb-8">
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="flex items-center justify-center px-4 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-all active:scale-95"
+                    >
+                        <ChevronLeft size={18} className="mr-1" /> Prev
+                    </button>
+                    
+                    <div className="flex items-center space-x-1">
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setCurrentPage(i + 1)}
+                                className={`w-10 h-10 rounded-xl font-bold flex items-center justify-center transition-all ${
+                                    currentPage === i + 1 
+                                        ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' 
+                                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="flex items-center justify-center px-4 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-all active:scale-95"
+                    >
+                        Next <ChevronRight size={18} className="ml-1" />
+                    </button>
+                </div>
             )}
         </div>
     );

@@ -136,6 +136,30 @@ exports.updateStatus = async (id, isActive) => {
     await pool.query('UPDATE doctors SET is_active = ? WHERE id = ?', [isActive, id]);
 };
 
+exports.delete = async (id) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+    try {
+        const [rows] = await connection.query('SELECT user_id FROM doctors WHERE id = ?', [id]);
+        if (rows.length === 0) throw new Error('Doctor not found');
+        const userId = rows[0].user_id;
+
+        // Delete dependencies first to avoid foreign key constraints
+        await connection.query('DELETE FROM appointments WHERE doctor_id = ?', [id]);
+        await connection.query('DELETE FROM doctor_schedules WHERE doctor_id = ?', [id]);
+        await connection.query('DELETE FROM doctors WHERE id = ?', [id]);
+        await connection.query('DELETE FROM users WHERE id = ?', [userId]);
+
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 exports.search = async ({ name, departmentId, specialization }) => {
     let query = `
         SELECT d.*, u.first_name, u.last_name, u.email, u.phone, u.profile_image, dept.name as department_name 

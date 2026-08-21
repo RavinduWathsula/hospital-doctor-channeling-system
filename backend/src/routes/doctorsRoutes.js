@@ -38,5 +38,6 @@ router.get('/', doctorsController.getAll);
 router.post('/', upload.single('profileImage'), doctorsController.create);
 router.put('/:id', upload.single('profileImage'), doctorsController.update);
 router.patch('/:id/status', doctorsController.updateStatus);
+router.delete('/:id', doctorsController.delete);
 
 module.exports = router;

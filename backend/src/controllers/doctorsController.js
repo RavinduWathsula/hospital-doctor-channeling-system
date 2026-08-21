@@ -74,6 +74,19 @@ exports.updateStatus = async (req, res, next) => {
     }
 };
 
+exports.delete = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await doctorsService.delete(id);
+        res.status(200).json({ success: true, message: 'Doctor deleted successfully' });
+    } catch (error) {
+        if (error.message === 'Doctor not found') {
+            return res.status(404).json({ success: false, message: error.message });
+        }
+        next(error);
+    }
+};
+
 exports.search = async (req, res, next) => {
     try {
         const { name, departmentId, specialization } = req.query;

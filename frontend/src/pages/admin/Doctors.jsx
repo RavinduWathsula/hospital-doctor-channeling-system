@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Plus, X, Search, ShieldCheck, UserPlus, Stethoscope, BadgeDollarSign, Building2, CheckCircle, XCircle, Sparkles, Star, HeartPulse } from 'lucide-react';
+import { Plus, X, Search, ShieldCheck, UserPlus, Stethoscope, BadgeDollarSign, Building2, CheckCircle, XCircle, Sparkles, Star, HeartPulse, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,6 +14,8 @@ const Doctors = () => {
     const [currentDocId, setCurrentDocId] = useState(null);
     const [profileImageFile, setProfileImageFile] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState(null);
+    const [doctorToDelete, setDoctorToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     
     // Form state
     const [formData, setFormData] = useState({
@@ -56,6 +58,30 @@ const Doctors = () => {
                 setDoctors(doctors.map(d => d.id === id ? { ...d, is_active: !currentStatus } : d));
             } else toast.error(data.message);
         } catch { toast.error('Error updating status'); }
+    };
+
+    const deleteDoctor = (id) => {
+        setDoctorToDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!doctorToDelete) return;
+        setIsDeleting(true);
+        try {
+            const res = await fetch(`http://localhost:5000/api/doctors/${doctorToDelete}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if(data.success) {
+                toast.success('Doctor completely removed from system');
+                setDoctors(doctors.filter(d => d.id !== doctorToDelete));
+            } else toast.error(data.message);
+        } catch { toast.error('Error deleting doctor'); }
+        finally {
+            setIsDeleting(false);
+            setDoctorToDelete(null);
+        }
     };
 
     const openModal = (doc = null) => {
@@ -265,18 +291,18 @@ const Doctors = () => {
                                         onClick={() => toggleStatus(doctor.id, doctor.is_active)}
                                         className={`group relative overflow-hidden px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm flex items-center border ${
                                             doctor.is_active 
-                                            ? 'bg-white text-rose-600 border-rose-200 hover:border-rose-300 hover:shadow-md' 
+                                            ? 'bg-white text-amber-600 border-amber-200 hover:border-amber-300 hover:shadow-md' 
                                             : 'bg-white text-emerald-600 border-emerald-200 hover:border-emerald-300 hover:shadow-md'
                                         }`}
                                     >
                                         <div className={`absolute inset-0 w-0 transition-all duration-300 ease-out group-hover:w-full ${
-                                            doctor.is_active ? 'bg-rose-50' : 'bg-emerald-50'
+                                            doctor.is_active ? 'bg-amber-50' : 'bg-emerald-50'
                                         }`}></div>
                                         <div className="relative flex items-center z-10">
                                             {doctor.is_active ? (
                                                 <>
                                                     <XCircle size={16} className="mr-1.5 transition-transform duration-300 group-hover:rotate-90" />
-                                                    <span>Deactivate</span>
+                                                    <span>Suspend</span>
                                                 </>
                                             ) : (
                                                 <>
@@ -285,6 +311,14 @@ const Doctors = () => {
                                                 </>
                                             )}
                                         </div>
+                                    </button>
+                                    <button 
+                                        onClick={() => deleteDoctor(doctor.id)}
+                                        className="group relative overflow-hidden px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm flex items-center bg-white text-rose-600 border border-rose-200 hover:border-rose-300 hover:shadow-md"
+                                        title="Delete Doctor"
+                                    >
+                                        <div className="absolute inset-0 w-0 bg-rose-50 transition-all duration-300 ease-out group-hover:w-full"></div>
+                                        <Trash2 size={16} className="relative z-10 transition-transform duration-300 group-hover:scale-110" />
                                     </button>
                                 </div>
                             </div>
@@ -444,6 +478,50 @@ const Doctors = () => {
                                     <button onClick={() => setIsModalOpen(false)} className="px-6 py-4 text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 font-bold transition-colors">Cancel</button>
                                     <button type="submit" form="addDoctorForm" className="px-8 py-4 text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 font-bold shadow-xl shadow-indigo-600/30 transition-all hover:-translate-y-1">
                                         {currentDocId ? 'Save Changes' : 'Register Doctor'}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Custom Delete Confirmation Modal */}
+            <AnimatePresence>
+                {doctorToDelete && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDoctorToDelete(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></motion.div>
+                        
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }} 
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden"
+                        >
+                            <div className="p-8 text-center">
+                                <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Trash2 size={32} className="text-rose-600" />
+                                </div>
+                                <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">Delete Doctor?</h2>
+                                <p className="text-slate-500 font-medium mb-8">
+                                    Are you sure you want to completely remove this doctor? This action will also delete all their schedules and appointments and cannot be undone.
+                                </p>
+                                <div className="flex space-x-3">
+                                    <button 
+                                        onClick={() => setDoctorToDelete(null)}
+                                        disabled={isDeleting}
+                                        className="flex-1 py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        onClick={confirmDelete}
+                                        disabled={isDeleting}
+                                        className="flex-1 py-3.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-lg shadow-rose-600/30 transition-all hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center"
+                                    >
+                                        {isDeleting ? (
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : 'Yes, Delete'}
                                     </button>
                                 </div>
                             </div>
