@@ -53,7 +53,7 @@ const Doctors = () => {
             const data = await res.json();
             if(data.success) {
                 toast.success('Doctor status updated');
-                fetchDoctors();
+                setDoctors(doctors.map(d => d.id === id ? { ...d, is_active: !currentStatus } : d));
             } else toast.error(data.message);
         } catch { toast.error('Error updating status'); }
     };
@@ -194,73 +194,97 @@ const Doctors = () => {
                             <p className="text-slate-500 font-medium">Try adjusting your search criteria.</p>
                         </div>
                     ) : filtered.map(doctor => (
-                        <motion.div variants={cardVariants} key={doctor.id} className="bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all group flex flex-col relative overflow-hidden">
-                            {/* Decorative Background */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-indigo-500/10 transition-colors"></div>
+                        <motion.div variants={cardVariants} key={doctor.id} className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 group flex flex-col relative overflow-hidden border border-slate-200 hover:border-indigo-200">
+                            {/* Colorful Accent Top Border */}
+                            <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${doctor.is_active ? 'from-blue-500 to-indigo-500' : 'from-rose-400 to-pink-500'}`}></div>
+                            
+                            {/* Soft Gradient Background Element */}
+                            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl group-hover:bg-indigo-100 transition-colors duration-500"></div>
                             
                             {/* Header: Avatar & Name */}
-                            <div className="flex items-start justify-between mb-6 relative z-10">
+                            <div className="flex items-start justify-between mb-6 relative z-10 pt-2">
                                 <div className="flex items-center">
                                     <div className="relative">
-                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-50 flex items-center justify-center text-indigo-600 font-black text-2xl shadow-inner border border-indigo-100 mr-4 overflow-hidden">
+                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center text-indigo-600 font-black text-2xl shadow-sm border border-indigo-100/50 mr-4 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                                             {doctor.profile_image ? (
                                                 <img src={doctor.profile_image} alt="Doctor" className="w-full h-full object-cover" />
                                             ) : (
                                                 doctor.first_name.charAt(0)
                                             )}
                                         </div>
-                                        <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center ${doctor.is_active ? 'bg-emerald-500' : 'bg-rose-500'}`}>
-                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                                        </div>
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-800 tracking-tight">Dr. {doctor.first_name} {doctor.last_name}</h3>
-                                        <p className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block mt-1 border border-indigo-100">{doctor.specialization}</p>
+                                        <h3 className="text-xl font-black text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors">Dr. {doctor.first_name} {doctor.last_name}</h3>
+                                        <p className="text-xs font-bold text-indigo-700 bg-indigo-100/60 px-2.5 py-1 rounded-lg inline-block mt-1.5 border border-indigo-200">{doctor.specialization}</p>
                                     </div>
                                 </div>
                             </div>
                             
                             {/* Doctor Details Grid */}
-                            <div className="grid grid-cols-2 gap-4 mb-6 relative z-10 flex-1">
-                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-                                    <Building2 size={16} className="text-slate-400 mr-2" />
+                            <div className="grid grid-cols-2 gap-3 mb-6 relative z-10 flex-1">
+                                <div className="flex items-center text-sm font-bold text-slate-700 bg-blue-50/80 px-4 py-3 rounded-2xl border border-blue-200/60 hover:bg-blue-100 transition-colors">
+                                    <Building2 size={16} className="text-blue-500 mr-2.5" />
                                     {doctor.department_name || 'N/A'}
                                 </div>
-                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-                                    <BadgeDollarSign size={16} className="text-emerald-500 mr-2" />
+                                <div className="flex items-center text-sm font-bold text-slate-700 bg-emerald-50/80 px-4 py-3 rounded-2xl border border-emerald-200/60 hover:bg-emerald-100 transition-colors">
+                                    <BadgeDollarSign size={16} className="text-emerald-500 mr-2.5" />
                                     ${parseFloat(doctor.consultation_fee).toFixed(2)}
                                 </div>
-                                <div className="flex items-center text-sm font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 col-span-2">
-                                    <ShieldCheck size={16} className="text-slate-400 mr-2" />
-                                    Reg No: <span className="text-slate-500 font-medium ml-1 bg-white px-2 py-0.5 rounded border border-slate-200">{doctor.registration_number}</span>
+                                <div className="flex items-center text-sm font-bold text-slate-700 bg-slate-50 px-4 py-3 rounded-2xl border border-slate-200 col-span-2 hover:bg-slate-100 transition-colors">
+                                    <ShieldCheck size={16} className="text-slate-400 mr-2.5" />
+                                    Reg No: <span className="text-slate-900 ml-1.5 bg-white px-2 py-0.5 rounded border border-slate-200">{doctor.registration_number}</span>
                                 </div>
                             </div>
 
                             {/* Actions Footer */}
-                            <div className="pt-4 border-t border-slate-100 relative z-10 flex justify-between items-center">
-                                <span className={`text-xs font-black uppercase tracking-widest ${doctor.is_active ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                    {doctor.is_active ? 'Account Active' : 'Account Suspended'}
-                                </span>
+                            <div className="pt-5 mt-auto border-t border-slate-100 relative z-10 flex justify-between items-center">
+                                <div className={`flex items-center px-3 py-1.5 rounded-full border bg-white ${doctor.is_active ? 'border-emerald-200' : 'border-rose-200'}`}>
+                                    <div className="relative flex h-2.5 w-2.5 mr-2.5">
+                                      {doctor.is_active ? (
+                                          <>
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                          </>
+                                      ) : (
+                                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                      )}
+                                    </div>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${doctor.is_active ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                        {doctor.is_active ? 'Active' : 'Suspended'}
+                                    </span>
+                                </div>
                                 <div className="flex space-x-2">
                                     <button 
                                         onClick={() => openModal(doctor)}
-                                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
+                                        className="group relative overflow-hidden px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm flex items-center bg-white text-indigo-600 border border-indigo-200 hover:border-indigo-300 hover:shadow-md"
                                     >
-                                        Edit
+                                        <div className="absolute inset-0 w-0 bg-indigo-50 transition-all duration-300 ease-out group-hover:w-full"></div>
+                                        <span className="relative z-10">Edit</span>
                                     </button>
                                     <button 
                                         onClick={() => toggleStatus(doctor.id, doctor.is_active)}
-                                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center ${
+                                        className={`group relative overflow-hidden px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm flex items-center border ${
                                             doctor.is_active 
-                                            ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100' 
-                                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'
+                                            ? 'bg-white text-rose-600 border-rose-200 hover:border-rose-300 hover:shadow-md' 
+                                            : 'bg-white text-emerald-600 border-emerald-200 hover:border-emerald-300 hover:shadow-md'
                                         }`}
                                     >
-                                        {doctor.is_active ? (
-                                            <><XCircle size={16} className="mr-1.5" /> Deactivate</>
-                                        ) : (
-                                            <><CheckCircle size={16} className="mr-1.5" /> Activate</>
-                                        )}
+                                        <div className={`absolute inset-0 w-0 transition-all duration-300 ease-out group-hover:w-full ${
+                                            doctor.is_active ? 'bg-rose-50' : 'bg-emerald-50'
+                                        }`}></div>
+                                        <div className="relative flex items-center z-10">
+                                            {doctor.is_active ? (
+                                                <>
+                                                    <XCircle size={16} className="mr-1.5 transition-transform duration-300 group-hover:rotate-90" />
+                                                    <span>Deactivate</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CheckCircle size={16} className="mr-1.5 transition-transform duration-300 group-hover:scale-110" />
+                                                    <span>Activate</span>
+                                                </>
+                                            )}
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -364,7 +388,7 @@ const Doctors = () => {
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Email (Login ID) *</label>
-                                                <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="dr.doe@hospital.com" />
+                                                <input type="email" name="email" required autoComplete="off" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder="dr.doe@hospital.com" />
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Contact Phone *</label>
@@ -374,7 +398,7 @@ const Doctors = () => {
                                                 <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">
                                                     {currentDocId ? 'New Password (leave blank to keep current)' : 'Temporary Password *'}
                                                 </label>
-                                                <input type="password" name="password" required={!currentDocId} value={formData.password} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder={currentDocId ? "Enter new password..." : "Provide a secure initial password..."} />
+                                                <input type="password" name="password" required={!currentDocId} autoComplete="new-password" value={formData.password} onChange={handleInputChange} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none font-bold text-slate-700" placeholder={currentDocId ? "Enter new password..." : "Provide a secure initial password..."} />
                                             </div>
                                         </div>
 

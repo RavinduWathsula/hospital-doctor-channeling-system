@@ -43,8 +43,8 @@ exports.registerPatient = async (patientData) => {
 
         return {
             id: userId,
-            firstName,
-            lastName,
+            first_name: firstName,
+            last_name: lastName,
             email,
             role: 'PATIENT',
             token: generateToken(userId, 'PATIENT')
@@ -72,8 +72,8 @@ exports.loginUser = async (email, password) => {
 
     return {
         id: user.id,
-        firstName: user.first_name,
-        lastName: user.last_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
         role: user.role,
         token: generateToken(user.id, user.role)

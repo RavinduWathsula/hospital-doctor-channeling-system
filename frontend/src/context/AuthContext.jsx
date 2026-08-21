@@ -63,8 +63,8 @@ export const AuthProvider = ({ children }) => {
             setToken(data.data.token);
             setUser({
                 id: data.data.id,
-                firstName: data.data.firstName,
-                lastName: data.data.lastName,
+                first_name: data.data.first_name,
+                last_name: data.data.last_name,
                 email: data.data.email,
                 role: data.data.role
             });

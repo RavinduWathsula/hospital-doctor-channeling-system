@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Plus, X, Calendar as CalendarIcon, Clock, Users, Trash2, ArrowRight, Activity, Sun, Moon } from 'lucide-react';
+import { Plus, X, Calendar as CalendarIcon, Clock, Users, Trash2, ArrowRight, Activity, Sun, Moon, Search, ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const daysOfWeek = [
@@ -20,6 +20,9 @@ const Schedules = () => {
     const [formData, setFormData] = useState({
         doctor_id: '', day_of_week: 1, start_time: '09:00', end_time: '17:00', slot_duration_minutes: 15, max_patients: 20
     });
+
+    const [doctorSearchQuery, setDoctorSearchQuery] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -185,65 +188,71 @@ const Schedules = () => {
                         ) : (
                             currentDaySchedules.map((schedule, index) => (
                                 <motion.div 
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                     key={schedule.id} 
-                                    className="bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl hover:shadow-amber-500/10 transition-all flex flex-col md:flex-row md:items-center justify-between group relative overflow-hidden"
+                                    className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 hover:border-amber-200 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between group relative overflow-hidden"
                                 >
-                                    <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    {/* Left Accent Bar */}
+                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-amber-400 to-orange-500 rounded-l-2xl"></div>
                                     
-                                    <div className="flex items-center md:w-1/3 mb-4 md:mb-0">
+                                    {/* Subtle Glow */}
+                                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-50 rounded-full blur-3xl group-hover:bg-amber-100 transition-colors duration-500"></div>
+
+                                    <div className="flex items-center md:w-1/3 mb-6 md:mb-0 relative z-10 pl-2">
                                         <div className="relative">
-                                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-50 flex items-center justify-center border border-indigo-100 shadow-inner mr-5 overflow-hidden">
+                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center border border-indigo-100 shadow-sm mr-5 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                                                 {schedule.profile_image ? (
                                                     <img src={schedule.profile_image} alt="Doctor" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <span className="text-2xl font-black text-indigo-600">{schedule.first_name?.charAt(0) || 'D'}</span>
+                                                    <span className="text-xl font-black text-indigo-600">{schedule.first_name?.charAt(0) || 'D'}</span>
                                                 )}
                                             </div>
-                                            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-emerald-50 border-2 border-white flex items-center justify-center shadow-sm">
-                                                <Activity size={12} className="text-emerald-500" />
+                                            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-emerald-50 border-2 border-white flex items-center justify-center shadow-sm">
+                                                <Activity size={10} className="text-emerald-500" />
                                             </div>
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-slate-800">Dr. {schedule.first_name} {schedule.last_name}</h3>
-                                            <span className="inline-block mt-1 px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg border border-indigo-100">
+                                            <h3 className="text-xl font-black text-slate-800 tracking-tight group-hover:text-amber-600 transition-colors">Dr. {schedule.first_name} {schedule.last_name}</h3>
+                                            <span className="inline-block mt-1.5 px-2.5 py-1 bg-indigo-50/80 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-100/60">
                                                 {schedule.specialization || 'General'}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center md:w-1/3 justify-start md:justify-center mb-4 md:mb-0 space-x-6">
-                                        <div className="text-center">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Start Time</p>
-                                            <div className="flex items-center text-lg font-black text-slate-700">
+                                    <div className="flex items-center md:w-1/3 justify-start md:justify-center mb-6 md:mb-0 space-x-4 relative z-10">
+                                        <div className="bg-slate-50/80 px-4 py-3 rounded-2xl border border-slate-100 text-center flex-1 md:flex-none">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Start Time</p>
+                                            <div className="flex items-center justify-center text-lg font-black text-slate-700 group-hover:text-amber-600 transition-colors">
                                                 {getTimeIcon(schedule.start_time)}
                                                 <span className="ml-2">{schedule.start_time.substring(0,5)}</span>
                                             </div>
                                         </div>
-                                        <div className="text-slate-300">
-                                            <ArrowRight size={20} />
+                                        
+                                        <div className="text-slate-200">
+                                            <ArrowRight size={20} className="group-hover:text-amber-300 transition-colors" />
                                         </div>
-                                        <div className="text-center">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">End Time</p>
-                                            <div className="flex items-center text-lg font-black text-slate-700">
+                                        
+                                        <div className="bg-slate-50/80 px-4 py-3 rounded-2xl border border-slate-100 text-center flex-1 md:flex-none">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">End Time</p>
+                                            <div className="flex items-center justify-center text-lg font-black text-slate-700 group-hover:text-orange-500 transition-colors">
                                                 {getTimeIcon(schedule.end_time)}
                                                 <span className="ml-2">{schedule.end_time.substring(0,5)}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between md:w-1/3 md:justify-end">
-                                        <div className="mr-8 text-right hidden lg:block">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Capacity</p>
-                                            <div className="flex items-center text-sm font-black text-blue-600">
-                                                <Users size={16} className="mr-1.5" /> {schedule.max_patients} Patients
+                                    <div className="flex items-center justify-between md:w-1/3 md:justify-end relative z-10 pt-4 md:pt-0 border-t border-slate-100 md:border-none">
+                                        <div className="mr-8">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 md:text-right">Capacity</p>
+                                            <div className="flex items-center text-sm font-black text-blue-600 bg-blue-50/80 px-3 py-1.5 rounded-xl border border-blue-100/60">
+                                                <Users size={16} className="mr-1.5" /> {schedule.max_patients} <span className="ml-1 opacity-80 font-bold hidden sm:inline">Patients</span>
                                             </div>
                                         </div>
                                         <button 
                                             onClick={() => handleDelete(schedule.id)} 
-                                            className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-500/40 transition-all"
+                                            className="w-12 h-12 rounded-2xl bg-white border border-rose-100 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-500/30 transition-all duration-300 group-hover:scale-105"
                                         >
                                             <Trash2 size={20} />
                                         </button>
@@ -259,7 +268,7 @@ const Schedules = () => {
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-0">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></motion.div>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsModalOpen(false); setIsDropdownOpen(false); }} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></motion.div>
                         
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.95, y: 20 }} 
@@ -277,29 +286,107 @@ const Schedules = () => {
                                     </h2>
                                     <p className="text-slate-500 font-medium mt-1 text-sm ml-13">Assign a new operational window for a doctor.</p>
                                 </div>
-                                <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shadow-sm">
+                                <button onClick={() => { setIsModalOpen(false); setIsDropdownOpen(false); }} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shadow-sm">
                                     <X size={20} />
                                 </button>
                             </div>
                             
-                            <div className="p-8">
+                            <div className="p-8 bg-white">
                                 <form id="scheduleForm" onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div className="sm:col-span-2">
+                                        
+                                        {/* Custom Searchable Doctor Dropdown */}
+                                        <div className="sm:col-span-2 relative">
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Select Doctor *</label>
-                                            <select required value={formData.doctor_id} onChange={(e) => setFormData({...formData, doctor_id: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
-                                                <option value="">Choose a medical professional...</option>
-                                                {doctors.filter(d => d.is_active).map(doc => (
-                                                    <option key={doc.id} value={doc.id}>Dr. {doc.first_name} {doc.last_name} ({doc.specialization})</option>
-                                                ))}
-                                            </select>
+                                            
+                                            {/* Dropdown Trigger */}
+                                            <div 
+                                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                                className={`w-full px-4 py-4 bg-slate-50 border ${isDropdownOpen ? 'border-amber-400 ring-2 ring-amber-500 bg-white' : 'border-slate-200 hover:border-slate-300'} rounded-xl cursor-pointer transition-all flex items-center justify-between group`}
+                                            >
+                                                {formData.doctor_id ? (
+                                                    <span className="font-bold text-slate-700">
+                                                        {(() => {
+                                                            const doc = doctors.find(d => d.id.toString() === formData.doctor_id.toString());
+                                                            return doc ? `Dr. ${doc.first_name} ${doc.last_name} (${doc.specialization})` : 'Select a doctor...';
+                                                        })()}
+                                                    </span>
+                                                ) : (
+                                                    <span className="font-bold text-slate-400">Choose a medical professional...</span>
+                                                )}
+                                                <ChevronDown size={20} className={`text-slate-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                                            </div>
+
+                                            {/* Dropdown Menu */}
+                                            <AnimatePresence>
+                                                {isDropdownOpen && (
+                                                    <motion.div 
+                                                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="absolute z-50 top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl overflow-hidden"
+                                                    >
+                                                        <div className="p-3 border-b border-slate-100 bg-slate-50">
+                                                            <div className="relative">
+                                                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                                <input 
+                                                                    type="text" 
+                                                                    placeholder="Search doctors by name or specialty..."
+                                                                    className="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-amber-400 font-bold text-slate-700 text-sm shadow-sm"
+                                                                    value={doctorSearchQuery}
+                                                                    onChange={(e) => setDoctorSearchQuery(e.target.value)}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="max-h-56 overflow-y-auto custom-scrollbar p-1">
+                                                            {doctors
+                                                                .filter(d => d.is_active && (
+                                                                    `${d.first_name} ${d.last_name}`.toLowerCase().includes(doctorSearchQuery.toLowerCase()) ||
+                                                                    d.specialization.toLowerCase().includes(doctorSearchQuery.toLowerCase())
+                                                                ))
+                                                                .map(doc => (
+                                                                    <div 
+                                                                        key={doc.id}
+                                                                        onClick={() => {
+                                                                            setFormData({ ...formData, doctor_id: doc.id });
+                                                                            setIsDropdownOpen(false);
+                                                                            setDoctorSearchQuery('');
+                                                                        }}
+                                                                        className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors mb-1 last:mb-0 ${formData.doctor_id.toString() === doc.id.toString() ? 'bg-amber-50 text-amber-700' : 'hover:bg-slate-50 text-slate-700'}`}
+                                                                    >
+                                                                        <div>
+                                                                            <p className="font-bold text-sm">Dr. {doc.first_name} {doc.last_name}</p>
+                                                                            <p className={`text-xs font-bold mt-0.5 ${formData.doctor_id.toString() === doc.id.toString() ? 'text-amber-500/80' : 'text-slate-400'}`}>{doc.specialization}</p>
+                                                                        </div>
+                                                                        {formData.doctor_id.toString() === doc.id.toString() && (
+                                                                            <Check size={18} className="text-amber-500" />
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                            {doctors.filter(d => d.is_active && (`${d.first_name} ${d.last_name}`.toLowerCase().includes(doctorSearchQuery.toLowerCase()) || d.specialization.toLowerCase().includes(doctorSearchQuery.toLowerCase()))).length === 0 && (
+                                                                <div className="p-6 text-center text-slate-400 font-bold text-sm">
+                                                                    No doctors found matching "{doctorSearchQuery}"
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
+
                                         <div className="sm:col-span-2">
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Day of Week *</label>
-                                            <select required value={formData.day_of_week} onChange={(e) => setFormData({...formData, day_of_week: parseInt(e.target.value)})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
-                                                {daysOfWeek.map(day => <option key={day.id} value={day.id}>{day.name}</option>)}
-                                            </select>
+                                            <div className="relative">
+                                                <select required value={formData.day_of_week} onChange={(e) => setFormData({...formData, day_of_week: parseInt(e.target.value)})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700 appearance-none cursor-pointer">
+                                                    {daysOfWeek.map(day => <option key={day.id} value={day.id}>{day.name}</option>)}
+                                                </select>
+                                                <ChevronDown size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                                            </div>
                                         </div>
+                                        
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Start Time *</label>
                                             <input type="time" required value={formData.start_time} onChange={(e) => setFormData({...formData, start_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
@@ -321,7 +408,7 @@ const Schedules = () => {
                             </div>
                             
                             <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end space-x-4">
-                                <button onClick={() => setIsModalOpen(false)} className="px-6 py-3 text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-colors shadow-sm">Cancel</button>
+                                <button onClick={() => { setIsModalOpen(false); setIsDropdownOpen(false); }} className="px-6 py-3 text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-bold transition-colors shadow-sm">Cancel</button>
                                 <button type="submit" form="scheduleForm" className="px-8 py-3 text-white bg-slate-900 rounded-xl hover:bg-slate-800 font-bold shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-1">Publish Shift</button>
                             </div>
                         </motion.div>

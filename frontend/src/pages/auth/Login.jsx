@@ -15,26 +15,18 @@ const Login = () => {
 
     useEffect(() => {
         if (user) {
-            // Redirect based on role
-            let from = location.state?.from?.pathname;
-            // Prevent redirecting back to auth pages
-            if (from === '/login' || from === '/register') {
-                from = null;
-            }
-
-            if (from) {
-                navigate(from, { replace: true });
-            } else {
-                switch (user.role) {
-                    case 'PATIENT': navigate('/patient/dashboard', { replace: true }); break;
-                    case 'DOCTOR': navigate('/doctor/dashboard', { replace: true }); break;
-                    case 'RECEPTIONIST': navigate('/reception/dashboard', { replace: true }); break;
-                    case 'ADMIN': navigate('/admin/dashboard', { replace: true }); break;
-                    default: navigate('/', { replace: true });
-                }
+            // Always redirect to the correct dashboard based on role to prevent "Access Denied" errors
+            // from stale or cross-role location.state.from paths.
+            const role = user.role?.toUpperCase()?.trim();
+            switch (role) {
+                case 'PATIENT': navigate('/patient/dashboard', { replace: true }); break;
+                case 'DOCTOR': navigate('/doctor/dashboard', { replace: true }); break;
+                case 'RECEPTIONIST': navigate('/reception/dashboard', { replace: true }); break;
+                case 'ADMIN': navigate('/admin/dashboard', { replace: true }); break;
+                default: navigate('/', { replace: true });
             }
         }
-    }, [user, navigate, location]);
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
