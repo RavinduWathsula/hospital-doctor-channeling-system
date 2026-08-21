@@ -33,4 +33,16 @@ router.post(
 // @desc    Get current logged in user
 router.get('/me', authenticateToken, authController.getMe);
 
+// @route   PUT /api/auth/me/password
+// @desc    Update password for logged in user
+router.put(
+    '/me/password',
+    authenticateToken,
+    [
+        body('currentPassword').exists().withMessage('Current password is required'),
+        body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
+    ],
+    authController.updatePassword
+);
+
 module.exports = router;

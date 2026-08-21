@@ -53,12 +53,24 @@ exports.login = async (req, res, next) => {
 
 exports.getMe = async (req, res, next) => {
     try {
-        const data = await authService.getUserById(req.user.id);
-        res.status(200).json({
-            success: true,
-            data
-        });
+        const user = await authService.getUserById(req.user.id);
+        res.status(200).json({ success: true, data: user });
     } catch (error) {
+        next(error);
+    }
+};
+
+exports.updatePassword = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { currentPassword, newPassword } = req.body;
+        
+        await authService.updatePassword(userId, currentPassword, newPassword);
+        res.status(200).json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+        if (error.message === 'Incorrect current password') {
+            return res.status(400).json({ success: false, message: error.message });
+        }
         next(error);
     }
 };

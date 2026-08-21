@@ -4,12 +4,14 @@ const notificationsService = require('./notificationsService');
 exports.getAll = async () => {
     const [rows] = await pool.query(`
         SELECT a.*, p.user_id as patient_user_id, u.first_name as patient_first_name, u.last_name as patient_last_name,
-        d.user_id as doctor_user_id, du.first_name as doctor_first_name, du.last_name as doctor_last_name
+        d.user_id as doctor_user_id, du.first_name as doctor_first_name, du.last_name as doctor_last_name,
+        dept.name as department_name
         FROM appointments a
         JOIN patients p ON a.patient_id = p.id
         JOIN users u ON p.user_id = u.id
         JOIN doctors d ON a.doctor_id = d.id
         JOIN users du ON d.user_id = du.id
+        JOIN departments dept ON d.department_id = dept.id
         ORDER BY a.appointment_date DESC, a.appointment_time DESC
     `);
     return rows;

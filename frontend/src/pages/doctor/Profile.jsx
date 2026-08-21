@@ -7,6 +7,10 @@ const DoctorProfile = () => {
     const { token, user } = useContext(AuthContext);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    
+    // Password Change State
+    const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [passwordLoading, setPasswordLoading] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -28,6 +32,40 @@ const DoctorProfile = () => {
             toast.error('Server error fetching profile');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            return toast.error('New passwords do not match');
+        }
+        
+        setPasswordLoading(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/auth/me/password', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                toast.success('Password changed successfully');
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            } else {
+                toast.error(data.message || 'Failed to change password');
+            }
+        } catch (error) {
+            toast.error('Server error while changing password');
+        } finally {
+            setPasswordLoading(false);
         }
     };
 
@@ -144,6 +182,57 @@ const DoctorProfile = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Security Settings: Change Password */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+                <div className="p-8">
+                    <h3 className="text-xl font-bold text-gray-800 mb-6">Security Settings</h3>
+                    <form onSubmit={handlePasswordChange} className="max-w-md space-y-5">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                            <input 
+                                type="password" 
+                                required 
+                                value={passwordData.currentPassword}
+                                onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="Enter your current password"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                            <input 
+                                type="password" 
+                                required 
+                                minLength="6"
+                                value={passwordData.newPassword}
+                                onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="Enter a new secure password"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                            <input 
+                                type="password" 
+                                required 
+                                minLength="6"
+                                value={passwordData.confirmPassword}
+                                onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="Confirm your new password"
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            disabled={passwordLoading}
+                            className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-md shadow-teal-500/20 transition-all disabled:opacity-70"
+                        >
+                            {passwordLoading ? 'Updating...' : 'Update Password'}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
