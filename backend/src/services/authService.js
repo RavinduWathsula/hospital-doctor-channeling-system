@@ -1,6 +1,7 @@
 const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const smsService = require('./smsService');
 
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -40,6 +41,11 @@ exports.registerPatient = async (patientData) => {
         );
 
         await connection.commit();
+
+        // Send Welcome SMS (non-blocking)
+        if (phone) {
+            smsService.sendWelcomeSMS(phone, firstName).catch(console.error);
+        }
 
         return {
             id: userId,

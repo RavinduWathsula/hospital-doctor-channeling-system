@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const notificationsService = require('./notificationsService');
+const smsService = require('./smsService');
 
 exports.getAll = async () => {
     const [rows] = await pool.query(`
@@ -136,7 +137,7 @@ exports.createAppointment = async (userId, data) => {
 
         await connection.commit();
         
-        // Trigger Notification
+        // Trigger Notification & SMS
         const [doctorDetails] = await pool.query('SELECT first_name, last_name FROM users JOIN doctors ON users.id = doctors.user_id WHERE doctors.id = ?', [doctor_id]);
         if (doctorDetails.length > 0) {
             const docName = `Dr. ${doctorDetails[0].first_name} ${doctorDetails[0].last_name}`;
@@ -145,6 +146,15 @@ exports.createAppointment = async (userId, data) => {
                 'Appointment Booked',
                 `Your appointment with ${docName} on ${new Date(appointment_date).toLocaleDateString()} at ${appointment_time} (Queue #${queue_number}) has been booked successfully.`
             );
+            
+            // Get patient info for SMS
+            const [patientDetails] = await pool.query('SELECT first_name, last_name, phone FROM users WHERE id = ?', [userId]);
+            if (patientDetails.length > 0 && patientDetails[0].phone) {
+                const patName = patientDetails[0].first_name;
+                const patPhone = patientDetails[0].phone;
+                // Combining Payment and Booking Confirmation as requested
+                smsService.sendBookingConfirmationSMS(patPhone, patName, docName, new Date(appointment_date).toLocaleDateString(), appointment_time, queue_number).catch(console.error);
+            }
         }
 
         return result.insertId;
