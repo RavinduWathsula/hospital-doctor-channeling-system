@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { MapPin, Briefcase, DollarSign, Award, ArrowLeft, Calendar } from 'lucide-react';
+import { MapPin, Briefcase, DollarSign, Award, ArrowLeft, Calendar, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DoctorProfile = () => {
@@ -9,7 +9,12 @@ const DoctorProfile = () => {
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
     const [doctor, setDoctor] = useState(null);
+    const [schedules, setSchedules] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const dayNames = {
+        1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'
+    };
 
     useEffect(() => {
         const fetchDoctor = async () => {
@@ -22,11 +27,21 @@ const DoctorProfile = () => {
                     setDoctor(data.data);
                 } else {
                     toast.error(data.message || 'Doctor not found');
-                    navigate('/doctors');
+                    navigate('/patient/doctors');
+                    return;
+                }
+
+                // Fetch schedules
+                const schedRes = await fetch(`http://localhost:5000/api/doctors/${id}/availability`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const schedData = await schedRes.json();
+                if (schedData.success) {
+                    setSchedules(schedData.data);
                 }
             } catch {
                 toast.error('Failed to load profile');
-                navigate('/doctors');
+                navigate('/patient/doctors');
             } finally {
                 setIsLoading(false);
             }
@@ -129,6 +144,25 @@ const DoctorProfile = () => {
                                             {doctor.is_active ? 'Currently accepting appointments' : 'Not available for booking'}
                                         </span>
                                     </div>
+                                </div>
+                                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                    <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                                        <Clock size={20} className="text-blue-600 mr-2" /> Weekly Schedule
+                                    </h3>
+                                    {schedules.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {schedules.map((schedule, idx) => (
+                                                <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                                                    <span className="font-medium text-gray-700">{dayNames[schedule.day_of_week]}</span>
+                                                    <span className="text-gray-500 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                                        {schedule.start_time.substring(0, 5)} - {schedule.end_time.substring(0, 5)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-gray-500">No schedules set for this doctor.</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
