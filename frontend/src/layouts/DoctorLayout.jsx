@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, CalendarCheck, Clock, CalendarDays, Users, UserCircle, LogOut, Stethoscope, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, Clock, CalendarDays, Users, UserCircle, LogOut, Stethoscope, Menu, X, Pill } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
@@ -21,6 +21,7 @@ const DoctorLayout = () => {
         { name: 'Live Queue', path: '/doctor/queue', icon: <Clock size={20} /> },
         { name: 'My Schedule', path: '/doctor/schedules', icon: <CalendarDays size={20} /> },
         { name: 'Patients', path: '/doctor/patients', icon: <Users size={20} /> },
+        { name: 'Prescriptions', path: '/doctor/prescriptions', icon: <Pill size={20} /> },
         { name: 'Profile', path: '/doctor/profile', icon: <UserCircle size={20} /> },
     ];
 

@@ -24,6 +24,7 @@ app.use('/api/queues', require('./routes/queuesRoutes'));
 app.use('/api/notifications', require('./routes/notificationsRoutes'));
 app.use('/api/reports', require('./routes/reportsRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/prescriptions', require('./routes/prescriptionsRoutes'));
 
 // Default Route
 app.get('/', (req, res) => {

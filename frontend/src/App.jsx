@@ -51,6 +51,7 @@ import DoctorQueue from './pages/doctor/Queue';
 import DoctorPatients from './pages/doctor/Patients';
 import DoctorProfile from './pages/doctor/Profile';
 import DoctorSchedules from './pages/doctor/Schedules';
+import DoctorPrescriptions from './pages/doctor/Prescriptions';
 
 // Reception Pages
 import ReceptionLayout from './layouts/ReceptionLayout';
@@ -118,6 +119,7 @@ function App() {
                 <Route path="/doctor/schedules" element={<DoctorSchedules />} />
                 <Route path="/doctor/patients" element={<DoctorPatients />} />
                 <Route path="/doctor/profile" element={<DoctorProfile />} />
+                <Route path="/doctor/prescriptions" element={<DoctorPrescriptions />} />
                 <Route path="/doctor/notifications" element={<Notifications />} />
               </Route>
             </Route>
