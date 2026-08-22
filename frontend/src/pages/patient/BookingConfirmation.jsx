@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Printer, Calendar, Clock, MapPin, User, CheckCircle, ArrowRight } from 'lucide-react';
+import { Printer, Calendar, Clock, MapPin, User, CheckCircle, ArrowRight, Download, CreditCard, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const BookingConfirmation = () => {
     const { id } = useParams();
@@ -32,136 +33,223 @@ const BookingConfirmation = () => {
         fetchAppointment();
     }, [id, token]);
 
-    const handlePrint = () => {
-        window.print();
+    const handleDownload = () => {
+        import('html2pdf.js').then((html2pdf) => {
+            const element = document.getElementById('receipt-container');
+            const opt = {
+                margin:       10,
+                filename:     `Appointment-Ticket-APT-${String(appointment?.id || 0).padStart(6, '0')}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 900 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'avoid-all' }
+            };
+            html2pdf.default().set(opt).from(element).save();
+        });
     };
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex justify-center items-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="min-h-screen flex justify-center items-center bg-[#f8fafc]">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
             </div>
         );
     }
 
     if (!appointment) return (
-        <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 text-gray-500">
-            <p className="text-xl mb-4">Could not load appointment details.</p>
-            <Link to="/patient/dashboard" className="text-blue-600 underline">Return to Dashboard</Link>
+        <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8fafc] text-slate-500">
+            <p className="text-xl mb-4 font-bold">Could not load appointment details.</p>
+            <Link to="/patient/dashboard" className="text-indigo-600 font-bold hover:underline">Return to Dashboard</Link>
         </div>
     );
 
-    return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 print:bg-white print:py-0">
-            <div className="max-w-3xl mx-auto">
-                {/* Success Banner (Hide on print) */}
-                <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8 text-center print:hidden">
-                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle size={32} className="text-green-600" />
-                    </div>
-                    <h1 className="text-2xl font-bold text-green-800 mb-2">Booking Confirmed!</h1>
-                    <p className="text-green-600">Your appointment has been successfully scheduled.</p>
-                </div>
+    const bookedAt = appointment.created_at ? new Date(appointment.created_at) : new Date();
 
-                {/* Printable Ticket */}
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden print:shadow-none print:border-none">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white text-center print:text-gray-900 print:bg-none print:border-b-2 print:border-gray-200">
-                        <h2 className="text-3xl font-extrabold uppercase tracking-wider opacity-90">Appointment Ticket</h2>
-                        <p className="mt-2 opacity-80 print:text-gray-500">Smart Hospital Channeling System</p>
+    return (
+        <div className="min-h-screen bg-[#f8fafc] pt-4 pb-12 px-4 print:bg-white print:py-0 font-sans print:p-8">
+            <style type="text/css" media="print">
+                {`@page { margin: 0; } body { margin: 1.6cm; }`}
+            </style>
+            <div className="max-w-2xl mx-auto">
+                
+                {/* Success Animation Header (Hidden on Print) */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                    className="text-center mb-8 print:hidden"
+                >
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-6 shadow-lg shadow-emerald-500/20 border-4 border-white">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                            <CheckCircle size={40} className="text-emerald-500" />
+                        </motion.div>
+                    </div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Payment Successful!</h1>
+                    <p className="text-lg font-medium text-slate-500">Your appointment has been securely confirmed.</p>
+                </motion.div>
+
+                {/* The Ticket / Receipt */}
+                <motion.div 
+                    id="receipt-container"
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1, type: 'spring', stiffness: 100, damping: 20 }}
+                    className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-900/10 border border-slate-100 overflow-hidden print:shadow-none print:border-none print:rounded-none relative"
+                >
+                    {/* Dark Premium Header */}
+                    <div className="bg-slate-900 p-10 text-white relative overflow-hidden print:bg-white print:text-black print:border-b-4 print:border-slate-800 print:p-6 print:pb-8">
+                        {/* Decorative mesh */}
+                        <div className="absolute top-[-50%] right-[-10%] w-[80%] h-[150%] bg-indigo-600/30 blur-[80px] rounded-full mix-blend-screen print:hidden"></div>
+                        
+                        {/* Hospital Letterhead */}
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/10 print:border-slate-200 pb-8">
+                            <div>
+                                <h2 className="text-3xl font-black tracking-tight mb-1">Smart Hospital</h2>
+                                <p className="text-indigo-300 font-bold text-sm mb-1 print:text-indigo-600 uppercase tracking-widest">Elite Healthcare Center</p>
+                                <p className="text-indigo-100/70 text-sm print:text-slate-500">123 Wellness Avenue, Medical District, Colombo 00700</p>
+                            </div>
+                            <div className="mt-4 md:mt-0 text-left md:text-right">
+                                <p className="text-indigo-100/90 text-sm font-bold print:text-slate-700">Tel: +94 11 234 5678</p>
+                                <p className="text-indigo-100/90 text-sm font-bold print:text-slate-700">Email: info@smarthospital.lk</p>
+                                <p className="text-indigo-100/90 text-sm font-bold print:text-slate-700">Web: www.smarthospital.lk</p>
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div>
+                                <div className="text-indigo-400 font-bold tracking-widest uppercase text-xs mb-2 print:text-slate-400">Official Receipt</div>
+                                <h2 className="text-2xl font-black tracking-tight mb-1">Appointment Ticket</h2>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-white/60 text-xs font-bold uppercase tracking-wider mb-1 print:text-slate-400">Status</div>
+                                <span className="inline-flex items-center px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-sm font-black uppercase tracking-widest print:bg-emerald-50 print:text-emerald-700 print:border-emerald-200">
+                                    <ShieldCheck size={14} className="mr-1.5" /> PAID
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div className="p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 border-b border-gray-100 pb-8">
+                    <div className="p-10 print:p-6">
+                        
+                        {/* Appointment ID & Time of Booking */}
+                        <div className="flex flex-col sm:flex-row justify-between pb-8 border-b border-dashed border-slate-200 mb-8 gap-4">
                             <div>
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Appointment Details</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <div className="text-xs text-gray-500 mb-1">Appointment Number</div>
-                                        <div className="text-xl font-bold text-gray-900">APT-{String(appointment.id).padStart(6, '0')}</div>
+                                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Booking Reference</div>
+                                <div className="text-2xl font-black text-slate-800 tracking-tight">APT-{String(appointment.id).padStart(6, '0')}</div>
+                            </div>
+                            <div className="sm:text-right">
+                                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Date Issued</div>
+                                <div className="text-slate-700 font-bold">
+                                    {bookedAt.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })} at {bookedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Core Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8 border-b border-dashed border-slate-200 pb-10">
+                            
+                            {/* Schedule Info */}
+                            <div>
+                                <h3 className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-5 flex items-center">
+                                    <Calendar className="mr-2" size={14} /> Schedule Details
+                                </h3>
+                                <div className="space-y-5">
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Consultation Date</div>
+                                        <div className="text-slate-900 font-black">{new Date(appointment.appointment_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                                     </div>
-                                    <div>
-                                        <div className="text-xs text-gray-500 mb-1">Queue Number</div>
-                                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-700 text-2xl font-black">
-                                            {appointment.queue_number}
-                                        </div>
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Time Slot</div>
+                                        <div className="text-indigo-600 font-black bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">{appointment.appointment_time}</div>
                                     </div>
-                                    <div>
-                                        <div className="text-xs text-gray-500 mb-1">Status</div>
-                                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold uppercase">
-                                            {appointment.status}
-                                        </span>
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Queue Number</div>
+                                        <div className="text-slate-900 font-black text-xl">#{appointment.queue_number}</div>
                                     </div>
                                 </div>
                             </div>
                             
+                            {/* Doctor Info */}
                             <div>
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Schedule & Doctor</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-start">
-                                        <Calendar className="w-5 h-5 text-blue-500 mr-3 mt-0.5" />
-                                        <div>
-                                            <div className="text-xs text-gray-500">Date</div>
-                                            <div className="font-semibold text-gray-900">{new Date(appointment.appointment_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                                        </div>
+                                <h3 className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-5 flex items-center">
+                                    <User className="mr-2" size={14} /> Practitioner
+                                </h3>
+                                <div className="space-y-5">
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Doctor Name</div>
+                                        <div className="text-slate-900 font-black text-right">Dr. {appointment.doctor_first_name} {appointment.doctor_last_name}</div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <Clock className="w-5 h-5 text-blue-500 mr-3 mt-0.5" />
-                                        <div>
-                                            <div className="text-xs text-gray-500">Time</div>
-                                            <div className="font-semibold text-gray-900 text-lg">{appointment.appointment_time}</div>
-                                        </div>
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Department</div>
+                                        <div className="text-slate-700 font-bold text-right">{appointment.department_name} Dept</div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <User className="w-5 h-5 text-blue-500 mr-3 mt-0.5" />
-                                        <div>
-                                            <div className="text-xs text-gray-500">Doctor</div>
-                                            <div className="font-semibold text-gray-900">Dr. {appointment.doctor_first_name} {appointment.doctor_last_name}</div>
-                                            <div className="text-sm text-gray-500">{appointment.department_name} Dept</div>
-                                        </div>
+                                    <div className="flex justify-between items-end">
+                                        <div className="text-slate-500 font-bold text-sm">Patient Name</div>
+                                        <div className="text-slate-700 font-bold text-right">{appointment.patient_first_name} {appointment.patient_last_name}</div>
                                     </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* Payment Breakdown */}
+                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8 print:bg-white print:border-none print:p-0">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center print:hidden">
+                                <CreditCard className="mr-2" size={14} /> Payment Summary
+                            </h3>
+                            
+                            <div className="flex justify-between items-center mb-3 text-sm">
+                                <div className="text-slate-600 font-bold">Consultation Fee</div>
+                                <div className="text-slate-800 font-black">LKR {parseFloat(appointment.consultation_fee).toLocaleString()}</div>
+                            </div>
+                            <div className="flex justify-between items-center mb-4 text-sm">
+                                <div className="text-slate-600 font-bold">Platform Fee (Tax Incl.)</div>
+                                <div className="text-slate-800 font-black">LKR 0.00</div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center pt-4 border-t border-slate-200">
+                                <div className="text-slate-900 font-black uppercase tracking-wider">Total Paid</div>
+                                <div className="flex items-baseline">
+                                    <span className="text-slate-500 font-bold mr-2 text-lg">LKR</span>
+                                    <span className="text-3xl font-black text-indigo-600">{parseFloat(appointment.consultation_fee).toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mb-4">
-                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Patient Information</h3>
-                            <div className="bg-gray-50 p-4 rounded-xl flex items-center">
-                                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-lg mr-4">
-                                    {appointment.patient_first_name.charAt(0)}
-                                </div>
-                                <div>
-                                    <div className="font-bold text-gray-900">{appointment.patient_first_name} {appointment.patient_last_name}</div>
-                                    <div className="text-sm text-gray-500">Email: {appointment.patient_email}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center mt-6">
-                            <div className="text-blue-800 font-semibold">Consultation Fee</div>
-                            <div className="text-2xl font-black text-blue-600">${appointment.consultation_fee}</div>
-                        </div>
-
-                        <div className="text-center mt-8 text-xs text-gray-400 italic">
-                            Please arrive 15 minutes before your scheduled appointment time. Bring your ID and this confirmation ticket.
+                        <div className="text-center text-xs font-bold text-slate-400 italic px-6 print:text-left print:px-0">
+                            Please arrive 15 minutes before your scheduled appointment time. <br className="hidden sm:block" /> Bring a valid ID and this confirmation ticket (digital or printed).
                         </div>
                     </div>
-                </div>
+                    
+                    {/* Dotted Tear-off edge effect at the bottom (Hidden on print) */}
+                    <div className="h-4 w-full bg-[radial-gradient(circle,transparent_4px,#ffffff_5px)] bg-[length:16px_16px] absolute -bottom-2 left-0 right-0 rotate-180 print:hidden opacity-0"></div>
+                </motion.div>
 
                 {/* Action Buttons (Hide on print) */}
-                <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4 print:hidden">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-10 flex flex-col sm:flex-row justify-center gap-4 print:hidden"
+                >
                     <button 
-                        onClick={handlePrint}
-                        className="px-8 py-3 bg-white border border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-50 flex items-center justify-center transition-colors shadow-sm"
+                        onClick={handleDownload}
+                        className="px-8 py-4 bg-white border border-slate-200 text-slate-700 font-black rounded-[1.5rem] hover:bg-slate-50 hover:border-slate-300 flex items-center justify-center transition-all shadow-sm group"
                     >
-                        <Printer size={18} className="mr-2" /> Print Ticket
+                        <Download size={20} className="mr-3 text-slate-400 group-hover:text-indigo-500 transition-colors" /> 
+                        Download Bill (PDF)
                     </button>
                     <Link 
                         to="/patient/dashboard"
-                        className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 flex items-center justify-center transition-colors shadow-md shadow-blue-500/20"
+                        className="px-8 py-4 bg-slate-900 text-white font-black rounded-[1.5rem] hover:bg-indigo-600 flex items-center justify-center transition-all shadow-xl shadow-slate-900/20 group"
                     >
-                        Go to Dashboard <ArrowRight size={18} className="ml-2" />
+                        Go to Dashboard <ArrowRight size={20} className="ml-3 transform group-hover:translate-x-1 transition-transform" />
                     </Link>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

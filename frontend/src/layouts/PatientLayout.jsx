@@ -30,7 +30,7 @@ const PatientLayout = () => {
     ];
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans print:h-auto print:overflow-visible print:bg-white">
             <Toaster position="top-right" />
             
             {/* Mobile Sidebar Overlay */}
@@ -39,7 +39,7 @@ const PatientLayout = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl print:hidden`}>
                 <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
                     <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">Patient Portal</span>
                     <button className="md:hidden text-gray-300 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
@@ -77,7 +77,7 @@ const PatientLayout = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 {/* Header */}
-                <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
+                <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10 print:hidden">
                     <div className="flex items-center md:hidden gap-3">
                         <button onClick={() => setIsMobileMenuOpen(true)} className="text-gray-600 hover:text-blue-600">
                             <Menu size={24} />
@@ -100,7 +100,7 @@ const PatientLayout = () => {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
+                <main className="flex-1 overflow-y-auto bg-gray-50/50 p-6 print:overflow-visible print:p-0 print:bg-white">
                     <Outlet />
                 </main>
             </div>

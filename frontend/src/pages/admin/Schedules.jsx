@@ -302,7 +302,7 @@ const Schedules = () => {
                                             {/* Dropdown Trigger */}
                                             <div 
                                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                                className={`w-full px-4 py-4 bg-slate-50 border ${isDropdownOpen ? 'border-amber-400 ring-2 ring-amber-500 bg-white' : 'border-slate-200 hover:border-slate-300'} rounded-xl cursor-pointer transition-all flex items-center justify-between group`}
+                                                className={`w-full px-4 py-4 bg-slate-50 border ${isDropdownOpen ? 'border-amber-400 ring-2 ring-amber-500 bg-white' : 'border-slate-300 shadow-sm hover:border-slate-400'} rounded-xl cursor-pointer transition-all flex items-center justify-between group`}
                                             >
                                                 {formData.doctor_id ? (
                                                     <span className="font-bold text-slate-700">
@@ -333,7 +333,7 @@ const Schedules = () => {
                                                                 <input 
                                                                     type="text" 
                                                                     placeholder="Search doctors by name or specialty..."
-                                                                    className="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-amber-400 font-bold text-slate-700 text-sm shadow-sm"
+                                                                    className="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 shadow-sm rounded-lg outline-none focus:border-amber-400 font-bold text-slate-700 text-sm"
                                                                     value={doctorSearchQuery}
                                                                     onChange={(e) => setDoctorSearchQuery(e.target.value)}
                                                                     onClick={(e) => e.stopPropagation()}
@@ -380,7 +380,7 @@ const Schedules = () => {
                                         <div className="sm:col-span-2">
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Day of Week *</label>
                                             <div className="relative">
-                                                <select required value={formData.day_of_week} onChange={(e) => setFormData({...formData, day_of_week: parseInt(e.target.value)})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700 appearance-none cursor-pointer">
+                                                <select required value={formData.day_of_week} onChange={(e) => setFormData({...formData, day_of_week: parseInt(e.target.value)})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700 appearance-none cursor-pointer">
                                                     {daysOfWeek.map(day => <option key={day.id} value={day.id}>{day.name}</option>)}
                                                 </select>
                                                 <ChevronDown size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -389,19 +389,19 @@ const Schedules = () => {
                                         
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Start Time *</label>
-                                            <input type="time" required value={formData.start_time} onChange={(e) => setFormData({...formData, start_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                            <input type="time" required value={formData.start_time} onChange={(e) => setFormData({...formData, start_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">End Time *</label>
-                                            <input type="time" required value={formData.end_time} onChange={(e) => setFormData({...formData, end_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                            <input type="time" required value={formData.end_time} onChange={(e) => setFormData({...formData, end_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Slot Duration (Mins) *</label>
-                                            <input type="number" required min="5" step="5" value={formData.slot_duration_minutes} onChange={(e) => setFormData({...formData, slot_duration_minutes: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                            <input type="number" required min="5" step="5" value={formData.slot_duration_minutes} onChange={(e) => setFormData({...formData, slot_duration_minutes: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Max Patients *</label>
-                                            <input type="number" required min="1" value={formData.max_patients} onChange={(e) => setFormData({...formData, max_patients: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
+                                            <input type="number" required min="1" value={formData.max_patients} onChange={(e) => setFormData({...formData, max_patients: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
                                         </div>
                                     </div>
                                 </form>
