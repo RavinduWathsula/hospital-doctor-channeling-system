@@ -149,23 +149,23 @@ const DoctorSchedules = () => {
         <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-2xl mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-800 opacity-90"></div>
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-900 opacity-90"></div>
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-pulse"></div>
                 
                 <div className="relative p-8 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                             <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                                <CalendarDays className="text-blue-300" size={24} />
+                                <CalendarDays className="text-teal-300" size={24} />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight">My Schedules</h1>
                         </div>
-                        <p className="text-blue-100/80 font-medium text-lg md:ml-16">
+                        <p className="text-teal-100/80 font-medium text-lg md:ml-16">
                             Define your working hours and availability for patients.
                         </p>
                     </div>
                     
-                    <button onClick={openCreateModal} className="flex items-center px-6 py-3 bg-white text-blue-900 font-bold rounded-2xl hover:bg-blue-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
+                    <button onClick={openCreateModal} className="flex items-center px-6 py-3 bg-white text-teal-900 font-bold rounded-2xl hover:bg-teal-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
                         <Plus size={20} className="mr-2" /> Add New Schedule
                     </button>
                 </div>
@@ -182,7 +182,7 @@ const DoctorSchedules = () => {
                             
                             <div className="flex justify-between items-start mb-6 relative z-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-blue-600 shadow-inner border border-blue-100/50">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 shadow-inner border border-teal-100/50">
                                         <span className="text-xl font-black">{day ? day.short : ''}</span>
                                     </div>
                                     <div>
@@ -203,7 +203,7 @@ const DoctorSchedules = () => {
                             </div>
                             
                             <div className="mt-auto flex gap-3 relative z-10 border-t border-slate-100 pt-5">
-                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
+                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-teal-50 text-teal-700 font-bold rounded-xl hover:bg-teal-600 hover:text-white transition-colors">
                                     <Edit2 size={16} className="mr-2" /> Edit
                                 </button>
                                 <button onClick={() => handleDelete(s.id)} className="w-12 flex items-center justify-center bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-600 hover:text-white transition-colors">
@@ -221,7 +221,7 @@ const DoctorSchedules = () => {
                         </div>
                         <h3 className="text-2xl font-black text-slate-800 mb-2">No Schedules Found</h3>
                         <p className="text-slate-500 max-w-sm text-lg mb-6">You haven't set up any working schedules yet. Add one to allow patients to book appointments.</p>
-                        <button onClick={openCreateModal} className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg hover:shadow-blue-500/30 transition-all">Create First Schedule</button>
+                        <button onClick={openCreateModal} className="px-6 py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 shadow-lg hover:shadow-teal-500/30 transition-all">Create First Schedule</button>
                     </div>
                 )}
             </div>

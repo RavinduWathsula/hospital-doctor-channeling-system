@@ -89,10 +89,10 @@ const PatientLayout = () => {
                         <NotificationDropdown rolePrefix="patient" />
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-2 shadow-sm border border-blue-200">
-                                {user?.firstName?.charAt(0) || 'P'}
+                                {user?.first_name?.charAt(0) || 'P'}
                             </div>
                             <div className="text-sm">
-                                <p className="font-semibold text-gray-700">{user?.firstName} {user?.lastName}</p>
+                                <p className="font-semibold text-gray-700">{user?.first_name} {user?.last_name}</p>
                                 <p className="text-xs text-blue-600 font-medium capitalize">Patient Account</p>
                             </div>
                         </div>

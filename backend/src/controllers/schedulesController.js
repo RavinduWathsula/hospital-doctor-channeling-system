@@ -96,6 +96,12 @@ exports.delete = async (req, res, next) => {
             message: 'Schedule deleted successfully'
         });
     } catch (error) {
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Cannot delete schedule because appointments have already been booked for it.' 
+            });
+        }
         next(error);
     }
 };

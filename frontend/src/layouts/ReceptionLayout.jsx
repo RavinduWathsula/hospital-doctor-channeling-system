@@ -89,10 +89,10 @@ const ReceptionLayout = () => {
                         <NotificationDropdown rolePrefix="reception" />
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold mr-2 shadow-sm border border-indigo-200">
-                                {user?.firstName?.charAt(0) || 'R'}
+                                {user?.first_name?.charAt(0) || 'R'}
                             </div>
                             <div className="text-sm">
-                                <p className="font-semibold text-gray-700">{user?.firstName} {user?.lastName}</p>
+                                <p className="font-semibold text-gray-700">{user?.first_name} {user?.last_name}</p>
                                 <p className="text-xs text-indigo-600 font-medium capitalize">Receptionist</p>
                             </div>
                         </div>

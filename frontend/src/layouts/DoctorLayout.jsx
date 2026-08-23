@@ -9,6 +9,24 @@ const DoctorLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+    const [currentTime, setCurrentTime] = React.useState(new Date());
+
+    React.useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const timeString = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).format(currentTime);
+
+    const dateString = new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+    }).format(currentTime);
 
     const handleLogout = () => {
         logout();
@@ -86,15 +104,21 @@ const DoctorLayout = () => {
                             <span className="text-xl font-bold text-teal-600">Doctor Portal</span>
                         </div>
                     </div>
-                    <div className="flex-1"></div>
+                    <div className="flex-1 flex justify-end md:justify-center px-4">
+                        <div className="hidden md:flex items-center gap-4 text-sm font-semibold text-slate-600 bg-slate-100/80 px-5 py-2 rounded-full border border-slate-200/50 shadow-sm">
+                            <span className="flex items-center gap-2"><CalendarCheck size={16} className="text-teal-600" /> {dateString}</span>
+                            <span className="text-slate-300">|</span>
+                            <span className="flex items-center gap-2 font-mono"><Clock size={16} className="text-teal-600 animate-pulse" /> {timeString}</span>
+                        </div>
+                    </div>
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="doctor" />
                         <div className="flex items-center">
                             <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold mr-2 shadow-sm border border-teal-200">
-                                {user?.firstName?.charAt(0) || 'D'}
+                                {user?.first_name?.charAt(0) || 'D'}
                             </div>
                             <div className="text-sm">
-                                <p className="font-semibold text-gray-700">Dr. {user?.firstName} {user?.lastName}</p>
+                                <p className="font-semibold text-gray-700">Dr. {user?.first_name} {user?.last_name}</p>
                                 <p className="text-xs text-teal-600 font-medium capitalize">Doctor Account</p>
                             </div>
                         </div>
