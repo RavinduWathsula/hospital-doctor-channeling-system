@@ -6,7 +6,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
 
 let client = null;
-if (accountSid && authToken) {
+if (accountSid && authToken && accountSid.startsWith('AC')) {
     client = twilio(accountSid, authToken);
 }
 

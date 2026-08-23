@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Clock, Users, Activity, CheckCircle, RotateCcw } from 'lucide-react';
+import { Clock, Users, Activity, CheckCircle, RotateCcw, CalendarPlus, Sparkles, Coffee } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Queue = () => {
     const { token } = useContext(AuthContext);
@@ -43,14 +44,73 @@ const Queue = () => {
 
     if (!queueData) {
         return (
-            <div className="max-w-4xl mx-auto mt-8">
-                <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-6">
-                        <Clock size={40} />
+            <div className="max-w-4xl mx-auto mt-8 relative group perspective-1000">
+                <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/50 to-indigo-50/50 rounded-[2.5rem] p-12 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 backdrop-blur-2xl transition-all duration-700 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)]">
+                    {/* Animated Background Blobs */}
+                    <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+                    <div className="absolute top-1/2 -right-24 w-80 h-80 bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+                    <div className="absolute -bottom-24 left-1/3 w-80 h-80 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+
+                    <div className="relative z-10 flex flex-col items-center">
+                        {/* Icon Container */}
+                        <div className="relative mb-10 mt-4">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-blue-400 to-indigo-400 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition duration-700 animate-pulse" style={{ animationDuration: '4s' }}></div>
+                            <div className="w-32 h-32 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-blue-600 shadow-2xl border border-white/60 relative transform transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3">
+                                <Coffee size={56} className="animate-bounce" style={{ animationDuration: '3s' }} />
+                                <div className="absolute -top-2 -right-2 bg-gradient-to-br from-amber-200 to-yellow-400 text-yellow-900 p-2.5 rounded-full shadow-lg transform rotate-12 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}>
+                                    <Sparkles size={22} className="animate-spin-slow" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-800 mb-5 tracking-tight pb-1 bg-300% animate-gradient">
+                            You're All Caught Up!
+                        </h2>
+                        
+                        <p className="text-lg text-gray-500 mb-10 max-w-lg mx-auto leading-relaxed font-medium">
+                            There are no active queues for you right now. Take a moment to relax, grab a coffee, or schedule your next visit when you're ready.
+                        </p>
+                        
+                        <Link 
+                            to="/patient/booking" 
+                            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 hover:from-blue-500 to-indigo-600 hover:to-indigo-500 text-white rounded-2xl font-semibold shadow-[0_8px_20px_rgb(79,70,229,0.3)] hover:shadow-[0_15px_30px_rgb(79,70,229,0.4)] transform hover:-translate-y-1 transition-all duration-300"
+                        >
+                            <CalendarPlus size={22} className="mr-3" />
+                            Book New Appointment
+                        </Link>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">No Active Queue</h2>
-                    <p className="text-gray-500 mb-8 max-w-md mx-auto">You don't have any appointments scheduled for today, or your appointment has already concluded.</p>
                 </div>
+                
+                {/* Embedded CSS for animations */}
+                <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes blob {
+                        0% { transform: translate(0px, 0px) scale(1); }
+                        33% { transform: translate(40px, -60px) scale(1.1); }
+                        66% { transform: translate(-30px, 30px) scale(0.9); }
+                        100% { transform: translate(0px, 0px) scale(1); }
+                    }
+                    @keyframes gradient {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                    .animate-blob {
+                        animation: blob 8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    .animation-delay-2000 {
+                        animation-delay: 2s;
+                    }
+                    .animation-delay-4000 {
+                        animation-delay: 4s;
+                    }
+                    .animate-gradient {
+                        background-size: 200% auto;
+                        animation: gradient 4s linear infinite;
+                    }
+                    .animate-spin-slow {
+                        animation: spin 6s linear infinite;
+                    }
+                `}} />
             </div>
         );
     }
