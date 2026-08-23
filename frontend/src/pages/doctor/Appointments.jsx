@@ -167,29 +167,29 @@ const DoctorAppointments = () => {
             
             {/* Header Section */}
             <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-2xl mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-900 to-emerald-800 opacity-90"></div>
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-theme-600 to-theme-900 opacity-90 transition-colors duration-500"></div>
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-theme-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob transition-colors duration-500"></div>
                 
                 <div className="relative p-8 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                             <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                                <CalendarClock className="text-emerald-300" size={24} />
+                                <CalendarClock className="text-theme-100" size={24} />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight">Appointments</h1>
                         </div>
-                        <p className="text-emerald-100/80 font-medium text-lg ml-0 md:ml-16">
+                        <p className="text-theme-50 font-medium text-lg ml-0 md:ml-16 opacity-90">
                             Manage consultations, view active patients, and track your schedule.
                         </p>
                     </div>
                     
                     <div className="w-full md:w-auto flex flex-col sm:flex-row gap-4">
                         <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-200 group-focus-within:text-white transition-colors" size={20} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-200 group-focus-within:text-white transition-colors" size={20} />
                             <input 
                                 type="text" 
                                 placeholder="Search Name, Q-No, or Appt ID..." 
-                                className="w-full md:w-80 pl-12 pr-4 py-3.5 bg-black/20 border border-white/10 text-white placeholder-emerald-100/50 rounded-2xl focus:bg-black/40 focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition-all backdrop-blur-md shadow-inner font-medium"
+                                className="w-full md:w-80 pl-12 pr-4 py-3.5 bg-black/20 border border-white/10 text-white placeholder-theme-100/50 rounded-2xl focus:bg-black/40 focus:ring-2 focus:ring-theme-400 focus:border-transparent outline-none transition-all backdrop-blur-md shadow-inner font-medium"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -214,7 +214,7 @@ const DoctorAppointments = () => {
                             <button 
                                 key={dateStr}
                                 onClick={() => setFilterDate(dateStr)}
-                                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${filterDate === dateStr ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${filterDate === dateStr ? 'bg-theme-600 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                             >
                                 {label}
                                 {count > 0 && (
@@ -237,13 +237,13 @@ const DoctorAppointments = () => {
                     </button>
                     <button 
                         onClick={() => setFilterStatus('ACTIVE')}
-                        className={`px-5 py-2 rounded-xl font-bold transition-all text-sm ${filterStatus === 'ACTIVE' ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/30' : 'text-slate-500 hover:bg-slate-100'}`}
+                        className={`px-5 py-2 rounded-xl font-bold transition-all text-sm ${filterStatus === 'ACTIVE' ? 'bg-theme-500 text-white shadow-lg shadow-theme-500/30' : 'text-slate-500 hover:bg-slate-100'}`}
                     >
                         Active / Pending
                     </button>
                     <button 
                         onClick={() => setFilterStatus('COMPLETED')}
-                        className={`px-5 py-2 rounded-xl font-bold transition-all text-sm ${filterStatus === 'COMPLETED' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'text-slate-500 hover:bg-slate-100'}`}
+                        className={`px-5 py-2 rounded-xl font-bold transition-all text-sm ${filterStatus === 'COMPLETED' ? 'bg-theme-500 text-white shadow-lg shadow-theme-500/30' : 'text-slate-500 hover:bg-slate-100'}`}
                     >
                         Completed
                     </button>
@@ -253,7 +253,7 @@ const DoctorAppointments = () => {
             {/* List View */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                    <div className="w-16 h-16 border-4 border-theme-500/30 border-t-theme-500 rounded-full animate-spin"></div>
                     <p className="mt-4 text-slate-500 font-bold uppercase tracking-widest animate-pulse">Loading Appointments...</p>
                 </div>
             ) : filteredAppointments.length === 0 ? (
@@ -270,25 +270,25 @@ const DoctorAppointments = () => {
                         <div key={app.id} className="bg-white rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300 group hover:-translate-y-1 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative overflow-hidden">
                             {/* Decorative Left Border based on status */}
                             <div className={`absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2 ${
-                                app.status === 'COMPLETED' ? 'bg-emerald-500' : 
+                                app.status === 'COMPLETED' ? 'bg-theme-500' : 
                                 app.status === 'IN_CONSULTATION' ? 'bg-orange-500' : 
-                                'bg-teal-500'
+                                'bg-theme-400'
                             }`}></div>
 
                             <div className="flex flex-col md:flex-row gap-6 w-full lg:w-auto items-start md:items-center flex-1 ml-2">
                                 
                                 {/* Patient Info & Avatar */}
                                 <div className="flex items-center gap-5 w-full md:w-80">
-                                    <div className="w-16 h-16 rounded-[1rem] bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 shadow-inner shrink-0 group-hover:from-teal-100 group-hover:to-emerald-100 group-hover:text-teal-600 transition-colors">
+                                    <div className="w-16 h-16 rounded-[1rem] bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 shadow-inner shrink-0 group-hover:from-theme-100 group-hover:to-theme-200 group-hover:text-theme-600 transition-colors">
                                         <User size={32} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-800 tracking-tight mb-1 group-hover:text-teal-700 transition-colors">
+                                        <h3 className="text-xl font-black text-slate-800 tracking-tight mb-1 group-hover:text-theme-700 transition-colors">
                                             {app.patient_first_name} {app.patient_last_name}
                                         </h3>
                                         <div className="flex gap-3 text-xs font-bold uppercase tracking-wider text-slate-400">
                                             <span className="flex items-center gap-1">
-                                                <Hash size={14} className="text-teal-500"/> APT-{app.id}
+                                                <Hash size={14} className="text-theme-500"/> APT-{app.id}
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <Activity size={14} className="text-orange-500"/> Q-{app.queue_number || 'N/A'}
@@ -376,7 +376,7 @@ const DoctorAppointments = () => {
                         {/* Modal Header */}
                         <div className="px-8 py-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-xl bg-theme-100 text-theme-600 flex items-center justify-center">
                                     <FileText size={24} />
                                 </div>
                                 <div>
@@ -404,7 +404,7 @@ const DoctorAppointments = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-black text-slate-800">{selectedAppointment.patient_first_name} {selectedAppointment.patient_last_name}</h3>
-                                            <p className="text-sm font-bold text-teal-600">Queue No: {selectedAppointment.queue_number || 'N/A'}</p>
+                                            <p className="text-sm font-bold text-theme-600">Queue No: {selectedAppointment.queue_number || 'N/A'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -428,7 +428,7 @@ const DoctorAppointments = () => {
                             {/* Additional Details (Reason / Notes) */}
                             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                                 <h4 className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                                    <Activity size={16} className="text-teal-500"/> Reason for Visit
+                                    <Activity size={16} className="text-theme-500"/> Reason for Visit
                                 </h4>
                                 <p className="text-slate-600 leading-relaxed">
                                     {selectedAppointment.reason || 'No specific reason provided by the patient during booking.'}

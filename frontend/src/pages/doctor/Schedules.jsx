@@ -149,23 +149,23 @@ const DoctorSchedules = () => {
         <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-2xl mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-900 opacity-90"></div>
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-teal-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-theme-600 to-theme-900 opacity-90 transition-colors duration-500"></div>
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-theme-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob transition-colors duration-500"></div>
                 
                 <div className="relative p-8 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                             <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                                <CalendarDays className="text-teal-300" size={24} />
+                                <CalendarDays className="text-theme-100" size={24} />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight">My Schedules</h1>
                         </div>
-                        <p className="text-teal-100/80 font-medium text-lg md:ml-16">
+                        <p className="text-theme-50 font-medium text-lg md:ml-16 opacity-90">
                             Define your working hours and availability for patients.
                         </p>
                     </div>
                     
-                    <button onClick={openCreateModal} className="flex items-center px-6 py-3 bg-white text-teal-900 font-bold rounded-2xl hover:bg-teal-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
+                    <button onClick={openCreateModal} className="flex items-center px-6 py-3 bg-white text-theme-900 font-bold rounded-2xl hover:bg-theme-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
                         <Plus size={20} className="mr-2" /> Add New Schedule
                     </button>
                 </div>
@@ -178,16 +178,16 @@ const DoctorSchedules = () => {
                     return (
                         <div key={s.id} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl border border-slate-100 transition-all duration-300 group relative overflow-hidden flex flex-col">
                             {/* Decorative background */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-10 -mt-10 transition-all group-hover:scale-150 ${s.status === 'ACTIVE' ? 'bg-emerald-400' : 'bg-red-400'}`}></div>
+                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full mix-blend-multiply filter blur-3xl opacity-10 -mr-10 -mt-10 transition-all group-hover:scale-150 group-hover:opacity-20 ${s.status === 'ACTIVE' ? 'bg-theme-400' : 'bg-red-400'}`}></div>
                             
                             <div className="flex justify-between items-start mb-6 relative z-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 shadow-inner border border-teal-100/50">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-theme-100 to-theme-200 flex items-center justify-center text-theme-700 shadow-inner border border-theme-100/50">
                                         <span className="text-xl font-black">{day ? day.short : ''}</span>
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-bold text-slate-800">{day ? day.name : 'Unknown'}</h3>
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 ${s.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 ${s.status === 'ACTIVE' ? 'bg-theme-50 text-theme-700 ring-1 ring-theme-600/20' : 'bg-red-50 text-red-700 ring-1 ring-red-600/20'}`}>
                                             {s.status === 'ACTIVE' ? <CheckCircle size={12} className="mr-1"/> : <X size={12} className="mr-1"/>}
                                             {s.status}
                                         </span>
@@ -197,13 +197,13 @@ const DoctorSchedules = () => {
                             
                             <div className="space-y-4 mb-8 relative z-10">
                                 <div className="flex items-center text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <Clock size={18} className="text-indigo-500 mr-3" />
+                                    <Clock size={18} className="text-theme-500 mr-3" />
                                     <span className="font-semibold">{s.start_time} - {s.end_time}</span>
                                 </div>
                             </div>
                             
                             <div className="mt-auto flex gap-3 relative z-10 border-t border-slate-100 pt-5">
-                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-teal-50 text-teal-700 font-bold rounded-xl hover:bg-teal-600 hover:text-white transition-colors">
+                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-theme-50 text-theme-700 font-bold rounded-xl hover:bg-theme-600 hover:text-white transition-colors">
                                     <Edit2 size={16} className="mr-2" /> Edit
                                 </button>
                                 <button onClick={() => handleDelete(s.id)} className="w-12 flex items-center justify-center bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-600 hover:text-white transition-colors">
@@ -221,7 +221,7 @@ const DoctorSchedules = () => {
                         </div>
                         <h3 className="text-2xl font-black text-slate-800 mb-2">No Schedules Found</h3>
                         <p className="text-slate-500 max-w-sm text-lg mb-6">You haven't set up any working schedules yet. Add one to allow patients to book appointments.</p>
-                        <button onClick={openCreateModal} className="px-6 py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 shadow-lg hover:shadow-teal-500/30 transition-all">Create First Schedule</button>
+                        <button onClick={openCreateModal} className="px-6 py-3 bg-theme-600 text-white font-bold rounded-xl hover:bg-theme-700 shadow-lg hover:shadow-theme-500/30 transition-all">Create First Schedule</button>
                     </div>
                 )}
             </div>
@@ -231,7 +231,7 @@ const DoctorSchedules = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
                         {/* Modal Header */}
-                        <div className="px-8 py-6 bg-gradient-to-r from-emerald-600 to-teal-600 flex items-center justify-between text-white relative overflow-hidden">
+                        <div className="px-8 py-6 bg-gradient-to-r from-theme-600 to-theme-800 flex items-center justify-between text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
                             <h2 className="text-2xl font-black relative z-10">{isEditMode ? 'Edit Schedule' : 'New Schedule'}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors relative z-10">
@@ -246,7 +246,7 @@ const DoctorSchedules = () => {
                                     <label className="block text-sm font-bold text-slate-700 mb-1">Day of Week</label>
                                     <div className="relative">
                                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                        <select name="day_of_week" required value={formData.day_of_week} onChange={handleInputChange} className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
+                                        <select name="day_of_week" required value={formData.day_of_week} onChange={handleInputChange} className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-theme-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
                                             {daysOfWeek.map(d => (
                                                 <option key={d.id} value={d.id}>{d.name}</option>
                                             ))}
@@ -258,13 +258,13 @@ const DoctorSchedules = () => {
                                     <div>
                                         <label className="block text-sm font-bold text-slate-700 mb-1">Start Time</label>
                                         <div className="relative">
-                                            <input type="time" name="start_time" required value={formData.start_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
+                                            <input type="time" name="start_time" required value={formData.start_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-theme-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-slate-700 mb-1">End Time</label>
                                         <div className="relative">
-                                            <input type="time" name="end_time" required value={formData.end_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
+                                            <input type="time" name="end_time" required value={formData.end_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-theme-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
                                         </div>
                                     </div>
                                 </div>
@@ -273,7 +273,7 @@ const DoctorSchedules = () => {
                                 
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1">Status</label>
-                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
+                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-theme-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
                                         <option value="ACTIVE">🟢 Active</option>
                                         <option value="INACTIVE">🔴 Inactive</option>
                                     </select>
@@ -284,7 +284,7 @@ const DoctorSchedules = () => {
                         {/* Modal Footer */}
                         <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
                             <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-slate-600 font-bold bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">Cancel</button>
-                            <button type="submit" form="scheduleForm" className="px-6 py-2.5 text-white font-bold bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all">
+                            <button type="submit" form="scheduleForm" className="px-6 py-2.5 text-white font-bold bg-theme-600 rounded-xl hover:bg-theme-700 hover:shadow-lg hover:shadow-theme-500/30 transition-all">
                                 {isEditMode ? 'Save Changes' : 'Create Schedule'}
                             </button>
                         </div>
