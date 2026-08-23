@@ -72,7 +72,7 @@ const DoctorProfile = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-theme-500"></div>
             </div>
         );
     }
@@ -91,7 +91,7 @@ const DoctorProfile = () => {
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 {/* Header background */}
-                <div className="h-32 bg-gradient-to-r from-teal-500 to-emerald-400 relative">
+                <div className="h-32 bg-gradient-to-r from-theme-500 to-theme-400 relative">
                     <button className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg backdrop-blur-sm transition-colors text-sm font-medium flex items-center">
                         <Camera size={16} className="mr-2" /> Change Cover
                     </button>
@@ -102,7 +102,7 @@ const DoctorProfile = () => {
                     <div className="flex justify-between items-end -mt-12 mb-6">
                         <div className="relative">
                             <div className="w-24 h-24 bg-white rounded-full p-1 shadow-md">
-                                <div className="w-full h-full bg-teal-100 text-teal-600 rounded-full flex items-center justify-center font-bold text-3xl">
+                                <div className="w-full h-full bg-theme-100 text-theme-600 rounded-full flex items-center justify-center font-bold text-3xl">
                                     {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
                                 </div>
                             </div>
@@ -115,7 +115,7 @@ const DoctorProfile = () => {
                     {/* Name & Specialization */}
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800">Dr. {profile.first_name} {profile.last_name}</h2>
-                        <p className="text-teal-600 font-medium flex items-center mt-1">
+                        <p className="text-theme-600 font-medium flex items-center mt-1">
                             <Stethoscope size={16} className="mr-1" /> {profile.specialization || 'General Practitioner'}
                         </p>
                     </div>
@@ -129,7 +129,7 @@ const DoctorProfile = () => {
                             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Professional Information</h3>
                             
                             <div className="flex items-start">
-                                <Award className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <Award className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Qualifications</p>
                                     <p className="font-medium text-gray-800">{profile.qualifications || 'N/A'}</p>
@@ -137,7 +137,7 @@ const DoctorProfile = () => {
                             </div>
                             
                             <div className="flex items-start">
-                                <CreditCard className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <CreditCard className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Consultation Fee</p>
                                     <p className="font-medium text-gray-800">LKR {profile.consultation_fee || '0.00'}</p>
@@ -145,7 +145,7 @@ const DoctorProfile = () => {
                             </div>
                             
                             <div className="flex items-start">
-                                <UserCircle className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <UserCircle className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Experience</p>
                                     <p className="font-medium text-gray-800">{profile.experience_years || '0'} Years</p>
@@ -158,7 +158,7 @@ const DoctorProfile = () => {
                             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Contact Information</h3>
                             
                             <div className="flex items-start">
-                                <Mail className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <Mail className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Email Address</p>
                                     <p className="font-medium text-gray-800">{user?.email || 'N/A'}</p>
@@ -166,7 +166,7 @@ const DoctorProfile = () => {
                             </div>
 
                             <div className="flex items-start">
-                                <Phone className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <Phone className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Phone Number</p>
                                     <p className="font-medium text-gray-800">{profile.phone || 'N/A'}</p>
@@ -174,7 +174,7 @@ const DoctorProfile = () => {
                             </div>
                             
                             <div className="flex items-start">
-                                <MapPin className="text-teal-500 mt-0.5 mr-3" size={18} />
+                                <MapPin className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Department/Room</p>
                                     <p className="font-medium text-gray-800">{profile.department_id ? `Dept ID: ${profile.department_id}` : 'N/A'}</p>
@@ -197,7 +197,7 @@ const DoctorProfile = () => {
                                 required 
                                 value={passwordData.currentPassword}
                                 onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-theme-500"
                                 placeholder="Enter your current password"
                             />
                         </div>
@@ -209,7 +209,7 @@ const DoctorProfile = () => {
                                 minLength="6"
                                 value={passwordData.newPassword}
                                 onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
-                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-theme-500"
                                 placeholder="Enter a new secure password"
                             />
                         </div>
@@ -221,14 +221,14 @@ const DoctorProfile = () => {
                                 minLength="6"
                                 value={passwordData.confirmPassword}
                                 onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-theme-500"
                                 placeholder="Confirm your new password"
                             />
                         </div>
                         <button 
                             type="submit" 
                             disabled={passwordLoading}
-                            className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-md shadow-teal-500/20 transition-all disabled:opacity-70"
+                            className="px-6 py-3 bg-theme-600 hover:bg-theme-700 text-white rounded-xl font-bold shadow-md shadow-theme-500/20 transition-all disabled:opacity-70"
                         >
                             {passwordLoading ? 'Updating...' : 'Update Password'}
                         </button>

@@ -114,7 +114,7 @@ export default function Prescriptions() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                        <div className="p-2.5 bg-emerald-100 text-emerald-600 rounded-xl">
+                        <div className="p-2.5 bg-theme-100 text-theme-600 rounded-xl">
                             <Pill size={28} />
                         </div>
                         E-Prescriptions
@@ -123,7 +123,7 @@ export default function Prescriptions() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40"
+                    className="group bg-theme-600 hover:bg-theme-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-theme-600/20 hover:shadow-theme-600/40"
                 >
                     <Plus size={20} className="group-hover:rotate-90 transition-transform" />
                     New Prescription
@@ -132,7 +132,7 @@ export default function Prescriptions() {
 
             {loading ? (
                 <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-600"></div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -141,7 +141,7 @@ export default function Prescriptions() {
                             <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-start">
                                 <div>
                                     <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                        <User size={16} className="text-emerald-600" />
+                                        <User size={16} className="text-theme-600" />
                                         {prescription.patient_first_name} {prescription.patient_last_name}
                                     </h3>
                                     <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
@@ -149,7 +149,7 @@ export default function Prescriptions() {
                                         {new Date(prescription.created_at).toLocaleDateString()}
                                     </p>
                                 </div>
-                                <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+                                <div className="p-2 bg-theme-100 text-theme-600 rounded-lg">
                                     <FileText size={18} />
                                 </div>
                             </div>
@@ -164,13 +164,13 @@ export default function Prescriptions() {
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prescribed Medicines ({prescription.items?.length || 0})</p>
                                     <ul className="space-y-3">
                                         {prescription.items?.map((item) => (
-                                            <li key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-emerald-100 bg-emerald-50/30">
-                                                <div className="mt-0.5 p-1.5 bg-emerald-100 text-emerald-600 rounded-md">
+                                            <li key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-theme-100 bg-theme-50/30">
+                                                <div className="mt-0.5 p-1.5 bg-theme-100 text-theme-600 rounded-md">
                                                     <Pill size={14} />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-emerald-900 text-sm">{item.medicine_name}</p>
-                                                    <p className="text-xs text-emerald-700/80 font-medium mt-0.5">
+                                                    <p className="font-bold text-theme-900 text-sm">{item.medicine_name}</p>
+                                                    <p className="text-xs text-theme-700/80 font-medium mt-0.5">
                                                         {item.dosage} • {item.frequency} • {item.duration}
                                                     </p>
                                                     {item.instructions && (
@@ -204,7 +204,7 @@ export default function Prescriptions() {
                     <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex items-center justify-between p-6 border-b border-slate-100">
                             <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                                <Pill className="text-emerald-600" size={24} />
+                                <Pill className="text-theme-600" size={24} />
                                 Issue New Prescription
                             </h2>
                             <button 
@@ -221,7 +221,7 @@ export default function Prescriptions() {
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">Select Patient <span className="text-rose-500">*</span></label>
                                     <select 
-                                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium"
                                         value={selectedPatientId}
                                         onChange={(e) => setSelectedPatientId(e.target.value)}
                                         required
@@ -239,7 +239,7 @@ export default function Prescriptions() {
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">Clinical Notes / Diagnosis</label>
                                     <textarea 
-                                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium resize-none h-24 custom-scrollbar"
+                                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium resize-none h-24 custom-scrollbar"
                                         placeholder="E.g., Patient diagnosed with acute bronchitis. Recommended bed rest."
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
@@ -253,7 +253,7 @@ export default function Prescriptions() {
                                         <button 
                                             type="button"
                                             onClick={addItem}
-                                            className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
+                                            className="text-xs font-bold text-theme-600 hover:text-theme-700 flex items-center gap-1 bg-theme-50 hover:bg-theme-100 px-3 py-1.5 rounded-lg transition-colors"
                                         >
                                             <Plus size={14} /> Add Drug
                                         </button>
@@ -278,7 +278,7 @@ export default function Prescriptions() {
                                                         <input 
                                                             type="text"
                                                             required
-                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium"
                                                             placeholder="E.g., Amoxicillin 500mg"
                                                             value={item.medicine_name}
                                                             onChange={(e) => handleItemChange(index, 'medicine_name', e.target.value)}
@@ -289,7 +289,7 @@ export default function Prescriptions() {
                                                         <input 
                                                             type="text"
                                                             required
-                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium"
                                                             placeholder="E.g., 1 Tablet"
                                                             value={item.dosage}
                                                             onChange={(e) => handleItemChange(index, 'dosage', e.target.value)}
@@ -303,7 +303,7 @@ export default function Prescriptions() {
                                                         <input 
                                                             type="text"
                                                             required
-                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium"
                                                             placeholder="E.g., Twice a day (After meals)"
                                                             value={item.frequency}
                                                             onChange={(e) => handleItemChange(index, 'frequency', e.target.value)}
@@ -314,7 +314,7 @@ export default function Prescriptions() {
                                                         <input 
                                                             type="text"
                                                             required
-                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                                            className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all font-medium"
                                                             placeholder="E.g., 5 Days"
                                                             value={item.duration}
                                                             onChange={(e) => handleItemChange(index, 'duration', e.target.value)}
@@ -326,7 +326,7 @@ export default function Prescriptions() {
                                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Special Instructions (Optional)</label>
                                                     <input 
                                                         type="text"
-                                                        className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                                        className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-theme-500/20 focus:border-theme-500 outline-none transition-all"
                                                         placeholder="E.g., Avoid dairy products while taking this medication."
                                                         value={item.instructions}
                                                         onChange={(e) => handleItemChange(index, 'instructions', e.target.value)}
@@ -350,7 +350,7 @@ export default function Prescriptions() {
                             <button 
                                 type="submit"
                                 form="prescription-form"
-                                className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all"
+                                className="px-6 py-2.5 bg-theme-600 text-white font-bold rounded-xl hover:bg-theme-700 flex items-center gap-2 shadow-lg shadow-theme-600/20 transition-all"
                             >
                                 <Check size={18} />
                                 Issue Prescription

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, CalendarCheck, Clock, CalendarDays, Users, UserCircle, LogOut, Stethoscope, Menu, X, Pill } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, Clock, CalendarDays, Users, UserCircle, LogOut, Stethoscope, Menu, X, Pill, Settings } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
@@ -23,6 +23,7 @@ const DoctorLayout = () => {
         { name: 'Patients', path: '/doctor/patients', icon: <Users size={20} /> },
         { name: 'Prescriptions', path: '/doctor/prescriptions', icon: <Pill size={20} /> },
         { name: 'Profile', path: '/doctor/profile', icon: <UserCircle size={20} /> },
+        { name: 'Settings', path: '/doctor/settings', icon: <Settings size={20} /> },
     ];
 
     return (
@@ -35,13 +36,13 @@ const DoctorLayout = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-teal-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl`}>
-                <div className="h-16 flex items-center justify-between px-6 border-b border-teal-800">
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl`}>
+                <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
                     <div className="flex items-center">
-                        <Stethoscope className="mr-2 text-teal-400" size={24} />
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-emerald-400">Doctor Portal</span>
+                        <Stethoscope className="mr-2 text-theme-400" size={24} />
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-200">Doctor Portal</span>
                     </div>
-                    <button className="md:hidden text-teal-100 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="md:hidden text-slate-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                         <X size={24} />
                     </button>
                 </div>
@@ -53,7 +54,7 @@ const DoctorLayout = () => {
                             to={item.path}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className={({ isActive }) => 
-                                `flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/30' : 'text-teal-100 hover:bg-teal-800 hover:text-white'}`
+                                `flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive ? 'bg-theme-600 text-white shadow-lg shadow-theme-500/30 font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white font-medium'}`
                             }
                         >
                             <span className="mr-3">{item.icon}</span>
@@ -62,13 +63,13 @@ const DoctorLayout = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-teal-800">
+                <div className="p-4 border-t border-slate-800">
                     <button 
                         onClick={handleLogout}
-                        className="flex items-center w-full px-3 py-2.5 text-teal-100 hover:text-white hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors"
+                        className="flex items-center w-full px-3 py-2.5 text-slate-400 hover:text-white hover:bg-rose-500/10 hover:text-rose-400 rounded-lg transition-colors font-medium"
                     >
                         <LogOut size={20} className="mr-3" />
-                        <span className="font-medium">Logout</span>
+                        <span>Logout</span>
                     </button>
                 </div>
             </aside>
@@ -78,24 +79,24 @@ const DoctorLayout = () => {
                 {/* Header */}
                 <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-50 relative">
                     <div className="flex items-center md:hidden gap-3">
-                        <button onClick={() => setIsMobileMenuOpen(true)} className="text-gray-600 hover:text-teal-600">
+                        <button onClick={() => setIsMobileMenuOpen(true)} className="text-gray-600 hover:text-theme-600">
                             <Menu size={24} />
                         </button>
                         <div className="flex items-center">
-                            <Stethoscope className="mr-2 text-teal-600" size={24} />
-                            <span className="text-xl font-bold text-teal-600">Doctor Portal</span>
+                            <Stethoscope className="mr-2 text-theme-600" size={24} />
+                            <span className="text-xl font-bold text-theme-600">Doctor Portal</span>
                         </div>
                     </div>
                     <div className="flex-1"></div>
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="doctor" />
                         <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold mr-2 shadow-sm border border-teal-200">
+                            <div className="w-8 h-8 rounded-full bg-theme-100 flex items-center justify-center text-theme-600 font-bold mr-2 shadow-sm border border-theme-200">
                                 {user?.firstName?.charAt(0) || 'D'}
                             </div>
                             <div className="text-sm">
                                 <p className="font-semibold text-gray-700">Dr. {user?.firstName} {user?.lastName}</p>
-                                <p className="text-xs text-teal-600 font-medium capitalize">Doctor Account</p>
+                                <p className="text-xs text-theme-600 font-medium capitalize">Doctor Account</p>
                             </div>
                         </div>
                     </div>
