@@ -14,6 +14,7 @@ router.get('/:id', doctorsController.getById);
 
 router.get('/:id/availability', doctorsController.getAvailability);
 router.get('/:id/slots', doctorsController.getSlots);
+router.get('/:id/patients', authenticateToken, requireRole('ADMIN', 'DOCTOR'), doctorsController.getDoctorPatients);
 
 const multer = require('multer');
 const path = require('path');

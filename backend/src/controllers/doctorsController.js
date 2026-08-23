@@ -182,3 +182,22 @@ exports.getSlots = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getDoctorPatients = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const [patients] = await pool.query(
+            `SELECT DISTINCT 
+                p.id, p.user_id, p.date_of_birth, p.address,
+                u.first_name, u.last_name, u.email, u.phone
+            FROM patients p 
+            JOIN users u ON p.user_id = u.id
+            JOIN appointments a ON p.id = a.patient_id 
+            WHERE a.doctor_id = ?`,
+            [id]
+        );
+        res.status(200).json({ success: true, data: patients });
+    } catch (error) {
+        next(error);
+    }
+};

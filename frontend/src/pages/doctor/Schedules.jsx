@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Plus, X, Trash2, Edit } from 'lucide-react';
+import { Plus, X, Trash2, Edit2, CalendarDays, Clock, Users, Activity, CheckCircle, Calendar } from 'lucide-react';
 
 const daysOfWeek = [
-    { id: 1, name: 'Monday' },
-    { id: 2, name: 'Tuesday' },
-    { id: 3, name: 'Wednesday' },
-    { id: 4, name: 'Thursday' },
-    { id: 5, name: 'Friday' },
-    { id: 6, name: 'Saturday' },
-    { id: 7, name: 'Sunday' }
+    { id: 1, name: 'Monday', short: 'Mon' },
+    { id: 2, name: 'Tuesday', short: 'Tue' },
+    { id: 3, name: 'Wednesday', short: 'Wed' },
+    { id: 4, name: 'Thursday', short: 'Thu' },
+    { id: 5, name: 'Friday', short: 'Fri' },
+    { id: 6, name: 'Saturday', short: 'Sat' },
+    { id: 7, name: 'Sunday', short: 'Sun' }
 ];
 
 const DoctorSchedules = () => {
@@ -65,7 +65,7 @@ const DoctorSchedules = () => {
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value } = e.e ? e.target : e.target; // fallback
         setFormData({ ...formData, [name]: value });
     };
 
@@ -145,118 +145,147 @@ const DoctorSchedules = () => {
         }
     };
 
-    const getDayName = (day) => {
-        const found = daysOfWeek.find(d => d.id === parseInt(day));
-        return found ? found.name : 'Unknown';
-    };
-
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-6xl mx-auto mt-8">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">My Weekly Schedules</h2>
-                <button onClick={openCreateModal} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    <Plus size={18} className="mr-2" /> Add Schedule
-                </button>
+        <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700">
+            {/* Header Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-2xl mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-800 opacity-90"></div>
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-pulse"></div>
+                
+                <div className="relative p-8 z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
+                                <CalendarDays className="text-blue-300" size={24} />
+                            </div>
+                            <h1 className="text-3xl font-black text-white tracking-tight">My Schedules</h1>
+                        </div>
+                        <p className="text-blue-100/80 font-medium text-lg md:ml-16">
+                            Define your working hours and availability for patients.
+                        </p>
+                    </div>
+                    
+                    <button onClick={openCreateModal} className="flex items-center px-6 py-3 bg-white text-blue-900 font-bold rounded-2xl hover:bg-blue-50 hover:scale-105 transition-all shadow-lg hover:shadow-xl">
+                        <Plus size={20} className="mr-2" /> Add New Schedule
+                    </button>
+                </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 uppercase border-b">
-                        <tr>
-                            <th className="px-4 py-3">Day</th>
-                            <th className="px-4 py-3">Time</th>
-                            <th className="px-4 py-3">Duration</th>
-                            <th className="px-4 py-3">Max Patients</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {schedules.map(s => (
-                            <tr key={s.id} className="border-b hover:bg-gray-50">
-                                <td className="px-4 py-3 font-semibold">{getDayName(s.day_of_week)}</td>
-                                <td className="px-4 py-3">{s.start_time} - {s.end_time}</td>
-                                <td className="px-4 py-3">{s.slot_duration_minutes} min</td>
-                                <td className="px-4 py-3">{s.max_patients}</td>
-                                <td className="px-4 py-3">
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${s.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                        {s.status}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 text-right flex justify-end space-x-2">
-                                    <button onClick={() => openEditModal(s)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                                        <Edit size={18} />
-                                    </button>
-                                    <button onClick={() => handleDelete(s.id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
-                                        <Trash2 size={18} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        {schedules.length === 0 && (
-                            <tr>
-                                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">No schedules found.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            {/* Schedules Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {schedules.map(s => {
+                    const day = daysOfWeek.find(d => d.id === parseInt(s.day_of_week));
+                    return (
+                        <div key={s.id} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl border border-slate-100 transition-all duration-300 group relative overflow-hidden flex flex-col">
+                            {/* Decorative background */}
+                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -mr-10 -mt-10 transition-all group-hover:scale-150 ${s.status === 'ACTIVE' ? 'bg-emerald-400' : 'bg-red-400'}`}></div>
+                            
+                            <div className="flex justify-between items-start mb-6 relative z-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-blue-600 shadow-inner border border-blue-100/50">
+                                        <span className="text-xl font-black">{day ? day.short : ''}</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-800">{day ? day.name : 'Unknown'}</h3>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 ${s.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                            {s.status === 'ACTIVE' ? <CheckCircle size={12} className="mr-1"/> : <X size={12} className="mr-1"/>}
+                                            {s.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-4 mb-8 relative z-10">
+                                <div className="flex items-center text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    <Clock size={18} className="text-indigo-500 mr-3" />
+                                    <span className="font-semibold">{s.start_time} - {s.end_time}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-auto flex gap-3 relative z-10 border-t border-slate-100 pt-5">
+                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
+                                    <Edit2 size={16} className="mr-2" /> Edit
+                                </button>
+                                <button onClick={() => handleDelete(s.id)} className="w-12 flex items-center justify-center bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-600 hover:text-white transition-colors">
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+                
+                {schedules.length === 0 && (
+                    <div className="col-span-full bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm flex flex-col items-center">
+                        <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                            <CalendarDays size={48} className="text-slate-300" />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-800 mb-2">No Schedules Found</h3>
+                        <p className="text-slate-500 max-w-sm text-lg mb-6">You haven't set up any working schedules yet. Add one to allow patients to book appointments.</p>
+                        <button onClick={openCreateModal} className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg hover:shadow-blue-500/30 transition-all">Create First Schedule</button>
+                    </div>
+                )}
             </div>
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Schedule' : 'Add New Schedule'}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                <X size={24} />
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="px-8 py-6 bg-gradient-to-r from-emerald-600 to-teal-600 flex items-center justify-between text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+                            <h2 className="text-2xl font-black relative z-10">{isEditMode ? 'Edit Schedule' : 'New Schedule'}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors relative z-10">
+                                <X size={18} />
                             </button>
                         </div>
                         
-                        <div className="p-6">
-                            <form id="scheduleForm" onSubmit={handleSubmit} className="space-y-4">
+                        {/* Modal Body */}
+                        <div className="p-8 pb-6">
+                            <form id="scheduleForm" onSubmit={handleSubmit} className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Day of Week *</label>
-                                    <select name="day_of_week" required value={formData.day_of_week} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        {daysOfWeek.map(d => (
-                                            <option key={d.id} value={d.id}>{d.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time *</label>
-                                        <input type="time" name="start_time" required value={formData.start_time} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
-                                        <input type="time" name="end_time" required value={formData.end_time} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Day of Week</label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                        <select name="day_of_week" required value={formData.day_of_week} onChange={handleInputChange} className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
+                                            {daysOfWeek.map(d => (
+                                                <option key={d.id} value={d.id}>{d.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                
+                                <div className="grid grid-cols-2 gap-5">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Slot Duration (min) *</label>
-                                        <input type="number" name="slot_duration_minutes" required min="1" value={formData.slot_duration_minutes} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Start Time</label>
+                                        <div className="relative">
+                                            <input type="time" name="start_time" required value={formData.start_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Max Patients *</label>
-                                        <input type="number" name="max_patients" required min="1" value={formData.max_patients} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">End Time</label>
+                                        <div className="relative">
+                                            <input type="time" name="end_time" required value={formData.end_time} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all cursor-pointer" />
+                                        </div>
                                     </div>
                                 </div>
+                                
+
+                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="ACTIVE">ACTIVE</option>
-                                        <option value="INACTIVE">INACTIVE</option>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Status</label>
+                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none font-medium text-slate-700 transition-all appearance-none cursor-pointer">
+                                        <option value="ACTIVE">🟢 Active</option>
+                                        <option value="INACTIVE">🔴 Inactive</option>
                                     </select>
                                 </div>
                             </form>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
-                            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                            <button type="submit" form="scheduleForm" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md">
-                                {isEditMode ? 'Update' : 'Create'} Schedule
+                        {/* Modal Footer */}
+                        <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-slate-600 font-bold bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">Cancel</button>
+                            <button type="submit" form="scheduleForm" className="px-6 py-2.5 text-white font-bold bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all">
+                                {isEditMode ? 'Save Changes' : 'Create Schedule'}
                             </button>
                         </div>
                     </div>

@@ -70,7 +70,13 @@ const DoctorAppointments = () => {
                     }
                 }
                 
-                setShiftDates([...new Set(generatedDates)].sort());
+                const uniqueDates = [...new Set(generatedDates)].sort();
+                setShiftDates(uniqueDates);
+                
+                // Select the first available shift by default
+                if (uniqueDates.length > 0 && filterDate === 'ALL') {
+                    setFilterDate(uniqueDates[0]);
+                }
 
             } else {
                 toast.error(appData.message || 'Failed to fetch appointments');
@@ -197,12 +203,6 @@ const DoctorAppointments = () => {
                 
                 {/* Date Tabs (Scrollable) */}
                 <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide flex-1">
-                    <button 
-                        onClick={() => setFilterDate('ALL')}
-                        className={`px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${filterDate === 'ALL' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
-                    >
-                        All Shifts
-                    </button>
                     {shiftDates.map(dateStr => {
                         const dateObj = new Date(dateStr);
                         const label = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });

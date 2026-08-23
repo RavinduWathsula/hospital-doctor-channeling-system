@@ -32,7 +32,8 @@ const DoctorDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const todayStr = new Date().toISOString().split('T')[0];
+            const localToday = new Date();
+            const todayStr = localToday.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' in local time
             
             // Fetch Appointments
             const appRes = await fetch('http://localhost:5000/api/appointments/doctor-appointments', {
@@ -43,7 +44,11 @@ const DoctorDashboard = () => {
             let completedCount = 0;
 
             if (appData.success && appData.data) {
-                const todays = appData.data.filter(a => a.appointment_date.split('T')[0] === todayStr);
+                const todays = appData.data.filter(a => {
+                    if (!a.appointment_date) return false;
+                    const appDate = new Date(a.appointment_date);
+                    return appDate.toLocaleDateString('en-CA') === todayStr;
+                });
                 todayAppsCount = todays.length;
                 completedCount = todays.filter(a => a.status === 'COMPLETED').length;
             }

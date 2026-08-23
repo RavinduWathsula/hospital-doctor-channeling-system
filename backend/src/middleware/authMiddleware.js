@@ -5,13 +5,8 @@ const authenticateToken = (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            // Get token from header
             token = req.headers.authorization.split(' ')[1];
-
-            // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // Add decoded user payload to request
             req.user = decoded;
             next();
         } catch (error) {
@@ -28,9 +23,10 @@ const authenticateToken = (req, res, next) => {
 
 const requireRole = (...roles) => {
     return (req, res, next) => {
+        console.log(`[AUTH] Route: ${req.originalUrl}, Required roles:`, roles, `User role:`, req.user ? req.user.role : 'none');
         if (!req.user || !roles.includes(req.user.role)) {
             res.status(403);
-            return next(new Error(`User role '${req.user ? req.user.role : 'unknown'}' is not authorized to access this route`));
+            return next(new Error(`User role '${req.user ? req.user.role : 'unknown'}' is not authorized to access this route. Expected one of: ${roles.join(', ')}`));
         }
         next();
     };
