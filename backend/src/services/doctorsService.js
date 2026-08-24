@@ -131,6 +131,43 @@ exports.update = async (id, doctorData) => {
     }
 };
 
+exports.updateMe = async (userId, doctorData) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+    try {
+        const [rows] = await connection.query('SELECT id FROM doctors WHERE user_id = ?', [userId]);
+        if (rows.length === 0) throw new Error('Doctor not found');
+        const doctorId = rows[0].id;
+
+        // 1. Update User
+        await connection.query(
+            'UPDATE users SET phone = ? WHERE id = ?',
+            [doctorData.phone, userId]
+        );
+
+        // 2. Update Doctor
+        await connection.query(`
+            UPDATE doctors 
+            SET specialization = ?, qualification = ?, experience_years = ?, consultation_fee = ?
+            WHERE id = ?
+        `, [
+            doctorData.specialization,
+            doctorData.qualification,
+            doctorData.experienceYears || 0,
+            doctorData.consultationFee,
+            doctorId
+        ]);
+
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 exports.updateStatus = async (id, isActive) => {
     // Optionally, could update the linked user as well. We'll stick to doctor table for now.
     await pool.query('UPDATE doctors SET is_active = ? WHERE id = ?', [isActive, id]);

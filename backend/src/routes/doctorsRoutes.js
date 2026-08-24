@@ -8,6 +8,7 @@ router.get('/search', doctorsController.search);
 
 // Doctor profile for logged in user (Protected)
 router.get('/me', authenticateToken, requireRole('DOCTOR'), doctorsController.getMe);
+router.put('/me', authenticateToken, requireRole('DOCTOR'), doctorsController.updateMe);
 
 // View specific doctor profile
 router.get('/:id', doctorsController.getById);

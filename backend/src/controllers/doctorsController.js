@@ -31,6 +31,16 @@ exports.getMe = async (req, res, next) => {
     }
 };
 
+exports.updateMe = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        await doctorsService.updateMe(userId, req.body);
+        res.status(200).json({ success: true, message: 'Profile updated successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.create = async (req, res, next) => {
     try {
         if (req.file) {

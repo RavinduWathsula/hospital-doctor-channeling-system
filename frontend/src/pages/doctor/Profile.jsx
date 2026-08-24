@@ -11,6 +11,14 @@ const DoctorProfile = () => {
     // Password Change State
     const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [passwordLoading, setPasswordLoading] = useState(false);
+    
+    // Edit Profile State
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editData, setEditData] = useState({});
+    const [editLoading, setEditLoading] = useState(false);
+
+    // Cover Image State
+    const [coverImage, setCoverImage] = useState(() => localStorage.getItem('doctor_cover_image'));
 
     useEffect(() => {
         fetchProfile();
@@ -69,6 +77,62 @@ const DoctorProfile = () => {
         }
     };
 
+    const handleEditProfile = async (e) => {
+        e.preventDefault();
+        setEditLoading(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/doctors/me', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    phone: editData.phone,
+                    specialization: editData.specialization,
+                    qualifications: editData.qualifications,
+                    experienceYears: editData.experience_years,
+                    consultationFee: editData.consultation_fee
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success('Profile updated successfully');
+                setIsEditModalOpen(false);
+                fetchProfile();
+            } else {
+                toast.error(data.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            toast.error('Server error updating profile');
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    const handleCoverChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                localStorage.setItem('doctor_cover_image', reader.result);
+                setCoverImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const openEditModal = () => {
+        setEditData({
+            phone: profile.phone || '',
+            specialization: profile.specialization || '',
+            qualifications: profile.qualifications || '',
+            experience_years: profile.experience_years || 0,
+            consultation_fee: profile.consultation_fee || ''
+        });
+        setIsEditModalOpen(true);
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full min-h-[400px]">
@@ -91,10 +155,14 @@ const DoctorProfile = () => {
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 {/* Header background */}
-                <div className="h-32 bg-gradient-to-r from-theme-500 to-theme-400 relative">
-                    <button className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg backdrop-blur-sm transition-colors text-sm font-medium flex items-center">
+                <div 
+                    className="h-32 bg-gradient-to-r from-theme-500 to-theme-400 relative bg-cover bg-center"
+                    style={coverImage ? { backgroundImage: `url(${coverImage})` } : {}}
+                >
+                    <label className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg backdrop-blur-sm transition-colors text-sm font-medium flex items-center cursor-pointer">
                         <Camera size={16} className="mr-2" /> Change Cover
-                    </button>
+                        <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+                    </label>
                 </div>
                 
                 <div className="px-8 pb-8 relative">
@@ -107,7 +175,7 @@ const DoctorProfile = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="px-6 py-2 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-xl font-semibold transition-colors shadow-sm">
+                        <button onClick={openEditModal} className="px-6 py-2 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-xl font-semibold transition-colors shadow-sm">
                             Edit Profile
                         </button>
                     </div>
@@ -235,6 +303,55 @@ const DoctorProfile = () => {
                     </form>
                 </div>
             </div>
+
+            {/* Edit Profile Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+                        <div className="px-8 py-6 bg-gradient-to-r from-theme-600 to-theme-800 flex items-center justify-between text-white">
+                            <h2 className="text-2xl font-black">Edit Profile</h2>
+                            <button onClick={() => setIsEditModalOpen(false)} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                                <span className="font-bold">X</span>
+                            </button>
+                        </div>
+                        <div className="p-8">
+                            <form onSubmit={handleEditProfile} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Specialization</label>
+                                        <input type="text" value={editData.specialization} onChange={e => setEditData({...editData, specialization: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Phone Number</label>
+                                        <input type="text" value={editData.phone} onChange={e => setEditData({...editData, phone: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Qualifications</label>
+                                    <input type="text" value={editData.qualifications} onChange={e => setEditData({...editData, qualifications: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Experience (Years)</label>
+                                        <input type="number" min="0" value={editData.experience_years} onChange={e => setEditData({...editData, experience_years: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Consultation Fee (LKR)</label>
+                                        <input type="number" min="0" step="0.01" value={editData.consultation_fee} onChange={e => setEditData({...editData, consultation_fee: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                    </div>
+                                </div>
+                                
+                                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+                                    <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-5 py-2.5 text-slate-600 font-bold bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
+                                    <button type="submit" disabled={editLoading} className="px-6 py-2.5 text-white font-bold bg-theme-600 rounded-xl hover:bg-theme-700 disabled:opacity-70">
+                                        {editLoading ? 'Saving...' : 'Save Profile'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
