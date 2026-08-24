@@ -90,7 +90,7 @@ const DoctorProfile = () => {
                 body: JSON.stringify({
                     phone: editData.phone,
                     specialization: editData.specialization,
-                    qualifications: editData.qualifications,
+                    qualification: editData.qualification,
                     experienceYears: editData.experience_years,
                     consultationFee: editData.consultation_fee
                 })
@@ -126,7 +126,7 @@ const DoctorProfile = () => {
         setEditData({
             phone: profile.phone || '',
             specialization: profile.specialization || '',
-            qualifications: profile.qualifications || '',
+            qualification: profile.qualification || '',
             experience_years: profile.experience_years || 0,
             consultation_fee: profile.consultation_fee || ''
         });
@@ -200,7 +200,7 @@ const DoctorProfile = () => {
                                 <Award className="text-theme-500 mt-0.5 mr-3" size={18} />
                                 <div>
                                     <p className="text-sm text-gray-500">Qualifications</p>
-                                    <p className="font-medium text-gray-800">{profile.qualifications || 'N/A'}</p>
+                                    <p className="font-medium text-gray-800">{profile.qualification || 'N/A'}</p>
                                 </div>
                             </div>
                             
@@ -328,7 +328,7 @@ const DoctorProfile = () => {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1">Qualifications</label>
-                                    <input type="text" value={editData.qualifications} onChange={e => setEditData({...editData, qualifications: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
+                                    <input type="text" value={editData.qualification} onChange={e => setEditData({...editData, qualification: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-theme-500 outline-none" required />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
