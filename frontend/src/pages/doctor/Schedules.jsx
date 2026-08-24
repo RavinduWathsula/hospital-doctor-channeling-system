@@ -176,37 +176,42 @@ const DoctorSchedules = () => {
                 {schedules.map(s => {
                     const day = daysOfWeek.find(d => d.id === parseInt(s.day_of_week));
                     return (
-                        <div key={s.id} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-2xl border border-slate-100 transition-all duration-300 group relative overflow-hidden flex flex-col">
-                            {/* Decorative background */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full mix-blend-multiply filter blur-3xl opacity-10 -mr-10 -mt-10 transition-all group-hover:scale-150 group-hover:opacity-20 ${s.status === 'ACTIVE' ? 'bg-theme-400' : 'bg-red-400'}`}></div>
+                        <div key={s.id} className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300 group relative overflow-hidden flex flex-col hover:-translate-y-1">
+                            {/* Creative decorative gradient swoop */}
+                            <div className={`absolute top-0 right-0 w-40 h-40 rounded-bl-[100px] -z-0 transition-transform duration-500 group-hover:scale-110 ${s.status === 'ACTIVE' ? 'bg-gradient-to-br from-theme-100/80 to-transparent' : 'bg-gradient-to-br from-rose-100/80 to-transparent'}`}></div>
                             
                             <div className="flex justify-between items-start mb-6 relative z-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-theme-100 to-theme-200 flex items-center justify-center text-theme-700 shadow-inner border border-theme-100/50">
-                                        <span className="text-xl font-black">{day ? day.short : ''}</span>
+                                    <div className="w-16 h-16 rounded-[1.25rem] bg-theme-50 text-theme-600 flex items-center justify-center font-black text-2xl shadow-inner border border-theme-100 group-hover:bg-theme-600 group-hover:text-white transition-colors duration-300">
+                                        {day ? day.short : ''}
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-800">{day ? day.name : 'Unknown'}</h3>
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 ${s.status === 'ACTIVE' ? 'bg-theme-50 text-theme-700 ring-1 ring-theme-600/20' : 'bg-red-50 text-red-700 ring-1 ring-red-600/20'}`}>
-                                            {s.status === 'ACTIVE' ? <CheckCircle size={12} className="mr-1"/> : <X size={12} className="mr-1"/>}
-                                            {s.status}
-                                        </span>
+                                        <h3 className="text-xl font-black text-slate-800 tracking-tight">{day ? day.name : 'Unknown'}</h3>
+                                        <div className="mt-1 flex">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] uppercase tracking-widest font-bold ${s.status === 'ACTIVE' ? 'bg-theme-100 text-theme-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                {s.status === 'ACTIVE' ? <CheckCircle size={12} className="mr-1.5"/> : <X size={12} className="mr-1.5"/>}
+                                                {s.status}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="space-y-4 mb-8 relative z-10">
-                                <div className="flex items-center text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <Clock size={18} className="text-theme-500 mr-3" />
-                                    <span className="font-semibold">{s.start_time} - {s.end_time}</span>
+                            <div className="mb-8 relative z-10">
+                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Working Hours</p>
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl flex-1 flex items-center shadow-inner">
+                                        <Clock size={18} className="text-theme-500 mr-3" />
+                                        <span className="font-bold text-slate-700 text-base">{s.start_time.slice(0, 5)} - {s.end_time.slice(0, 5)}</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div className="mt-auto flex gap-3 relative z-10 border-t border-slate-100 pt-5">
-                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-2.5 bg-theme-50 text-theme-700 font-bold rounded-xl hover:bg-theme-600 hover:text-white transition-colors">
-                                    <Edit2 size={16} className="mr-2" /> Edit
+                            <div className="mt-auto flex gap-3 relative z-10 border-t border-slate-50 pt-6">
+                                <button onClick={() => openEditModal(s)} className="flex-1 flex items-center justify-center px-4 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-theme-50 hover:text-theme-700 hover:border-theme-200 transition-all shadow-sm">
+                                    <Edit2 size={16} className="mr-2" /> Edit Schedule
                                 </button>
-                                <button onClick={() => handleDelete(s.id)} className="w-12 flex items-center justify-center bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-600 hover:text-white transition-colors">
+                                <button onClick={() => handleDelete(s.id)} className="w-[52px] flex items-center justify-center bg-white border border-rose-100 text-rose-500 font-bold rounded-2xl hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm">
                                     <Trash2 size={18} />
                                 </button>
                             </div>

@@ -142,115 +142,97 @@ const DoctorDashboard = () => {
             
             {/* Stats Grid - Glassmorphic / Modern */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group hover:-translate-y-1 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-theme-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                    <div className="relative z-10">
-                        <div className="w-14 h-14 rounded-2xl bg-theme-500 text-white flex items-center justify-center mb-4 shadow-lg shadow-theme-500/30 group-hover:rotate-6 transition-transform">
-                            <CalendarCheck size={28} />
+                {[
+                    { label: 'Total Booked', value: stats.todayAppointments, icon: CalendarCheck, gradient: 'from-blue-500 to-blue-700', bg: 'bg-blue-50', text: 'text-blue-600' },
+                    { label: 'In Waiting Room', value: stats.waitingPatients, icon: Users, gradient: 'from-amber-500 to-amber-700', bg: 'bg-amber-50', text: 'text-amber-600' },
+                    { label: 'Completed Today', value: stats.completedConsultations, icon: CheckCircle, gradient: 'from-emerald-500 to-emerald-700', bg: 'bg-emerald-50', text: 'text-emerald-600' },
+                ].map((stat, idx) => (
+                    <div key={idx} className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 group hover:-translate-y-2 overflow-hidden relative flex flex-col justify-between">
+                        <div className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full -z-0 transition-transform duration-700 group-hover:scale-125 opacity-50 ${stat.bg}`}></div>
+                        <div className="relative z-10 flex justify-between items-start mb-6">
+                            <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center shadow-lg transform group-hover:rotate-6 transition-all duration-500 text-white bg-gradient-to-br ${stat.gradient}`}>
+                                <stat.icon size={32} />
+                            </div>
                         </div>
-                        <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Total Booked</p>
-                        <h3 className="text-4xl font-black text-slate-800 tracking-tight">{stats.todayAppointments}</h3>
-                    </div>
-                </div>
-                
-                <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group hover:-translate-y-1 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-theme-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                    <div className="relative z-10">
-                        <div className="w-14 h-14 rounded-2xl bg-theme-500 text-white flex items-center justify-center mb-4 shadow-lg shadow-theme-500/30 group-hover:-rotate-6 transition-transform">
-                            <Users size={28} />
+                        <div className="relative z-10">
+                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{stat.label}</p>
+                            <h3 className="text-5xl font-black text-slate-800 tracking-tighter">{stat.value}</h3>
                         </div>
-                        <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">In Waiting Room</p>
-                        <h3 className="text-4xl font-black text-slate-800 tracking-tight">{stats.waitingPatients}</h3>
                     </div>
-                </div>
+                ))}
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group hover:-translate-y-1 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-theme-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+                <div className="bg-gradient-to-br from-theme-500 via-theme-600 to-theme-800 rounded-[2rem] p-6 shadow-lg shadow-theme-500/30 text-white relative overflow-hidden group hover:shadow-theme-500/50 hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between">
+                    <div className="absolute -right-6 -bottom-6 opacity-20 group-hover:scale-125 group-hover:rotate-12 transition-all duration-700">
+                        <Clock size={140} />
+                    </div>
                     <div className="relative z-10">
-                        <div className="w-14 h-14 rounded-2xl bg-theme-500 text-white flex items-center justify-center mb-4 shadow-lg shadow-theme-500/30 group-hover:scale-110 transition-transform">
-                            <CheckCircle size={28} />
-                        </div>
-                        <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Completed Today</p>
-                        <h3 className="text-4xl font-black text-slate-800 tracking-tight">{stats.completedConsultations}</h3>
-                    </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-theme-500 via-theme-600 to-theme-800 rounded-2xl p-6 shadow-lg shadow-theme-500/20 text-white relative overflow-hidden group hover:shadow-theme-500/40 hover:-translate-y-1 transition-all duration-300">
-                    <div className="absolute -right-6 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-500">
-                        <Clock size={120} />
-                    </div>
-                    <div className="relative z-10 h-full flex flex-col justify-between">
-                        <div>
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-theme-100 mb-1 flex items-center"><Clock size={16} className="mr-1.5"/> Shift Details</h3>
-                            {todaySchedule ? (
-                                <>
-                                    <p className="text-3xl font-black tracking-tight">{todaySchedule.start_time.substring(0, 5)} - {todaySchedule.end_time.substring(0, 5)}</p>
-                                    <div className="mt-3 inline-block bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-semibold">
-                                        {todaySchedule.slot_duration_minutes} min / slot
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="flex flex-col justify-center h-full pt-4">
-                                    <p className="text-xl font-bold text-white mb-1">Off Duty</p>
-                                    <p className="text-theme-100 text-sm">No active schedule for today.</p>
-                                </div>
-                            )}
-                        </div>
+                        <h3 className="text-xs font-black uppercase tracking-widest text-theme-100 mb-6 flex items-center"><Clock size={16} className="mr-2"/> Shift Details</h3>
+                        {todaySchedule ? (
+                            <div>
+                                <p className="text-4xl font-black tracking-tighter mb-3 drop-shadow-md">{todaySchedule.start_time.substring(0, 5)} <span className="text-theme-300 text-2xl font-bold">to</span> {todaySchedule.end_time.substring(0, 5)}</p>
+                                <span className="inline-block bg-black/20 backdrop-blur-md px-4 py-2 rounded-xl text-sm font-black tracking-widest uppercase shadow-inner border border-white/10">
+                                    {todaySchedule.slot_duration_minutes} MIN / SLOT
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col justify-center mt-2">
+                                <p className="text-3xl font-black text-white mb-2 tracking-tight drop-shadow-md">Off Duty</p>
+                                <p className="text-theme-100 text-sm font-medium">No active schedule for today.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Current Patient - Masterpiece UI */}
-                <div className="lg:col-span-7 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-[400px]">
-                    <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-                        <h2 className="text-xl font-black text-slate-800 flex items-center">
-                            <Activity className="mr-2 text-theme-500" size={24} /> 
+                <div className="lg:col-span-7 bg-white rounded-[2rem] shadow-sm hover:shadow-lg transition-shadow duration-500 border border-slate-100 overflow-hidden flex flex-col h-[420px] relative">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-theme-50 rounded-bl-full -z-0"></div>
+                    <div className="px-8 py-6 border-b border-slate-50 bg-white/50 backdrop-blur-xl flex items-center justify-between z-10 relative">
+                        <h2 className="text-xl font-black text-slate-800 flex items-center tracking-tight">
+                            <Activity className="mr-3 text-theme-500" size={24} /> 
                             Active Consultation
                         </h2>
                         {currentPatient && (
-                            <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-theme-600 bg-theme-50 px-3 py-1 rounded-full">
-                                <span className="w-2 h-2 rounded-full bg-theme-500 animate-pulse"></span> In Progress
+                            <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-theme-700 bg-theme-100 px-4 py-1.5 rounded-full shadow-sm">
+                                <span className="w-2 h-2 rounded-full bg-theme-500 animate-ping"></span> In Progress
                             </span>
                         )}
                     </div>
                     
                     {currentPatient ? (
-                        <div className="flex-1 flex items-center p-8 relative">
-                            {/* Decorative background circle */}
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-slate-50 rounded-full -z-0"></div>
-                            
-                            <div className="relative z-10 w-full flex flex-col md:flex-row items-center gap-8">
-                                <div className="w-32 h-32 bg-gradient-to-br from-theme-400 to-theme-700 rounded-[2rem] flex items-center justify-center text-4xl font-black text-white shadow-xl shadow-theme-500/30 transform rotate-3 hover:rotate-0 transition-transform">
+                        <div className="flex-1 flex items-center p-8 relative z-10">
+                            <div className="relative w-full flex flex-col md:flex-row items-center gap-10">
+                                <div className="w-40 h-40 bg-gradient-to-br from-theme-400 to-theme-700 rounded-[2.5rem] flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-theme-500/40 transform -rotate-3 hover:rotate-3 transition-transform duration-500 border-4 border-white">
                                     {currentPatient.first_name.charAt(0)}{currentPatient.last_name.charAt(0)}
                                 </div>
                                 
                                 <div className="flex-1 text-center md:text-left">
-                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-theme-50 text-theme-700 ring-1 ring-theme-600/20 mb-3">
+                                    <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 mb-4 shadow-sm">
                                         Queue #{currentPatient.queue_number}
                                     </span>
-                                    <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
+                                    <h3 className="text-4xl font-black text-slate-900 tracking-tighter mb-3 drop-shadow-sm">
                                         {currentPatient.first_name} {currentPatient.last_name}
                                     </h3>
-                                    <p className="text-slate-500 font-medium text-lg flex items-center justify-center md:justify-start gap-2 mb-6">
-                                        <Clock size={18} className="text-slate-400" />
+                                    <p className="text-slate-500 font-bold text-lg flex items-center justify-center md:justify-start gap-2 mb-8 bg-slate-50 inline-flex px-4 py-2 rounded-xl">
+                                        <Clock size={20} className="text-theme-500" />
                                         Scheduled for {currentPatient.appointment_time}
                                     </p>
                                     
-                                    <Link to="/doctor/queue" className="inline-flex items-center justify-center px-8 py-3.5 bg-theme-600 hover:bg-theme-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-theme-600/25 hover:shadow-theme-600/40 hover:-translate-y-0.5 w-full md:w-auto">
-                                        Manage Consultation <ArrowRight size={18} className="ml-2" />
+                                    <Link to="/doctor/queue" className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 hover:bg-theme-600 text-white rounded-2xl font-black tracking-wide transition-all duration-300 shadow-xl shadow-slate-900/20 hover:shadow-theme-600/40 hover:-translate-y-1 w-full md:w-auto">
+                                        Manage Consultation <ArrowRight size={20} className="ml-3" />
                                     </Link>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                                <UserCheck className="text-slate-300" size={48} />
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative z-10">
+                            <div className="w-28 h-28 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner border border-slate-100 transform rotate-3">
+                                <UserCheck className="text-slate-300" size={56} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-700 mb-2">Ready for Next Patient</h3>
-                            <p className="text-slate-500 max-w-sm mb-6">The consultation room is empty. Call the next patient from your live queue when you are ready.</p>
-                            <Link to="/doctor/queue" className="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-slate-200 hover:border-theme-500 text-slate-700 hover:text-theme-700 rounded-xl font-bold transition-all hover:shadow-md">
+                            <h3 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">Ready for Next Patient</h3>
+                            <p className="text-slate-500 max-w-sm mb-8 font-medium">The consultation room is empty. Call the next patient from your live queue when you are ready.</p>
+                            <Link to="/doctor/queue" className="inline-flex items-center justify-center px-8 py-4 bg-white border border-slate-200 hover:border-theme-200 text-slate-700 hover:text-theme-700 rounded-2xl font-black tracking-wide transition-all duration-300 hover:shadow-lg hover:shadow-theme-500/10 hover:-translate-y-1">
                                 Open Live Queue
                             </Link>
                         </div>
@@ -258,35 +240,36 @@ const DoctorDashboard = () => {
                 </div>
 
                 {/* Quick Actions & Info */}
-                <div className="lg:col-span-5 bg-white rounded-3xl shadow-sm border border-slate-100 p-8 h-[400px] flex flex-col">
-                    <h2 className="text-xl font-black text-slate-800 mb-6">Quick Navigation</h2>
-                    <div className="grid grid-cols-2 gap-4 flex-1">
-                        <Link to="/doctor/appointments" className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-teal-50 rounded-2xl border border-slate-100 hover:border-teal-200 transition-all group">
-                            <div className="w-12 h-12 bg-white text-teal-600 rounded-full flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white transition-all">
-                                <CalendarCheck size={22} />
+                <div className="lg:col-span-5 bg-white rounded-[2rem] shadow-sm hover:shadow-lg transition-shadow duration-500 border border-slate-100 p-8 h-[420px] flex flex-col relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-theme-50 rounded-bl-full -z-0 opacity-50"></div>
+                    <h2 className="text-xl font-black text-slate-800 mb-8 tracking-tight relative z-10">Quick Navigation</h2>
+                    <div className="grid grid-cols-2 gap-4 flex-1 relative z-10">
+                        <Link to="/doctor/appointments" className="flex flex-col items-center justify-center p-6 bg-slate-50 hover:bg-blue-50 rounded-3xl border border-slate-100 hover:border-blue-200 transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <div className="w-14 h-14 bg-white text-blue-500 rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 transform -rotate-3 group-hover:rotate-0">
+                                <CalendarCheck size={24} />
                             </div>
-                            <h3 className="font-bold text-slate-800 group-hover:text-teal-900 transition-colors">Appointments</h3>
+                            <h3 className="font-bold text-slate-700 group-hover:text-blue-900 transition-colors tracking-tight">Appointments</h3>
                         </Link>
                         
-                        <Link to="/doctor/queue" className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-emerald-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all group">
-                            <div className="w-12 h-12 bg-white text-emerald-600 rounded-full flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                <Clock size={22} />
+                        <Link to="/doctor/queue" className="flex flex-col items-center justify-center p-6 bg-slate-50 hover:bg-emerald-50 rounded-3xl border border-slate-100 hover:border-emerald-200 transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <div className="w-14 h-14 bg-white text-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 transform rotate-3 group-hover:rotate-0">
+                                <Clock size={24} />
                             </div>
-                            <h3 className="font-bold text-slate-800 group-hover:text-emerald-900 transition-colors">Live Queue</h3>
+                            <h3 className="font-bold text-slate-700 group-hover:text-emerald-900 transition-colors tracking-tight">Live Queue</h3>
                         </Link>
 
-                        <Link to="/doctor/patients" className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-blue-50 rounded-2xl border border-slate-100 hover:border-blue-200 transition-all group">
-                            <div className="w-12 h-12 bg-white text-blue-600 rounded-full flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                <Users size={22} />
+                        <Link to="/doctor/patients" className="flex flex-col items-center justify-center p-6 bg-slate-50 hover:bg-amber-50 rounded-3xl border border-slate-100 hover:border-amber-200 transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <div className="w-14 h-14 bg-white text-amber-500 rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 transform rotate-3 group-hover:rotate-0">
+                                <Users size={24} />
                             </div>
-                            <h3 className="font-bold text-slate-800 group-hover:text-blue-900 transition-colors">My Patients</h3>
+                            <h3 className="font-bold text-slate-700 group-hover:text-amber-900 transition-colors tracking-tight">My Patients</h3>
                         </Link>
 
-                        <Link to="/doctor/schedules" className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-indigo-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all group">
-                            <div className="w-12 h-12 bg-white text-indigo-600 rounded-full flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                <CalendarCheck size={22} />
+                        <Link to="/doctor/schedules" className="flex flex-col items-center justify-center p-6 bg-slate-50 hover:bg-purple-50 rounded-3xl border border-slate-100 hover:border-purple-200 transition-all duration-300 group hover:-translate-y-1 hover:shadow-md">
+                            <div className="w-14 h-14 bg-white text-purple-500 rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 transform -rotate-3 group-hover:rotate-0">
+                                <CalendarCheck size={24} />
                             </div>
-                            <h3 className="font-bold text-slate-800 group-hover:text-indigo-900 transition-colors">Schedules</h3>
+                            <h3 className="font-bold text-slate-700 group-hover:text-purple-900 transition-colors tracking-tight">Schedules</h3>
                         </Link>
                     </div>
                 </div>

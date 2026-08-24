@@ -137,44 +137,62 @@ export default function Prescriptions() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {prescriptions.map((prescription) => (
-                        <div key={prescription.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all group">
-                            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-start">
+                        <div key={prescription.id} className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 group hover:-translate-y-1 relative">
+                            {/* Decorative background element */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-theme-100 to-theme-50/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                            
+                            <div className="p-6 border-b border-slate-50 flex justify-between items-start z-10">
                                 <div>
-                                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                        <User size={16} className="text-theme-600" />
+                                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2 tracking-tight">
+                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-theme-600">
+                                            <User size={16} />
+                                        </div>
                                         {prescription.patient_first_name} {prescription.patient_last_name}
                                     </h3>
-                                    <p className="text-sm text-slate-500 mt-1 flex items-center gap-1.5">
-                                        <Calendar size={14} />
-                                        {new Date(prescription.created_at).toLocaleDateString()}
+                                    <p className="text-sm text-slate-500 mt-2 flex items-center gap-1.5 ml-10 font-medium">
+                                        <Calendar size={14} className="text-slate-400" />
+                                        {new Date(prescription.created_at).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                                     </p>
                                 </div>
-                                <div className="p-2 bg-theme-100 text-theme-600 rounded-lg">
-                                    <FileText size={18} />
+                                <div className="p-2.5 bg-theme-50 text-theme-600 rounded-xl shadow-sm border border-theme-100/50 group-hover:bg-theme-600 group-hover:text-white transition-colors duration-300 cursor-pointer">
+                                    <FileText size={20} />
                                 </div>
                             </div>
-                            <div className="p-5">
+                            
+                            <div className="p-6 z-10">
                                 {prescription.notes && (
-                                    <div className="mb-4">
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Doctor's Notes</p>
-                                        <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100">{prescription.notes}</p>
+                                    <div className="mb-6 relative">
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-theme-500 rounded-full"></div>
+                                        <div className="pl-4">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Doctor's Notes</p>
+                                            <p className="text-sm text-slate-700 bg-slate-50/80 p-4 rounded-2xl border border-slate-100 shadow-inner font-medium italic">{prescription.notes}</p>
+                                        </div>
                                     </div>
                                 )}
+                                
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prescribed Medicines ({prescription.items?.length || 0})</p>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        Prescribed Medicines 
+                                        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px]">{prescription.items?.length || 0}</span>
+                                    </p>
                                     <ul className="space-y-3">
                                         {prescription.items?.map((item) => (
-                                            <li key={item.id} className="flex items-start gap-3 p-3 rounded-xl border border-theme-100 bg-theme-50/30">
-                                                <div className="mt-0.5 p-1.5 bg-theme-100 text-theme-600 rounded-md">
-                                                    <Pill size={14} />
+                                            <li key={item.id} className="flex items-start gap-4 p-4 rounded-2xl border border-slate-100 bg-white hover:bg-theme-50/30 transition-colors shadow-sm hover:border-theme-200 group/item">
+                                                <div className="mt-1 p-2 bg-theme-100 text-theme-600 rounded-xl group-hover/item:scale-110 transition-transform shadow-sm">
+                                                    <Pill size={16} />
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-theme-900 text-sm">{item.medicine_name}</p>
-                                                    <p className="text-xs text-theme-700/80 font-medium mt-0.5">
-                                                        {item.dosage} • {item.frequency} • {item.duration}
-                                                    </p>
+                                                <div className="flex-1">
+                                                    <p className="font-bold text-slate-800 text-base">{item.medicine_name}</p>
+                                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                        <span className="text-xs font-bold text-theme-700 bg-theme-50 px-2 py-1 rounded-lg border border-theme-100/50">{item.dosage}</span>
+                                                        <span className="text-xs font-bold text-slate-600 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">{item.frequency}</span>
+                                                        <span className="text-xs font-bold text-slate-600 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">{item.duration}</span>
+                                                    </div>
                                                     {item.instructions && (
-                                                        <p className="text-xs text-slate-500 mt-1 italic">"{item.instructions}"</p>
+                                                        <p className="text-sm text-slate-500 mt-2 italic flex gap-2 items-start bg-slate-50/50 p-2 rounded-lg">
+                                                            <span className="text-slate-400 font-serif text-lg leading-none">"</span>
+                                                            {item.instructions}
+                                                        </p>
                                                     )}
                                                 </div>
                                             </li>
