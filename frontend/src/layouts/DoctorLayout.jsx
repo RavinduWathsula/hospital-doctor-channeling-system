@@ -54,13 +54,13 @@ const DoctorLayout = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl`}>
-                <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
+            <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-theme-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-xl`}>
+                <div className="h-16 flex items-center justify-between px-6 border-b border-theme-800">
                     <div className="flex items-center">
-                        <Stethoscope className="mr-2 text-theme-400" size={24} />
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-theme-400 to-theme-200">Doctor Portal</span>
+                        <Stethoscope className="mr-2 text-theme-300" size={24} />
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-theme-300 to-theme-100">Doctor Portal</span>
                     </div>
-                    <button className="md:hidden text-slate-400 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="md:hidden text-theme-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                         <X size={24} />
                     </button>
                 </div>
@@ -72,7 +72,7 @@ const DoctorLayout = () => {
                             to={item.path}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className={({ isActive }) => 
-                                `flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive ? 'bg-theme-600 text-white shadow-lg shadow-theme-500/30 font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white font-medium'}`
+                                `flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive ? 'bg-theme-600 text-white shadow-lg shadow-theme-500/30 font-semibold' : 'text-theme-100 hover:bg-theme-800 hover:text-white font-medium'}`
                             }
                         >
                             <span className="mr-3">{item.icon}</span>
@@ -81,10 +81,10 @@ const DoctorLayout = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-slate-800">
+                <div className="p-4 border-t border-theme-800">
                     <button 
                         onClick={handleLogout}
-                        className="flex items-center w-full px-3 py-2.5 text-slate-400 hover:text-white hover:bg-rose-500/10 hover:text-rose-400 rounded-lg transition-colors font-medium"
+                        className="flex items-center w-full px-3 py-2.5 text-theme-200 hover:text-white hover:bg-theme-800 rounded-lg transition-colors font-medium"
                     >
                         <LogOut size={20} className="mr-3" />
                         <span>Logout</span>

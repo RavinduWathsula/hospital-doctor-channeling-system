@@ -15,6 +15,13 @@ const DoctorDashboard = () => {
     const [todaySchedule, setTodaySchedule] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning';
+        if (hour < 18) return 'Good Afternoon';
+        return 'Good Evening';
+    };
+
     // Date formatting for the greeting
     const today = new Date();
     const formattedDate = new Intl.DateTimeFormat('en-US', { 
@@ -106,28 +113,28 @@ const DoctorDashboard = () => {
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-10">
             {/* Dynamic Premium Greeting Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-2xl mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-theme-600 to-theme-900 opacity-90 transition-colors duration-500"></div>
+            <div className="relative overflow-hidden rounded-3xl bg-theme-900 shadow-2xl mb-8 group transition-all duration-500 hover:shadow-theme-900/50">
+                <div className="absolute inset-0 bg-gradient-to-r from-theme-600 via-theme-700 to-theme-900 opacity-90 transition-colors duration-500"></div>
                 
                 {/* Decorative Elements */}
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-theme-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob transition-colors duration-500"></div>
-                <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-theme-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 transition-colors duration-500"></div>
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-theme-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse transition-colors duration-500"></div>
+                <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-theme-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse transition-colors duration-500" style={{ animationDelay: '2s' }}></div>
                 
                 <div className="relative p-8 md:p-12 z-10 flex flex-col md:flex-row items-center justify-between">
                     <div className="text-center md:text-left">
                         <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                                <Activity className="text-theme-100" size={24} />
+                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                                <Sparkles className="text-theme-100 animate-pulse" size={24} />
                             </div>
-                            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">Overview</h1>
+                            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">{getGreeting()}, Dr. {user?.first_name}</h1>
                         </div>
                         <p className="text-theme-50 text-lg md:text-xl max-w-xl leading-relaxed opacity-90 md:ml-16">
-                            Welcome back, Dr. {user?.first_name}. Here is your schedule and patient summary for today.
+                            Welcome back. Here is your schedule and patient summary for today.
                         </p>
                     </div>
                     <div className="mt-8 md:mt-0 hidden md:block">
-                        <div className="w-32 h-32 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(var(--theme-rgb),0.3)]">
-                            <Stethoscope size={56} className="text-theme-100 drop-shadow-lg" />
+                        <div className="w-32 h-32 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(var(--color-theme-500),0.3)] group-hover:scale-110 transition-transform duration-500">
+                            <Stethoscope size={56} className="text-theme-100 drop-shadow-lg group-hover:text-white transition-colors" />
                         </div>
                     </div>
                 </div>

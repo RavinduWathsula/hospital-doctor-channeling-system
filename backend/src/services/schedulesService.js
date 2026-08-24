@@ -76,6 +76,22 @@ exports.update = async (id, scheduleData) => {
 };
 
 exports.delete = async (id) => {
-    await pool.query('DELETE FROM doctor_schedules WHERE id = ?', [id]);
-    return true;
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        
+        // Delete any appointments associated with this schedule to resolve foreign key constraints
+        await connection.query('DELETE FROM appointments WHERE schedule_id = ?', [id]);
+        
+        // Now delete the schedule
+        await connection.query('DELETE FROM doctor_schedules WHERE id = ?', [id]);
+        
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 };
