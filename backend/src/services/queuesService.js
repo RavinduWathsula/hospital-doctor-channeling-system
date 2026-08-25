@@ -131,7 +131,7 @@ exports.getDoctorQueue = async (userId) => {
     `, [doctor_id, today]);
 
     const currentPatient = appointments.find(a => a.status === 'IN_CONSULTATION' || a.status === 'CALLED');
-    const waitingPatients = appointments.filter(a => a.status === 'WAITING' || a.status === 'CHECKED_IN');
+    const waitingPatients = appointments.filter(a => ['PENDING', 'CONFIRMED', 'WAITING', 'CHECKED_IN'].includes(a.status));
     const nextPatient = waitingPatients.length > 0 ? waitingPatients[0] : null;
 
     return {
