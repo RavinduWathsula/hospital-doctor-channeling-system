@@ -10,6 +10,7 @@ const BookingConfirmation = () => {
     const { token } = useContext(AuthContext);
     const [appointment, setAppointment] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         const fetchAppointment = async () => {
@@ -33,8 +34,12 @@ const BookingConfirmation = () => {
         fetchAppointment();
     }, [id, token]);
 
-    const handleDownload = () => {
-        import('html2pdf.js').then((html2pdf) => {
+    const handleDownload = async () => {
+        setIsDownloading(true);
+        try {
+            const html2pdfModule = await import('html2pdf.js');
+            const html2pdf = html2pdfModule.default || html2pdfModule;
+            
             const element = document.getElementById('receipt-container');
             const opt = {
                 margin:       10,
@@ -44,8 +49,14 @@ const BookingConfirmation = () => {
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: 'avoid-all' }
             };
-            html2pdf.default().set(opt).from(element).save();
-        });
+            await html2pdf().set(opt).from(element).save();
+            toast.success('Bill downloaded successfully');
+        } catch (error) {
+            console.error('PDF Error:', error);
+            toast.error('Failed to download bill. Please try again.');
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
     if (isLoading) {
@@ -238,10 +249,15 @@ const BookingConfirmation = () => {
                 >
                     <button 
                         onClick={handleDownload}
-                        className="px-8 py-4 bg-white border border-slate-200 text-slate-700 font-black rounded-[1.5rem] hover:bg-slate-50 hover:border-slate-300 flex items-center justify-center transition-all shadow-sm group"
+                        disabled={isDownloading}
+                        className="px-8 py-4 bg-white border border-slate-200 text-slate-700 font-black rounded-[1.5rem] hover:bg-slate-50 hover:border-slate-300 flex items-center justify-center transition-all shadow-sm group disabled:opacity-70"
                     >
-                        <Download size={20} className="mr-3 text-slate-400 group-hover:text-indigo-500 transition-colors" /> 
-                        Download Bill (PDF)
+                        {isDownloading ? (
+                            <div className="w-5 h-5 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin mr-3"></div>
+                        ) : (
+                            <Download size={20} className="mr-3 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                        )}
+                        {isDownloading ? 'Downloading...' : 'Download Bill (PDF)'}
                     </button>
                     <Link 
                         to="/patient/dashboard"

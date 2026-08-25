@@ -8,6 +8,7 @@ const Users = () => {
     const { token } = useContext(AuthContext);
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
+    const [roleFilter, setRoleFilter] = useState('ALL');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -38,7 +39,11 @@ const Users = () => {
         } catch { toast.error('Error updating status'); }
     };
 
-    const filtered = users.filter(u => (u.first_name + ' ' + u.last_name + ' ' + u.email + ' ' + u.role).toLowerCase().includes(search.toLowerCase()));
+    const filtered = users.filter(u => {
+        const matchesSearch = (u.first_name + ' ' + u.last_name + ' ' + u.email + ' ' + u.role).toLowerCase().includes(search.toLowerCase());
+        const matchesRole = roleFilter === 'ALL' || u.role === roleFilter;
+        return matchesSearch && matchesRole;
+    });
 
     const getRoleBadge = (role) => {
         switch (role) {
@@ -85,6 +90,23 @@ const Users = () => {
                         />
                     </div>
                 </div>
+            </div>
+
+            {/* Category Filters */}
+            <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar">
+                {['ALL', 'PATIENT', 'DOCTOR', 'ADMIN', 'RECEPTIONIST'].map(role => (
+                    <button
+                        key={role}
+                        onClick={() => setRoleFilter(role)}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 ${
+                            roleFilter === role 
+                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 -translate-y-0.5' 
+                            : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 border border-slate-200 shadow-sm'
+                        }`}
+                    >
+                        {role === 'ALL' ? 'All Users' : role.charAt(0) + role.slice(1).toLowerCase() + 's'}
+                    </button>
+                ))}
             </div>
 
             {/* Main Table Container */}

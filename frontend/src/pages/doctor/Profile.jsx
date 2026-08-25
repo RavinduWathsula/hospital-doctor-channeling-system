@@ -170,8 +170,12 @@ const DoctorProfile = () => {
                     <div className="flex justify-between items-end -mt-12 mb-6">
                         <div className="relative">
                             <div className="w-24 h-24 bg-white rounded-full p-1 shadow-md">
-                                <div className="w-full h-full bg-theme-100 text-theme-600 rounded-full flex items-center justify-center font-bold text-3xl">
-                                    {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                                <div className="w-full h-full bg-theme-100 text-theme-600 rounded-full flex items-center justify-center font-bold text-3xl overflow-hidden">
+                                    {profile.profile_image ? (
+                                        <img src={profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <>{profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}</>
+                                    )}
                                 </div>
                             </div>
                         </div>

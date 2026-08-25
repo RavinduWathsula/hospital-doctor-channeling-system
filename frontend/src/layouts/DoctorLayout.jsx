@@ -139,8 +139,12 @@ const DoctorLayout = () => {
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="doctor" />
                         <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-theme-100 flex items-center justify-center text-theme-600 font-bold mr-2 shadow-sm border border-theme-200">
-                                {user?.first_name?.charAt(0) || 'D'}
+                            <div className="w-8 h-8 rounded-full bg-theme-100 flex items-center justify-center text-theme-600 font-bold mr-2 shadow-sm border border-theme-200 overflow-hidden">
+                                {user?.profile_image ? (
+                                    <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    user?.first_name?.charAt(0) || 'D'
+                                )}
                             </div>
                             <div className="text-sm">
                                 <p className="font-semibold text-gray-700">Dr. {user?.first_name} {user?.last_name}</p>
