@@ -1,18 +1,40 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, Users, Activity, Building, Calendar, ClipboardList, Settings, LogOut, UserCircle, Menu, X, Command } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
 const AdminLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    const handleLogoutClick = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    const handleConfirmLogout = () => {
+        setShowLogoutConfirm(false);
+        toast.success(`See you next time, ${user?.first_name || 'Admin'}! 👋`, {
+            style: {
+                borderRadius: '12px',
+                background: '#fff',
+                color: '#334155',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+            },
+            iconTheme: {
+                primary: '#4f46e5',
+                secondary: '#fff',
+            },
+            duration: 2000,
+        });
+        setTimeout(() => {
+            logout();
+            navigate('/login');
+        }, 1200);
     };
 
     const navItems = [
@@ -78,11 +100,14 @@ const AdminLayout = () => {
                 {/* Bottom Logout Area */}
                 <div className="p-6 border-t border-slate-100 relative overflow-hidden bg-white">
                     <button 
-                        onClick={handleLogout}
-                        className="flex items-center justify-center w-full px-4 py-3 text-slate-600 bg-slate-50 border border-slate-200 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 rounded-2xl transition-all duration-300 group shadow-sm"
+                        onClick={handleLogoutClick}
+                        className="relative overflow-hidden flex items-center justify-center w-full px-4 py-3 text-slate-600 bg-slate-50 border border-slate-200 hover:border-rose-200 hover:text-rose-600 rounded-2xl transition-all duration-300 group shadow-sm"
                     >
-                        <LogOut size={20} className="mr-3 transition-colors" />
-                        <span className="font-semibold transition-colors">Logout Securely</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-rose-50 to-orange-50 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out"></div>
+                        <div className="relative flex items-center justify-center w-full">
+                            <LogOut size={20} className="mr-3 group-hover:-translate-x-1 group-hover:scale-110 transition-all duration-300" />
+                            <span className="font-semibold transition-colors group-hover:pl-1 duration-300">Logout Securely</span>
+                        </div>
                     </button>
                 </div>
             </aside>
@@ -123,6 +148,34 @@ const AdminLayout = () => {
                     </div>
                 </main>
             </div>
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)}></div>
+                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full relative z-10 shadow-2xl transform transition-all animate-in fade-in zoom-in-95 duration-200 border border-slate-100">
+                        <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <LogOut size={32} className="text-rose-600 ml-1" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-center text-slate-800 mb-2">Sign Out</h3>
+                        <p className="text-center text-slate-500 mb-8 font-medium">Are you sure you want to securely log out of the admin portal?</p>
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => setShowLogoutConfirm(false)}
+                                className="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleConfirmLogout}
+                                className="flex-1 py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-rose-600/30"
+                            >
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -72,7 +72,7 @@ const Queue = () => {
                         </p>
                         
                         <Link 
-                            to="/patient/booking" 
+                            to="/patient/doctors" 
                             className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 hover:from-blue-500 to-indigo-600 hover:to-indigo-500 text-white rounded-2xl font-semibold shadow-[0_8px_20px_rgb(79,70,229,0.3)] hover:shadow-[0_15px_30px_rgb(79,70,229,0.4)] transform hover:-translate-y-1 transition-all duration-300"
                         >
                             <CalendarPlus size={22} className="mr-3" />
