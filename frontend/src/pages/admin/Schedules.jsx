@@ -243,13 +243,7 @@ const Schedules = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between md:w-1/3 md:justify-end relative z-10 pt-4 md:pt-0 border-t border-slate-100 md:border-none">
-                                        <div className="mr-8">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 md:text-right">Capacity</p>
-                                            <div className="flex items-center text-sm font-black text-blue-600 bg-blue-50/80 px-3 py-1.5 rounded-xl border border-blue-100/60">
-                                                <Users size={16} className="mr-1.5" /> {schedule.max_patients} <span className="ml-1 opacity-80 font-bold hidden sm:inline">Patients</span>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center justify-end md:w-1/3 relative z-10 pt-4 md:pt-0 border-t border-slate-100 md:border-none">
                                         <button 
                                             onClick={() => handleDelete(schedule.id)} 
                                             className="w-12 h-12 rounded-2xl bg-white border border-rose-100 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-500/30 transition-all duration-300 group-hover:scale-105"
@@ -394,14 +388,6 @@ const Schedules = () => {
                                         <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">End Time *</label>
                                             <input type="time" required value={formData.end_time} onChange={(e) => setFormData({...formData, end_time: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Slot Duration (Mins) *</label>
-                                            <input type="number" required min="5" step="5" value={formData.slot_duration_minutes} onChange={(e) => setFormData({...formData, slot_duration_minutes: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Max Patients *</label>
-                                            <input type="number" required min="1" value={formData.max_patients} onChange={(e) => setFormData({...formData, max_patients: e.target.value})} className="w-full px-4 py-4 bg-slate-50 border border-slate-300 shadow-sm rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-bold text-slate-700" />
                                         </div>
                                     </div>
                                 </form>

@@ -9,12 +9,13 @@ const Appointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('ALL');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm]);
+    }, [searchTerm, filterStatus]);
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -61,11 +62,13 @@ const Appointments = () => {
         }
     };
 
-    const filteredAppointments = appointments.filter(apt => 
-        apt.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        apt.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        apt.id.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredAppointments = appointments.filter(apt => {
+        const matchesSearch = apt.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                              apt.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              apt.id.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = filterStatus === 'ALL' || apt.status === filterStatus;
+        return matchesSearch && matchesStatus;
+    });
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -130,6 +133,23 @@ const Appointments = () => {
                     </div>
                 </div>
             </motion.div>
+
+            {/* Status Tabs */}
+            <div className="flex space-x-2 overflow-x-auto hide-scrollbar pb-2">
+                {['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].map(status => (
+                    <button
+                        key={status}
+                        onClick={() => setFilterStatus(status)}
+                        className={`px-6 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${
+                            filterStatus === status
+                                ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                                : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-200'
+                        }`}
+                    >
+                        {status === 'ALL' ? 'All Bookings' : status.charAt(0) + status.slice(1).toLowerCase()}
+                    </button>
+                ))}
+            </div>
 
             {/* Content Area */}
             {isLoading ? (
