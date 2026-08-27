@@ -67,7 +67,7 @@ exports.getDoctorPrescriptions = async (doctorId) => {
 exports.getPatientPrescriptions = async (patientUserId) => {
     const [prescriptions] = await pool.query(`
         SELECT p.*, 
-        u.first_name as doctor_first_name, u.last_name as doctor_last_name, d.specialization,
+        u.first_name as doctor_first_name, u.last_name as doctor_last_name, doc.specialization,
         a.appointment_date, a.appointment_time
         FROM prescriptions p
         JOIN doctors doc ON p.doctor_id = doc.id

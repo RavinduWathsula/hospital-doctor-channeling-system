@@ -22,7 +22,7 @@ exports.getPatientAppointments = async (userId) => {
     const [rows] = await pool.query(`
         SELECT a.*, 
         d.id as doctor_id, du.first_name as doctor_first_name, du.last_name as doctor_last_name, 
-        dept.name as department_name, d.specialization
+        dept.name as department_name, d.specialization, d.consultation_fee
         FROM appointments a
         JOIN patients p ON a.patient_id = p.id
         JOIN doctors d ON a.doctor_id = d.id

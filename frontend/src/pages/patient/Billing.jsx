@@ -11,14 +11,33 @@ const Billing = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchAppointments = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/appointments/my-appointments', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setAppointments(data.data);
+                const [aptRes, docRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/appointments/my-appointments', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch('http://localhost:5000/api/doctors')
+                ]);
+                
+                const aptData = await aptRes.json();
+                const docData = await docRes.json();
+                
+                if (aptData.success) {
+                    let finalApts = aptData.data;
+                    
+                    // Merge consultation_fee dynamically in case backend isn't sending it
+                    if (docData.success && docData.data) {
+                        finalApts = finalApts.map(apt => {
+                            const doctor = docData.data.find(d => d.id === apt.doctor_id);
+                            return {
+                                ...apt,
+                                consultation_fee: apt.consultation_fee || (doctor ? doctor.consultation_fee : 0)
+                            };
+                        });
+                    }
+                    
+                    setAppointments(finalApts);
                 }
             } catch (error) {
                 toast.error('Failed to load billing history');
@@ -27,7 +46,7 @@ const Billing = () => {
             }
         };
 
-        fetchAppointments();
+        fetchData();
     }, [token]);
 
     const paidAppointments = appointments.filter(apt => apt.status !== 'CANCELLED');

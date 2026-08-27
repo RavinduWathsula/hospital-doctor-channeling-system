@@ -5,6 +5,9 @@ import { Printer, Calendar, Clock, MapPin, User, CheckCircle, ArrowRight, Downlo
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
+import domtoimage from 'dom-to-image-more';
+import { jsPDF } from 'jspdf';
+
 const BookingConfirmation = () => {
     const { id } = useParams();
     const { token } = useContext(AuthContext);
@@ -37,23 +40,37 @@ const BookingConfirmation = () => {
     const handleDownload = async () => {
         setIsDownloading(true);
         try {
-            const html2pdfModule = await import('html2pdf.js');
-            const html2pdf = html2pdfModule.default || html2pdfModule;
-            
             const element = document.getElementById('receipt-container');
-            const opt = {
-                margin:       10,
-                filename:     `Appointment-Ticket-APT-${String(appointment?.id || 0).padStart(6, '0')}.pdf`,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 900 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' }
-            };
-            await html2pdf().set(opt).from(element).save();
+            
+            // Higher scale for better print quality
+            const scale = 2;
+            const dataUrl = await domtoimage.toJpeg(element, {
+                quality: 0.98,
+                bgcolor: '#ffffff',
+                width: element.clientWidth * scale,
+                height: element.clientHeight * scale,
+                style: {
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top left',
+                    width: `${element.clientWidth}px`,
+                    height: `${element.clientHeight}px`
+                }
+            });
+            
+            // Setup A4 PDF
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const margin = 10;
+            const finalWidth = pdfWidth - (margin * 2);
+            const finalHeight = (element.clientHeight * scale * finalWidth) / (element.clientWidth * scale);
+            
+            pdf.addImage(dataUrl, 'JPEG', margin, margin, finalWidth, finalHeight);
+            pdf.save(`Appointment-Ticket-APT-${String(appointment?.id || 0).padStart(6, '0')}.pdf`);
+            
             toast.success('Bill downloaded successfully');
         } catch (error) {
             console.error('PDF Error:', error);
-            toast.error('Failed to download bill. Please try again.');
+            toast.error(`Failed to download bill: ${error.message || 'Unknown error'}`);
         } finally {
             setIsDownloading(false);
         }
