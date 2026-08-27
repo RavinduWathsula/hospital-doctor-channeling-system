@@ -103,10 +103,10 @@ const Reports = () => {
                 </div>
                 
                 <div className="flex space-x-3">
-                    <button className="flex items-center px-4 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
+                    <button onClick={() => toast('Advanced filtering coming soon!', { icon: '🚧' })} className="flex items-center px-4 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
                         <Filter size={18} className="mr-2" /> Filter
                     </button>
-                    <button className="flex items-center px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5">
+                    <button onClick={() => window.print()} className="flex items-center px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5">
                         <Download size={18} className="mr-2" /> Export PDF
                     </button>
                 </div>

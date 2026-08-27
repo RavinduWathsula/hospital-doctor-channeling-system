@@ -254,7 +254,7 @@ const Doctors = () => {
                                 </div>
                                 <div className="flex items-center text-sm font-bold text-slate-700 bg-emerald-50/80 px-4 py-3 rounded-2xl border border-emerald-200/60 hover:bg-emerald-100 transition-colors">
                                     <BadgeDollarSign size={16} className="text-emerald-500 mr-2.5" />
-                                    ${parseFloat(doctor.consultation_fee).toFixed(2)}
+                                    LKR {parseFloat(doctor.consultation_fee).toFixed(2)}
                                 </div>
                                 <div className="flex items-center text-sm font-bold text-slate-700 bg-slate-50 px-4 py-3 rounded-2xl border border-slate-200 col-span-2 hover:bg-slate-100 transition-colors">
                                     <ShieldCheck size={16} className="text-slate-400 mr-2.5" />

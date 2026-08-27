@@ -280,7 +280,7 @@ const DoctorSearch = () => {
                                             </div>
                                             <div className="flex items-center justify-between text-sm font-semibold text-slate-600 bg-white p-3 rounded-2xl shadow-sm border border-slate-100 group-hover:border-indigo-100 transition-colors">
                                                 <div className="flex items-center"><DollarSign size={16} className="text-indigo-400 mr-2" /> Fee</div>
-                                                <span className="text-indigo-600 font-black">${doctor.consultation_fee}</span>
+                                                <span className="text-indigo-600 font-black">LKR {doctor.consultation_fee}</span>
                                             </div>
                                         </div>
                                     </div>
