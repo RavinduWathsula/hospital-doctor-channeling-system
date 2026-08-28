@@ -127,7 +127,7 @@ const Settings = () => {
                             <div className={`w-14 h-8 rounded-full p-1 transition-colors ${settings.maintenanceMode ? 'bg-rose-500' : 'bg-slate-700'}`}>
                                 <div className={`w-6 h-6 bg-white rounded-full shadow-sm transform transition-transform ${settings.maintenanceMode ? 'translate-x-6' : 'translate-x-0'}`}></div>
                             </div>
-                            <input type="checkbox" name="maintenanceMode" checked={settings.maintenanceMode} onChange={handleChange} className="hidden" />
+                            <input type="checkbox" name="maintenanceMode" checked={settings.maintenanceMode} onChange={handleChange} className="sr-only" />
                         </label>
                     </motion.div>
                 </div>

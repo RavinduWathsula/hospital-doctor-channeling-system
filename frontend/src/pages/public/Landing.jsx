@@ -134,6 +134,19 @@ const Landing = () => {
         'Appointment Reminders'
     ];
 
+    const [doctorsList, setDoctorsList] = useState([]);
+
+    useEffect(() => {
+        fetch('http://localhost:5000/api/doctors/search')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setDoctorsList(data.data || []);
+                }
+            })
+            .catch(err => console.error('Error fetching doctors:', err));
+    }, []);
+
     const faqs = [
         { q: "How do I book an appointment?", a: "Search for a doctor or specialty, select an available date and time session, and confirm your booking securely online." },
         { q: "Are all doctors on this platform verified?", a: "Yes, every doctor listed on our platform is verified through their respective medical councils and hospital boards." },
@@ -352,20 +365,20 @@ const Landing = () => {
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {featuredDoctors.map((doc, idx) => (
+                        {(doctorsList.length > 0 ? doctorsList.slice(0, 8) : featuredDoctors).map((doc, idx) => (
                             <motion.div key={idx} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className="bg-gradient-to-b from-white/80 to-blue-50/50 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg shadow-blue-900/5 border border-white/80 hover:shadow-xl hover:border-blue-200 transition-all duration-300 hover:-translate-y-1 group">
                                 <div className="h-56 bg-slate-200 relative overflow-hidden">
-                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${doc.img}&backgroundColor=e2e8f0`} alt={doc.name} className="w-full h-full object-cover" />
+                                    <img src={doc.profile_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${doc.img || doc.first_name}&backgroundColor=e2e8f0`} alt={doc.name || `${doc.first_name} ${doc.last_name}`} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="p-6">
-                                    <h3 className="text-xl font-extrabold text-slate-900 mb-1">{doc.name}</h3>
-                                    <p className="text-blue-600 font-bold text-sm mb-4">{doc.spec}</p>
+                                    <h3 className="text-xl font-extrabold text-slate-900 mb-1">{doc.name || `Dr. ${doc.first_name} ${doc.last_name}`}</h3>
+                                    <p className="text-blue-600 font-bold text-sm mb-4">{doc.spec || doc.specialization}</p>
                                     
                                     <div className="flex items-center gap-1 text-amber-500 mb-2">
                                         {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
-                                        <span className="text-slate-700 font-bold ml-1 text-sm">{doc.rating}</span>
+                                        <span className="text-slate-700 font-bold ml-1 text-sm">{doc.rating || '5.0'}</span>
                                     </div>
-                                    <p className="text-slate-500 text-sm font-medium mb-6">{doc.exp} Experience</p>
+                                    <p className="text-slate-500 text-sm font-medium mb-6">{doc.exp || `${doc.experience_years}+ Years`} Experience</p>
                                     
                                     <div className="flex gap-2">
                                         <Link to="/register" className="flex-1 py-2.5 text-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-sm">
