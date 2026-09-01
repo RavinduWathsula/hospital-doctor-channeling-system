@@ -4,6 +4,7 @@ import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { Activity, Download, CalendarCheck, Users, TrendingUp, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import html2pdf from 'html2pdf.js';
 
 const COLORS = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -90,9 +91,21 @@ const Reports = () => {
         name: d.departmentName,
         value: d.count
     }));
+    const handleExportPDF = () => {
+        const element = document.getElementById('report-content');
+        const opt = {
+            margin:       10,
+            filename:     'hospital-analytics-report.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    };
 
     return (
-        <div className="space-y-6 pb-10 font-sans">
+        <div id="report-content" className="space-y-6 pb-10 font-sans">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -106,7 +119,7 @@ const Reports = () => {
                     <button onClick={() => toast('Advanced filtering coming soon!', { icon: '🚧' })} className="flex items-center px-4 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
                         <Filter size={18} className="mr-2" /> Filter
                     </button>
-                    <button onClick={() => window.print()} className="flex items-center px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5">
+                    <button onClick={handleExportPDF} className="flex items-center px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5">
                         <Download size={18} className="mr-2" /> Export PDF
                     </button>
                 </div>
