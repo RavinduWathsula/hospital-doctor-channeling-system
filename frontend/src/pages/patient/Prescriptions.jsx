@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Pill, Calendar, User, FileText, Download } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import html2pdf from 'html2pdf.js';
+
 
 export default function Prescriptions() {
     const { token } = useContext(AuthContext);
@@ -27,6 +29,18 @@ export default function Prescriptions() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDownload = (prescription) => {
+        const element = document.getElementById(`prescription-${prescription.id}`);
+        const opt = {
+            margin:       10,
+            filename:     `Prescription_${prescription.doctor_first_name}_${prescription.doctor_last_name}_${new Date(prescription.created_at).toLocaleDateString().replace(/\//g, '-')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     };
 
     return (
@@ -55,7 +69,7 @@ export default function Prescriptions() {
                     className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
                     {prescriptions.map((prescription) => (
-                        <div key={prescription.id} className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 group hover:-translate-y-1 relative">
+                        <div key={prescription.id} id={`prescription-${prescription.id}`} className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 group hover:-translate-y-1 relative">
                             {/* Decorative background element */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-100 to-teal-50/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
                             
@@ -72,7 +86,12 @@ export default function Prescriptions() {
                                         {new Date(prescription.created_at).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                                     </p>
                                 </div>
-                                <div className="p-2.5 bg-teal-50 text-teal-600 rounded-xl shadow-sm border border-teal-100/50 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300 cursor-pointer" title="Download Prescription">
+                                <div 
+                                    className="p-2.5 bg-teal-50 text-teal-600 rounded-xl shadow-sm border border-teal-100/50 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300 cursor-pointer" 
+                                    title="Download Prescription"
+                                    onClick={() => handleDownload(prescription)}
+                                    data-html2canvas-ignore
+                                >
                                     <Download size={20} />
                                 </div>
                             </div>
