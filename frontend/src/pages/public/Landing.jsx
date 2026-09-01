@@ -579,8 +579,14 @@ const Landing = () => {
                         <div className="lg:col-span-2 lg:col-start-6">
                             <h4 className="font-extrabold text-white mb-6 uppercase tracking-wider text-sm">Platform</h4>
                             <ul className="space-y-3 font-medium">
-                                {['Home', 'About Us', 'Doctors', 'Specialties', 'How It Works'].map(link => (
-                                    <li key={link}><a href="#" className="hover:text-blue-400 transition-colors flex items-center gap-2"><ChevronRight size={14} className="text-slate-600" />{link}</a></li>
+                                {[
+                                    { name: 'Home', id: 'home' },
+                                    { name: 'About Us', id: 'about' },
+                                    { name: 'Doctors', id: 'doctors' },
+                                    { name: 'Specialties', id: 'specialties' },
+                                    { name: 'How It Works', id: 'how-it-works' }
+                                ].map(link => (
+                                    <li key={link.name}><a href={`#${link.id}`} className="hover:text-blue-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"><ChevronRight size={14} className="text-slate-600" />{link.name}</a></li>
                                 ))}
                             </ul>
                         </div>
