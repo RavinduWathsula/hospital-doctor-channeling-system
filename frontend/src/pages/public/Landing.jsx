@@ -427,23 +427,23 @@ const Landing = () => {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8 relative">
-                        <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-blue-100 via-indigo-200 to-blue-100 z-0 opacity-60"></div>
+                        <div className="hidden md:block absolute top-24 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200 z-0 opacity-60"></div>
 
                         {[
-                            { title: "Find a Doctor", desc: "Search by doctor, specialty, or hospital.", icon: <Search />, num: "01", cardBg: "from-blue-50/90 to-blue-100/50 border-blue-200/60 shadow-blue-900/10", hoverBorder: "hover:border-blue-400" },
-                            { title: "Choose a Session", desc: "View available dates and times.", icon: <Calendar />, num: "02", cardBg: "from-indigo-50/90 to-indigo-100/50 border-indigo-200/60 shadow-indigo-900/10", hoverBorder: "hover:border-indigo-400" },
-                            { title: "Book Appointment", desc: "Confirm your preferred appointment.", icon: <CheckCircle2 />, num: "03", cardBg: "from-purple-50/90 to-purple-100/50 border-purple-200/60 shadow-purple-900/10", hoverBorder: "hover:border-purple-400" }
+                            { title: "Find a Doctor", desc: "Search by doctor, specialty, or hospital.", icon: <Search />, num: "01", cardBg: "from-blue-500 to-blue-600 border-blue-400 shadow-blue-600/20", hoverBorder: "hover:border-blue-300" },
+                            { title: "Choose a Session", desc: "View available dates and times.", icon: <Calendar />, num: "02", cardBg: "from-blue-500 to-blue-600 border-blue-400 shadow-blue-600/20", hoverBorder: "hover:border-blue-300" },
+                            { title: "Book Appointment", desc: "Confirm your preferred appointment.", icon: <CheckCircle2 />, num: "03", cardBg: "from-blue-500 to-blue-600 border-blue-400 shadow-blue-600/20", hoverBorder: "hover:border-blue-300" }
                         ].map((step, idx) => (
                             <motion.div key={idx} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.2 }} className="relative z-10 group">
                                 <div className={`bg-gradient-to-br ${step.cardBg} backdrop-blur-xl p-8 rounded-[2rem] shadow-xl border ${step.hoverBorder} transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl h-full relative overflow-hidden text-center`}>
-                                    <div className="absolute -right-4 -top-8 text-[8rem] font-black text-slate-900 opacity-5 group-hover:opacity-10 group-hover:-translate-y-4 transition-all duration-500 pointer-events-none select-none">
+                                    <div className="absolute -right-4 -top-8 text-[8rem] font-black text-white opacity-10 group-hover:opacity-20 group-hover:-translate-y-4 transition-all duration-500 pointer-events-none select-none">
                                         {step.num}
                                     </div>
-                                    <div className="w-20 h-20 mx-auto bg-white rounded-2xl flex items-center justify-center text-blue-600 mb-8 group-hover:bg-gradient-to-br group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-500 transform group-hover:rotate-12 group-hover:scale-110 shadow-lg shadow-blue-900/5 relative z-10">
+                                    <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white mb-8 group-hover:bg-white group-hover:text-blue-600 transition-all duration-500 transform group-hover:rotate-12 group-hover:scale-110 shadow-lg relative z-10 border border-white/30">
                                         {React.cloneElement(step.icon, { size: 36, strokeWidth: 1.5 })}
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-4 relative z-10">{step.title}</h3>
-                                    <p className="text-slate-600 relative z-10 font-medium leading-relaxed">{step.desc}</p>
+                                    <h3 className="text-2xl font-bold text-white mb-4 relative z-10">{step.title}</h3>
+                                    <p className="text-blue-50 relative z-10 font-medium leading-relaxed">{step.desc}</p>
                                 </div>
                             </motion.div>
                         ))}
