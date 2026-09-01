@@ -6,6 +6,9 @@ const { authenticateToken, requireRole } = require('../middleware/authMiddleware
 // Get all appointments (Admin/Receptionist)
 router.get('/', authenticateToken, requireRole('ADMIN', 'RECEPTIONIST'), appointmentsController.getAll);
 
+// Walk-in booking (Admin/Receptionist)
+router.post('/walk-in', authenticateToken, requireRole('ADMIN', 'RECEPTIONIST'), appointmentsController.createWalkIn);
+
 // Patient specific routes
 router.get('/my-appointments', authenticateToken, requireRole('PATIENT'), appointmentsController.getPatientAppointments);
 router.post('/', authenticateToken, requireRole('PATIENT'), appointmentsController.create);

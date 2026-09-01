@@ -67,6 +67,28 @@ exports.create = async (req, res, next) => {
     }
 };
 
+exports.createWalkIn = async (req, res, next) => {
+    try {
+        const insertId = await appointmentsService.createWalkInAppointment(req.body);
+        const data = await appointmentsService.getAppointmentById(insertId);
+        
+        res.status(201).json({
+            success: true,
+            message: 'Walk-in Appointment booked successfully',
+            data
+        });
+    } catch (error) {
+        if (
+            error.message.includes('booked') || 
+            error.message.includes('already have an appointment') ||
+            error.message.includes('not available')
+        ) {
+            return res.status(409).json({ success: false, message: error.message });
+        }
+        next(error);
+    }
+};
+
 exports.cancel = async (req, res, next) => {
     try {
         const userId = req.user.id;

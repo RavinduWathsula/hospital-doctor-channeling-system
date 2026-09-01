@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, Users, CalendarCheck, CheckSquare, Clock, LogOut, Building2, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, CalendarCheck, CheckSquare, Clock, LogOut, Building2, Menu, X, UserPlus, MonitorPlay } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
@@ -18,9 +18,11 @@ const ReceptionLayout = () => {
     const navItems = [
         { name: 'Dashboard', path: '/reception/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'Patients', path: '/reception/patients', icon: <Users size={20} /> },
+        { name: 'Walk-In Booking', path: '/reception/walk-in', icon: <UserPlus size={20} /> },
         { name: 'Appointments', path: '/reception/appointments', icon: <CalendarCheck size={20} /> },
         { name: 'Check-In', path: '/reception/check-in', icon: <CheckSquare size={20} /> },
         { name: 'Live Queue', path: '/reception/queue', icon: <Clock size={20} /> },
+        { name: 'TV Display', path: '/reception/tv-display', icon: <MonitorPlay size={20} /> },
     ];
 
     return (

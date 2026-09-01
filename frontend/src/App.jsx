@@ -62,6 +62,8 @@ import ReceptionPatients from './pages/reception/Patients';
 import ReceptionAppointments from './pages/reception/Appointments';
 import ReceptionCheckIn from './pages/reception/CheckIn';
 import ReceptionQueue from './pages/reception/Queue';
+import ReceptionWalkInBooking from './pages/reception/WalkInBooking';
+import ReceptionTvDisplay from './pages/reception/TvDisplay';
 
 function App() {
   return (
@@ -136,6 +138,8 @@ function App() {
                   <Route path="/reception/appointments" element={<ReceptionAppointments />} />
                   <Route path="/reception/check-in" element={<ReceptionCheckIn />} />
                   <Route path="/reception/queue" element={<ReceptionQueue />} />
+                  <Route path="/reception/walk-in" element={<ReceptionWalkInBooking />} />
+                  <Route path="/reception/tv-display" element={<ReceptionTvDisplay />} />
                   <Route path="/reception/notifications" element={<Notifications />} />
                 </Route>
               </Route>

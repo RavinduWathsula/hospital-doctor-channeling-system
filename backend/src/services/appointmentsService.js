@@ -166,6 +166,84 @@ exports.createAppointment = async (userId, data) => {
     }
 };
 
+exports.createWalkInAppointment = async (data) => {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        const { patient_id, doctor_id, appointment_date, appointment_time, notes } = data;
+
+        // Verify doctor is active
+        const [doctors] = await connection.query('SELECT is_active FROM doctors WHERE id = ?', [doctor_id]);
+        if (doctors.length === 0 || !doctors[0].is_active) {
+            throw new Error('Doctor is not available.');
+        }
+
+        // Verify schedule exists
+        const dateObj = new Date(appointment_date);
+        let dayOfWeek = dateObj.getDay(); 
+        if (dayOfWeek === 0) dayOfWeek = 7;
+
+        const [schedules] = await connection.query(`
+            SELECT id FROM doctor_schedules 
+            WHERE doctor_id = ? AND day_of_week = ? AND status = 'ACTIVE'
+        `, [doctor_id, dayOfWeek]);
+
+        if (schedules.length === 0) {
+            throw new Error('Doctor does not have an active schedule on this day.');
+        }
+        
+        const schedule = schedules[0];
+        
+        // Double Booking Check (Doctor)
+        const [existingDocApps] = await connection.query(`
+            SELECT id FROM appointments 
+            WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? 
+            AND status NOT IN ('CANCELLED', 'NO_SHOW')
+            FOR UPDATE
+        `, [doctor_id, appointment_date, appointment_time]);
+
+        if (existingDocApps.length > 0) {
+            throw new Error('This slot has already been booked.');
+        }
+
+        // Check Patient double booking
+        const [existingPatApps] = await connection.query(`
+            SELECT id FROM appointments 
+            WHERE patient_id = ? AND appointment_date = ? AND appointment_time = ? 
+            AND status NOT IN ('CANCELLED', 'NO_SHOW')
+        `, [patient_id, appointment_date, appointment_time]);
+
+        if (existingPatApps.length > 0) {
+            throw new Error('Patient already has an appointment at this time.');
+        }
+
+        // Generate Queue Number
+        const [queueCount] = await connection.query(`
+            SELECT COUNT(*) as count FROM appointments 
+            WHERE doctor_id = ? AND appointment_date = ? AND status NOT IN ('CANCELLED')
+        `, [doctor_id, appointment_date]);
+        
+        const queue_number = queueCount[0].count + 1;
+
+        // Insert Appointment as 'WAITING' because it's a walk-in, so they are checked in immediately
+        const [result] = await connection.query(`
+            INSERT INTO appointments 
+            (patient_id, doctor_id, schedule_id, appointment_date, appointment_time, queue_number, status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, 'WAITING', ?)
+        `, [patient_id, doctor_id, schedule.id, appointment_date, appointment_time, queue_number, notes || 'Walk-in Appointment']);
+
+        await connection.commit();
+        
+        return result.insertId;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 exports.cancelAppointment = async (id, userId) => {
     // Only allow cancelling PENDING or CONFIRMED appointments
     const [result] = await pool.query(`
