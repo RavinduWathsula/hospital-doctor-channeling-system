@@ -4,30 +4,13 @@ import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, CalendarCheck, Clock, CalendarDays, Users, UserCircle, LogOut, Stethoscope, Menu, X, Pill, Settings } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
+import LiveDateTime from '../components/LiveDateTime';
 
 const DoctorLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [currentTime, setCurrentTime] = React.useState(new Date());
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-    React.useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    const timeString = new Intl.DateTimeFormat('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    }).format(currentTime);
-
-    const dateString = new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-    }).format(currentTime);
 
     const handleLogoutClick = () => {
         setShowLogoutConfirm(true);
@@ -129,12 +112,8 @@ const DoctorLayout = () => {
                             <span className="text-xl font-bold text-theme-600">Doctor Portal</span>
                         </div>
                     </div>
-                    <div className="flex-1 flex justify-end md:justify-center px-4">
-                        <div className="hidden md:flex items-center gap-4 text-sm font-semibold text-slate-600 bg-slate-100/80 px-5 py-2 rounded-full border border-slate-200/50 shadow-sm">
-                            <span className="flex items-center gap-2"><CalendarCheck size={16} className="text-teal-600" /> {dateString}</span>
-                            <span className="text-slate-300">|</span>
-                            <span className="flex items-center gap-2 font-mono"><Clock size={16} className="text-teal-600 animate-pulse" /> {timeString}</span>
-                        </div>
+                    <div className="flex-1 flex items-center justify-center">
+                        <LiveDateTime />
                     </div>
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="doctor" />

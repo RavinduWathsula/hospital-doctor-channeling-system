@@ -5,6 +5,8 @@ import { LayoutDashboard, Users, Activity, Building, Calendar, ClipboardList, Se
 import { Toaster, toast } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
 
+import LiveDateTime from '../components/LiveDateTime';
+
 const AdminLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -115,15 +117,16 @@ const AdminLayout = () => {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 {/* Top Header - Light Professional */}
-                <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-8 z-10 sticky top-0 transition-all shadow-sm">
+                <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0 transition-all shadow-sm">
                     <div className="flex items-center md:hidden gap-4">
                         <button onClick={() => setIsMobileMenuOpen(true)} className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 shadow-sm border border-slate-200 transition-all">
                             <Menu size={20} />
                         </button>
-                        <span className="text-lg font-black tracking-tight text-slate-800">Admin Portal</span>
+                        <span className="text-lg font-black tracking-tight text-slate-800">Admin</span>
                     </div>
-                    <div className="flex-1 hidden md:block">
-                        {/* Could put a global search bar here if desired in the future */}
+                    
+                    <div className="flex-1 flex items-center justify-center">
+                        <LiveDateTime />
                     </div>
                     
                     <div className="flex items-center space-x-6">

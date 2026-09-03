@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Clock, Bell, UserCircle, LogOut, Menu, X, Pill, FileBarChart, CreditCard, UserPlus, Video } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
-
+import LiveDateTime from '../components/LiveDateTime';
 const PatientLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -110,7 +110,9 @@ const PatientLayout = () => {
                         </button>
                         <span className="text-xl font-bold text-blue-600">Patient Portal</span>
                     </div>
-                    <div className="flex-1"></div>
+                    <div className="flex-1 flex items-center justify-center">
+                        <LiveDateTime />
+                    </div>
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="patient" />
                         <div className="flex items-center">

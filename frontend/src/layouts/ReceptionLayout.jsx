@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { LayoutDashboard, Users, CalendarCheck, CheckSquare, Clock, LogOut, Building2, Menu, X, UserPlus, MonitorPlay } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import NotificationDropdown from '../components/NotificationDropdown';
-
+import LiveDateTime from '../components/LiveDateTime';
 const ReceptionLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -86,7 +86,9 @@ const ReceptionLayout = () => {
                             <span className="text-xl font-bold text-indigo-600">Front Desk</span>
                         </div>
                     </div>
-                    <div className="flex-1"></div>
+                    <div className="flex-1 flex items-center justify-center">
+                        <LiveDateTime />
+                    </div>
                     <div className="flex items-center space-x-6">
                         <NotificationDropdown rolePrefix="reception" />
                         <div className="flex items-center">
