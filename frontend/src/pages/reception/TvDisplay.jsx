@@ -1,228 +1,222 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { MonitorPlay, Users, Volume2, Clock, CalendarDays, Maximize2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Volume2, MonitorPlay, Activity, Clock, BellRing, Info, ActivitySquare } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import LiveDateTime from '../../components/LiveDateTime';
 
-const TvDisplay = () => {
-    const { token } = useContext(AuthContext);
+const ReceptionTvDisplay = () => {
     const [queues, setQueues] = useState([]);
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
         fetchQueues();
-        const interval = setInterval(fetchQueues, 10000); // Refresh every 10 seconds
-        const clockInterval = setInterval(() => setCurrentTime(new Date()), 1000);
+        const interval = setInterval(fetchQueues, 15000); // Auto-refresh every 15 seconds
+        
+        const timeInterval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
 
         return () => {
             clearInterval(interval);
-            clearInterval(clockInterval);
+            clearInterval(timeInterval);
         };
     }, []);
 
     const fetchQueues = async () => {
         try {
-            const res = await fetch('/api/queues', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // Note: In a real app this should be a public or specific endpoint for TV display
+            // that doesn't require admin token, or you pass a specific display token.
+            // Using the existing endpoint for demo.
+            const res = await fetch('/api/queues');
             const data = await res.json();
-            if (data.success) {
+            if (data.success && data.data) {
                 setQueues(data.data);
             }
         } catch (error) {
-            console.error("Error fetching queues", error);
+            console.error('Error fetching live queues for TV', error);
         }
     };
 
-    // Calculate currently calling (IN_CONSULTATION)
+    // Filter out patients who are CALLED so they flash prominently
     const callingPatients = queues.flatMap(q => 
         q.waitingPatients
-            .filter(p => p.status === 'IN_CONSULTATION' || p.status === 'CALLED')
-            .map(p => ({ ...p, doctorName: `Dr. ${q.doctor.firstName} ${q.doctor.lastName}`, room: q.doctor.room || 'Consultation Room' }))
+            ?.filter(p => p.status === 'CALLED')
+            .map(p => ({ ...p, doctorName: q.doctorName, room: q.room || 'Consultation Room' })) || []
     );
 
-    // Enter full screen
-    const handleFullScreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch((err) => {
-                console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-            setIsFullscreen(true);
-        } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
-        }
+    const formatTime = (date) => {
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
     return (
-        <div className="min-h-screen bg-[#0B0F19] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-[#0B0F19] text-white p-6 md:p-8 font-sans overflow-hidden flex flex-col">
-            {/* Header */}
-            <header className="flex justify-between items-center mb-8 pb-6 border-b border-white/10 relative shrink-0">
-                <div className="absolute inset-x-0 -bottom-[1px] h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+        <div className="fixed inset-0 z-[100] bg-slate-950 text-slate-200 overflow-hidden font-sans flex flex-col">
+            {/* Dark Mode Background Effects */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[120%] bg-indigo-900/20 skew-x-12 blur-3xl opacity-50"></div>
+                <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[80%] bg-blue-900/20 -skew-x-12 blur-3xl opacity-50"></div>
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-10"></div>
+            </div>
+
+            {/* Header Section */}
+            <header className="relative z-10 flex items-center justify-between px-8 py-6 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 shadow-2xl">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-600/20 rounded-2xl border border-blue-500/30 backdrop-blur-sm">
-                        <MonitorPlay size={36} className="text-blue-400" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.4)]">
+                        <MonitorPlay size={32} className="text-white" />
                     </div>
                     <div>
-                        <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                            Queue Display
+                        <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+                            SmartHospital <span className="text-indigo-400">Live</span>
                         </h1>
-                        <p className="text-blue-400/80 font-medium text-sm mt-1 tracking-wider uppercase">Live Patient Status</p>
+                        <p className="text-slate-400 font-semibold tracking-widest uppercase text-sm mt-1 flex items-center gap-2">
+                            <ActivitySquare size={14} className="text-emerald-400" /> Waitlist Status Display
+                        </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-8">
-                    <div className="flex flex-col items-end">
-                        <div className="flex items-center text-3xl font-bold font-mono tracking-wider text-white shadow-sm">
-                            <Clock size={24} className="mr-3 text-blue-500 opacity-80" />
-                            {currentTime.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute:'2-digit', second:'2-digit' })}
-                        </div>
-                        <div className="flex items-center text-slate-400 font-medium mt-1">
-                            <CalendarDays size={16} className="mr-2 opacity-70" />
-                            {currentTime.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                        </div>
+
+                <div className="flex items-center gap-6">
+                    <div className="px-6 py-3 bg-slate-800/80 backdrop-blur-md rounded-2xl border border-white/5 flex items-center gap-3 shadow-lg">
+                        <Clock className="text-indigo-400" size={24} />
+                        <span className="text-3xl font-black tracking-wider text-white">{formatTime(currentTime)}</span>
                     </div>
-                    <button 
-                        onClick={handleFullScreen} 
-                        className="p-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl border border-white/10 text-slate-300 hover:text-white"
-                        title="Toggle Fullscreen"
-                    >
-                        <Maximize2 size={24} />
-                    </button>
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-0">
-                {/* Now Calling Section - Large */}
-                <div className="lg:col-span-5 flex flex-col h-full">
-                    <div className="flex items-center mb-6 shrink-0">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/20 mr-4 relative">
-                            <div className="w-3 h-3 rounded-full bg-red-500 animate-ping absolute"></div>
-                            <div className="w-3 h-3 rounded-full bg-red-500 relative"></div>
-                        </div>
-                        <h2 className="text-3xl font-bold text-white tracking-wide">Now Calling</h2>
+            {/* Main Content Split */}
+            <div className="flex-1 flex overflow-hidden relative z-10 p-6 gap-6">
+                
+                {/* Left Side: Now Calling (High Priority) */}
+                <div className="w-1/3 flex flex-col bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                    <div className="p-6 bg-gradient-to-r from-emerald-900/40 to-slate-900 border-b border-white/10 flex items-center justify-between">
+                        <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                            <BellRing className="text-emerald-400 animate-bounce" size={28} />
+                            NOW CALLING
+                        </h2>
                     </div>
-                    
-                    <div className="flex-1 min-h-0 bg-gradient-to-br from-blue-900/40 to-indigo-900/20 rounded-3xl p-8 border border-blue-500/30 backdrop-blur-md relative overflow-hidden flex flex-col">
-                        <div className="absolute top-0 right-0 -mt-10 -mr-10 text-blue-500/10 pointer-events-none">
-                            <Volume2 size={300} />
-                        </div>
-                        
-                        <div className="relative z-10 flex-1 flex flex-col min-h-0">
+
+                    <div className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4">
+                        <AnimatePresence>
                             {callingPatients.length > 0 ? (
-                                <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar h-full">
-                                    {callingPatients.map((p, idx) => (
-                                        <div key={idx} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] transform transition-all hover:scale-[1.02] relative overflow-hidden group">
-                                            <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-blue-400 to-indigo-600"></div>
-                                            
-                                            <div className="flex justify-between items-start mb-6">
-                                                <div>
-                                                    <p className="text-sm font-semibold text-blue-300 uppercase tracking-widest mb-1">Token Number</p>
-                                                    <p className="text-7xl font-black text-white tracking-tighter drop-shadow-lg">{String(p.queue_number).padStart(3, '0')}</p>
-                                                </div>
-                                                <div className="h-16 w-16 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-400/30">
-                                                    <Volume2 size={28} className="text-blue-400 group-hover:animate-pulse" />
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="bg-black/30 rounded-xl p-5 border border-white/5">
-                                                <p className="font-bold text-2xl text-slate-100 mb-1">{p.doctorName}</p>
-                                                <div className="flex items-center text-blue-300 font-medium text-lg">
-                                                    <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
-                                                    Proceed to {p.room}
-                                                </div>
+                                callingPatients.map((p, idx) => (
+                                    <motion.div 
+                                        key={p.id}
+                                        initial={{ opacity: 0, x: -50 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        className="bg-gradient-to-br from-emerald-500/20 to-teal-900/40 border border-emerald-500/30 rounded-3xl p-6 shadow-[0_0_40px_rgba(16,185,129,0.15)] relative overflow-hidden"
+                                    >
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-3xl -z-10 rounded-full animate-pulse"></div>
+                                        
+                                        <div className="flex items-center justify-between mb-4">
+                                            <p className="text-slate-300 font-bold tracking-widest text-sm uppercase">Ticket Number</p>
+                                            <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,1)] animate-ping"></div>
+                                        </div>
+                                        
+                                        <h3 className="text-7xl font-black text-white tracking-tighter mb-6">
+                                            {p.queue_number}
+                                        </h3>
+                                        
+                                        <div className="space-y-2">
+                                            <p className="text-2xl font-bold text-emerald-300">Dr. {p.doctorName}</p>
+                                            <div className="inline-flex items-center px-4 py-2 bg-emerald-950/50 rounded-xl text-emerald-400 font-bold border border-emerald-800/50">
+                                                Proceed to {p.room}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    </motion.div>
+                                ))
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-60">
-                                    <div className="w-32 h-32 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
-                                        <MonitorPlay size={64} className="text-blue-400/50" />
-                                    </div>
-                                    <p className="text-3xl text-slate-300 font-light tracking-wide">Waiting for next patient</p>
-                                    <div className="flex gap-2 mt-4">
-                                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                                    </div>
+                                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50 p-8">
+                                    <Volume2 size={64} className="text-slate-600 mb-6" />
+                                    <p className="text-2xl font-bold text-slate-400">Please wait for your queue number to be called.</p>
                                 </div>
                             )}
-                        </div>
+                        </AnimatePresence>
                     </div>
                 </div>
 
-                {/* Waiting Queue Section */}
-                <div className="lg:col-span-7 flex flex-col h-full">
-                    <div className="flex items-center mb-6 shrink-0">
-                        <Users className="text-slate-400 mr-4" size={32} /> 
-                        <h2 className="text-3xl font-bold text-slate-200 tracking-wide">Waiting List</h2>
+                {/* Right Side: Doctor Queues */}
+                <div className="w-2/3 flex flex-col bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                    <div className="p-6 bg-gradient-to-r from-indigo-900/40 to-slate-900 border-b border-white/10 flex items-center justify-between">
+                        <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                            <Users className="text-indigo-400" size={28} />
+                            WAITING LIST
+                        </h2>
                     </div>
-                    
-                    <div className="flex-1 min-h-0 bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 shadow-2xl overflow-hidden flex flex-col">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto pr-4 custom-scrollbar h-full content-start">
+
+                    <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+                        {queues.every(q => q.waitingPatients?.filter(p => p.status === 'WAITING' || p.status === 'PENDING').length === 0) && (
+                            <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                                <Activity size={80} className="mb-6 opacity-20" />
+                                <p className="text-2xl font-black tracking-wide">No patients currently waiting</p>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-6">
                             {queues.map(q => {
-                                const waiting = q.waitingPatients.filter(p => p.status === 'WAITING' || p.status === 'PENDING');
+                                const waiting = q.waitingPatients?.filter(p => p.status === 'WAITING' || p.status === 'PENDING') || [];
                                 if (waiting.length === 0) return null;
-                                
+
                                 return (
-                                    <div key={q.doctor.id} className="bg-black/20 rounded-2xl p-6 border border-white/5 transition-all hover:bg-black/30">
-                                        <div className="flex justify-between items-center mb-5 pb-4 border-b border-white/10">
+                                    <div key={q.doctorId} className="bg-slate-800/60 border border-slate-700/50 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-colors duration-500"></div>
+                                        
+                                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-700">
                                             <div>
-                                                <h3 className="font-bold text-xl text-slate-100">Dr. {q.doctor.firstName} {q.doctor.lastName}</h3>
-                                                <p className="text-sm text-slate-400 mt-1">{q.doctor.specialization || 'Consultant'}</p>
+                                                <h3 className="text-2xl font-black text-white">Dr. {q.doctorName}</h3>
+                                                <p className="text-indigo-400 font-bold">{q.specialization}</p>
                                             </div>
-                                            <div className="bg-indigo-500/20 text-indigo-300 px-4 py-1.5 rounded-full text-sm font-semibold border border-indigo-500/30 flex items-center shadow-inner">
-                                                <span className="w-2 h-2 rounded-full bg-indigo-400 mr-2"></span>
-                                                {waiting.length} Waiting
+                                            <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center font-bold text-xl text-slate-300 border border-slate-700">
+                                                {waiting.length}
                                             </div>
                                         </div>
-                                        
-                                        <div className="flex flex-wrap gap-3">
-                                            {waiting.slice(0, 8).map((p, idx) => (
-                                                <div key={idx} className="bg-slate-800/80 border border-slate-600/50 px-4 py-3 rounded-xl text-center min-w-[80px] shadow-sm">
-                                                    <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Token</p>
-                                                    <p className="text-2xl font-bold text-white">{String(p.queue_number).padStart(3, '0')}</p>
+
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {waiting.slice(0, 9).map(p => (
+                                                <div key={p.id} className="bg-slate-900/80 border border-slate-700 rounded-xl py-3 text-center shadow-inner text-white font-black text-2xl">
+                                                    {p.queue_number}
                                                 </div>
                                             ))}
-                                            {waiting.length > 8 && (
-                                                <div className="bg-blue-900/30 border border-blue-500/30 px-4 py-3 rounded-xl flex items-center justify-center min-w-[80px]">
-                                                    <p className="text-xl font-bold text-blue-300">+{waiting.length - 8}</p>
+                                            {waiting.length > 9 && (
+                                                <div className="bg-slate-900/40 border border-slate-700/50 border-dashed rounded-xl py-3 text-center text-slate-400 font-black text-xl flex items-center justify-center">
+                                                    +{waiting.length - 9}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                 );
                             })}
-                            
-                            {queues.every(q => q.waitingPatients.filter(p => p.status === 'WAITING' || p.status === 'PENDING').length === 0) && (
-                                <div className="col-span-1 md:col-span-2 h-full min-h-[300px] flex flex-col items-center justify-center text-slate-500">
-                                    <Users size={64} className="mb-4 opacity-20" />
-                                    <p className="text-xl font-medium tracking-wide">No patients currently waiting</p>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
             </div>
-            
-            {/* Styles for custom scrollbar */}
+
+            {/* Bottom Ticker */}
+            <div className="h-12 bg-indigo-600 relative z-20 flex items-center overflow-hidden border-t border-indigo-500">
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-indigo-600 to-transparent z-10"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-indigo-600 to-transparent z-10"></div>
+                
+                <div className="animate-marquee whitespace-nowrap flex items-center text-indigo-50 font-bold tracking-widest uppercase text-sm">
+                    <span className="mx-8 flex items-center"><Info size={16} className="mr-2" /> Please keep your belongings safe</span>
+                    <span className="mx-8 flex items-center">•</span>
+                    <span className="mx-8 flex items-center">Maintain silence in the waiting area</span>
+                    <span className="mx-8 flex items-center">•</span>
+                    <span className="mx-8 flex items-center">For any assistance, contact the front desk</span>
+                    <span className="mx-8 flex items-center">•</span>
+                    <span className="mx-8 flex items-center">Masks are highly recommended inside the hospital</span>
+                    <span className="mx-8 flex items-center">•</span>
+                </div>
+            </div>
+
             <style dangerouslySetInnerHTML={{__html: `
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
+                @keyframes marquee {
+                    0% { transform: translateX(0%); }
+                    100% { transform: translateX(-50%); }
                 }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.02);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(255, 255, 255, 0.2);
+                .animate-marquee {
+                    animation: marquee 20s linear infinite;
+                    min-width: 200%;
                 }
             `}} />
         </div>
     );
 };
 
-export default TvDisplay;
+export default ReceptionTvDisplay;
