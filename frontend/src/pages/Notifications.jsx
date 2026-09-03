@@ -15,7 +15,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/notifications/my', {
+            const res = await fetch('/api/notifications/my', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -31,7 +31,7 @@ const Notifications = () => {
 
     const markAsRead = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            const res = await fetch(`/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -54,7 +54,7 @@ const Notifications = () => {
         
         try {
             await Promise.all(unread.map(n => 
-                fetch(`http://localhost:5000/api/notifications/${n.id}/read`, {
+                fetch(`/api/notifications/${n.id}/read`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${token}` }
                 })

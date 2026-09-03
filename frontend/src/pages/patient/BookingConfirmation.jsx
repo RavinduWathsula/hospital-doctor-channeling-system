@@ -18,7 +18,7 @@ const BookingConfirmation = () => {
     useEffect(() => {
         const fetchAppointment = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/appointments/${id}`, {
+                const res = await fetch(`/api/appointments/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();

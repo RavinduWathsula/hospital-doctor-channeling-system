@@ -13,7 +13,7 @@ const Queue = () => {
     const fetchQueue = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/queues/patient', {
+            const res = await fetch('/api/queues/patient', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

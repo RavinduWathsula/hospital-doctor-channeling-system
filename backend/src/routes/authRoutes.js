@@ -13,7 +13,11 @@ router.post(
         body('lastName').notEmpty().withMessage('Last name is required'),
         body('email').isEmail().withMessage('Valid email is required'),
         body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-        body('nic').notEmpty().withMessage('NIC is required')
+        body('role').optional().isIn(['PATIENT', 'DOCTOR']).withMessage('Invalid role'),
+        body('nic').if(body('role').not().equals('DOCTOR')).notEmpty().withMessage('NIC is required'),
+        body('registrationNumber').if(body('role').equals('DOCTOR')).notEmpty().withMessage('Registration number is required'),
+        body('specialization').if(body('role').equals('DOCTOR')).notEmpty().withMessage('Specialization is required'),
+        body('departmentId').if(body('role').equals('DOCTOR')).notEmpty().withMessage('Department is required')
     ],
     authController.register
 );

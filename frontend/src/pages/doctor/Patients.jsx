@@ -18,7 +18,7 @@ const DoctorPatients = () => {
         setSelectedPatient(patient);
         setLoadingHistory(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/prescriptions/patient?userId=${patient.user_id}`, {
+            const res = await fetch(`/api/prescriptions/patient?userId=${patient.user_id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -44,7 +44,7 @@ const DoctorPatients = () => {
 
     const fetchDoctorProfile = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/doctors/me', {
+            const res = await fetch('/api/doctors/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -61,7 +61,7 @@ const DoctorPatients = () => {
     const fetchPatients = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:5000/api/doctors/${doctorId}/patients`, {
+            const res = await fetch(`/api/doctors/${doctorId}/patients`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

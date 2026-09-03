@@ -16,7 +16,7 @@ const Reports = () => {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/reports/analytics', {
+                const response = await fetch('/api/reports/analytics', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();

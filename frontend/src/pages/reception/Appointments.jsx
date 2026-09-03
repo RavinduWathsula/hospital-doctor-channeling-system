@@ -16,7 +16,7 @@ const ReceptionAppointments = () => {
     const fetchAppointments = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/appointments', {
+            const res = await fetch('/api/appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -34,7 +34,7 @@ const ReceptionAppointments = () => {
         if (!window.confirm(`Are you sure you want to mark this as ${status}?`)) return;
         
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${id}/admin-status`, {
+            const res = await fetch(`/api/appointments/${id}/admin-status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ const DoctorAppointments = () => {
             if (!silent) setLoading(true);
             
             // 1. Fetch Appointments
-            const appRes = await fetch('http://localhost:5000/api/appointments/doctor-appointments', {
+            const appRes = await fetch('/api/appointments/doctor-appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const appData = await appRes.json();
@@ -30,12 +30,12 @@ const DoctorAppointments = () => {
             // 2. Fetch Doctor ID & Schedules
             let schedules = [];
             try {
-                const docRes = await fetch('http://localhost:5000/api/doctors/me', {
+                const docRes = await fetch('/api/doctors/me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const docData = await docRes.json();
                 if (docData.success && docData.data) {
-                    const schedRes = await fetch(`http://localhost:5000/api/schedules/doctor/${docData.data.id}`, {
+                    const schedRes = await fetch(`/api/schedules/doctor/${docData.data.id}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const schedData = await schedRes.json();
@@ -90,7 +90,7 @@ const DoctorAppointments = () => {
 
     const handleUpdateStatus = async (id, status) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${id}/status`, {
+            const res = await fetch(`/api/appointments/${id}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

@@ -29,7 +29,7 @@ const ReceptionDashboard = () => {
             setLoading(true);
             const today = new Date().toISOString().split('T')[0];
             
-            const appRes = await fetch('http://localhost:5000/api/appointments', {
+            const appRes = await fetch('/api/appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const appData = await appRes.json();
@@ -45,7 +45,7 @@ const ReceptionDashboard = () => {
                 completed = todays.filter(a => a.status === 'COMPLETED').length;
             }
 
-            const qRes = await fetch('http://localhost:5000/api/queues', {
+            const qRes = await fetch('/api/queues', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const qData = await qRes.json();

@@ -17,7 +17,7 @@ const Users = () => {
 
     const fetchUsers = () => {
         setIsLoading(true);
-        fetch('http://localhost:5000/api/users', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => { if(data.success) setUsers(data.data); })
             .catch(() => toast.error('Error fetching users'))
@@ -26,7 +26,7 @@ const Users = () => {
 
     const toggleStatus = async (id, currentStatus) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/users/${id}/status`, {
+            const res = await fetch(`/api/users/${id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ isActive: !currentStatus })

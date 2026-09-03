@@ -43,7 +43,7 @@ const Departments = () => {
 
     const fetchDepartments = () => {
         setIsLoading(true);
-        fetch('http://localhost:5000/api/departments', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('/api/departments', { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => { if(data.success) setDepartments(data.data); })
             .catch(() => toast.error('Error fetching departments'))
@@ -56,9 +56,9 @@ const Departments = () => {
         setIsLoadingDetails(true);
         try {
             const [statsRes, docsRes, schedsRes] = await Promise.all([
-                fetch(`http://localhost:5000/api/reports/analytics?departmentId=${dept.id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                fetch('http://localhost:5000/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } }),
-                fetch('http://localhost:5000/api/schedules', { headers: { 'Authorization': `Bearer ${token}` } })
+                fetch(`/api/reports/analytics?departmentId=${dept.id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch('/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch('/api/schedules', { headers: { 'Authorization': `Bearer ${token}` } })
             ]);
 
             const statsData = await statsRes.json();
@@ -103,7 +103,7 @@ const Departments = () => {
         e.preventDefault();
         try {
             const method = currentDept ? 'PUT' : 'POST';
-            const url = currentDept ? `http://localhost:5000/api/departments/${currentDept.id}` : 'http://localhost:5000/api/departments';
+            const url = currentDept ? `/api/departments/${currentDept.id}` : '/api/departments';
             
             const res = await fetch(url, {
                 method,

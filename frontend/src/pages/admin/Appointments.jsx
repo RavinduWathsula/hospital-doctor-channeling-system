@@ -21,7 +21,7 @@ const Appointments = () => {
         const fetchAppointments = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:5000/api/appointments', {
+                const response = await fetch('/api/appointments', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();

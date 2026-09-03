@@ -43,7 +43,7 @@ const DoctorSchedules = () => {
 
     const fetchDoctorProfile = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/doctors/me', {
+            const res = await fetch('/api/doctors/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -58,7 +58,7 @@ const DoctorSchedules = () => {
     };
 
     const fetchSchedules = () => {
-        fetch(`http://localhost:5000/api/schedules/doctor/${doctorId}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`/api/schedules/doctor/${doctorId}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => { if (data.success) setSchedules(data.data); })
             .catch(() => toast.error('Error fetching schedules'));
@@ -103,8 +103,8 @@ const DoctorSchedules = () => {
         e.preventDefault();
         try {
             const url = isEditMode 
-                ? `http://localhost:5000/api/schedules/${editId}` 
-                : 'http://localhost:5000/api/schedules';
+                ? `/api/schedules/${editId}` 
+                : '/api/schedules';
             const method = isEditMode ? 'PUT' : 'POST';
 
             const res = await fetch(url, {
@@ -129,7 +129,7 @@ const DoctorSchedules = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this schedule?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/schedules/${id}`, {
+            const res = await fetch(`/api/schedules/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

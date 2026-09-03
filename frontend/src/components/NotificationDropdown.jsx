@@ -32,7 +32,7 @@ const NotificationDropdown = ({ rolePrefix = 'patient' }) => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/notifications/my', {
+            const res = await fetch('/api/notifications/my', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -47,7 +47,7 @@ const NotificationDropdown = ({ rolePrefix = 'patient' }) => {
 
     const markAsRead = async (id) => {
         try {
-            await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            await fetch(`/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

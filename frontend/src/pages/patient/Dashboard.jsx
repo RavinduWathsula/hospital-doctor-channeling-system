@@ -20,7 +20,7 @@ const Dashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 // Fetch Appointments
-                const aptRes = await fetch('http://localhost:5000/api/appointments/my-appointments', {
+                const aptRes = await fetch('/api/appointments/my-appointments', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const aptData = await aptRes.json();
@@ -37,7 +37,7 @@ const Dashboard = () => {
                 }
 
                 // Fetch Queue
-                const qRes = await fetch('http://localhost:5000/api/queues/patient', {
+                const qRes = await fetch('/api/queues/patient', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const qData = await qRes.json();
@@ -46,7 +46,7 @@ const Dashboard = () => {
                 }
 
                 // Fetch Notifications
-                const notifRes = await fetch('http://localhost:5000/api/notifications/my', {
+                const notifRes = await fetch('/api/notifications/my', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const notifData = await notifRes.json();

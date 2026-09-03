@@ -63,6 +63,57 @@ exports.registerPatient = async (patientData) => {
     }
 };
 
+exports.registerDoctor = async (doctorData) => {
+    const { firstName, lastName, email, password, phone, registrationNumber, specialization, departmentId, qualification, experienceYears, consultationFee } = doctorData;
+
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // Check for duplicate email or registration number
+        const [existingUsers] = await connection.query('SELECT u.id FROM users u LEFT JOIN doctors d ON u.id = d.user_id WHERE u.email = ? OR d.registration_number = ?', [email, registrationNumber]);
+        if (existingUsers.length > 0) {
+            throw new Error('User with this email or Registration Number already exists');
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Insert into users
+        const [userResult] = await connection.query(
+            'INSERT INTO users (first_name, last_name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?, ?)',
+            [firstName, lastName, email, hashedPassword, 'DOCTOR', phone]
+        );
+
+        const userId = userResult.insertId;
+
+        // Insert into doctors
+        await connection.query(
+            'INSERT INTO doctors (user_id, department_id, specialization, qualification, experience_years, consultation_fee, registration_number, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, departmentId, specialization, qualification || null, experienceYears || 0, consultationFee, registrationNumber, 0] // 0 for inactive, needs admin approval, or 1 for auto-active? Let's use 1 to allow immediate login, or match existing logic. Wait, let's use 1 for now.
+        );
+        // Wait, I should update the query to use 1 for is_active.
+        await connection.query('UPDATE doctors SET is_active = 1 WHERE user_id = ?', [userId]);
+
+        await connection.commit();
+
+        return {
+            id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            role: 'DOCTOR',
+            token: generateToken(userId, 'DOCTOR')
+        };
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
 exports.loginUser = async (email, password) => {
     const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) {

@@ -41,7 +41,7 @@ const DoctorSearch = () => {
 
     const fetchDepartments = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/departments', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('/api/departments', { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             if (data.success) setDepartments(data.data);
         } catch { console.error("Error fetching departments"); }
@@ -55,7 +55,7 @@ const DoctorSearch = () => {
             if (selectedDept) queryParams.append('departmentId', selectedDept);
             if (selectedSpec) queryParams.append('specialization', selectedSpec);
 
-            const res = await fetch(`http://localhost:5000/api/doctors/search?${queryParams.toString()}`, {
+            const res = await fetch(`/api/doctors/search?${queryParams.toString()}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

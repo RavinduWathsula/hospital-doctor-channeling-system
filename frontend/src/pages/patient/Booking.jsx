@@ -29,7 +29,7 @@ const Booking = () => {
     useEffect(() => {
         const fetchDoctor = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/doctors/${id}`, {
+                const res = await fetch(`/api/doctors/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -57,7 +57,7 @@ const Booking = () => {
             setSlots([]);
             setSelectedSlot('');
             try {
-                const res = await fetch(`http://localhost:5000/api/doctors/${id}/slots?date=${date}`, {
+                const res = await fetch(`/api/doctors/${id}/slots?date=${date}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -116,7 +116,7 @@ const Booking = () => {
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         try {
-            const res = await fetch('http://localhost:5000/api/appointments', {
+            const res = await fetch('/api/appointments', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

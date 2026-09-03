@@ -11,14 +11,20 @@ exports.register = async (req, res, next) => {
             throw err;
         }
 
-        const data = await authService.registerPatient(req.body);
+        let data;
+        if (req.body.role === 'DOCTOR') {
+            data = await authService.registerDoctor(req.body);
+        } else {
+            data = await authService.registerPatient(req.body);
+        }
+
         res.status(201).json({
             success: true,
-            message: 'Patient registered successfully',
+            message: 'User registered successfully',
             data
         });
     } catch (error) {
-        if (error.message === 'User with this email or NIC already exists') {
+        if (error.message === 'User with this email or NIC already exists' || error.message === 'User with this email or Registration Number already exists') {
             res.status(409);
         }
         next(error);

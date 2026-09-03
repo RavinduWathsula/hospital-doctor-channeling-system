@@ -60,7 +60,7 @@ const Dashboard = () => {
     ];
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/reports/dashboard-stats', {
+        fetch('/api/reports/dashboard-stats', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => res.json())

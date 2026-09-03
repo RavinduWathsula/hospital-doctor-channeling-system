@@ -18,7 +18,7 @@ async function setupDatabase() {
         await connection.query('USE smart_hospital;');
 
         console.log('Reading schema.sql...');
-        const schemaPath = path.join(__dirname, '../database/schema.sql');
+        const schemaPath = path.join(__dirname, '../database/smart_hospital_full.sql');
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
 
         console.log('Executing schema...');

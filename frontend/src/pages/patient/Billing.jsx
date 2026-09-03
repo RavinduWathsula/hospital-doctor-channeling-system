@@ -14,10 +14,10 @@ const Billing = () => {
         const fetchData = async () => {
             try {
                 const [aptRes, docRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/appointments/my-appointments', {
+                    fetch('/api/appointments/my-appointments', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     }),
-                    fetch('http://localhost:5000/api/doctors')
+                    fetch('/api/doctors')
                 ]);
                 
                 const aptData = await aptRes.json();

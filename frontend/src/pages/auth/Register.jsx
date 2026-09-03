@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Stethoscope, User } from 'lucide-react';
 
 const Register = () => {
     const { register, error, isLoading, user } = useContext(AuthContext);
@@ -10,24 +10,36 @@ const Register = () => {
     const [localError, setLocalError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [role, setRole] = useState('PATIENT');
+    const [departments, setDepartments] = useState([]);
     
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        nic: '',
-        dateOfBirth: '',
-        gender: '',
-        phone: '',
-        address: '',
-        emergencyContact: ''
+        firstName: '', lastName: '', email: '', password: '', confirmPassword: '',
+        nic: '', dateOfBirth: '', gender: '', phone: '', address: '', emergencyContact: '',
+        registrationNumber: '', specialization: '', departmentId: '', qualification: '', experienceYears: '', consultationFee: ''
     });
 
     useEffect(() => {
-        if (user) navigate('/patient/dashboard');
+        if (user) {
+            const userRole = user.role?.toUpperCase()?.trim();
+            switch (userRole) {
+                case 'PATIENT': navigate('/patient/dashboard', { replace: true }); break;
+                case 'DOCTOR': navigate('/doctor/dashboard', { replace: true }); break;
+                case 'RECEPTIONIST': navigate('/reception/dashboard', { replace: true }); break;
+                case 'ADMIN': navigate('/admin/dashboard', { replace: true }); break;
+                default: navigate('/', { replace: true });
+            }
+        }
     }, [user, navigate]);
+
+    useEffect(() => {
+        if (role === 'DOCTOR' && departments.length === 0) {
+            fetch('/api/departments')
+                .then(res => res.json())
+                .then(data => { if(data.success) setDepartments(data.data); })
+                .catch(console.error);
+        }
+    }, [role, departments.length]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,7 +54,7 @@ const Register = () => {
         }
 
         try {
-            await register(formData);
+            await register({ ...formData, role });
             // Redirect to login page to sign in manually
             navigate('/login');
         } catch (err) {
@@ -78,124 +90,197 @@ const Register = () => {
                     {/* Inner content box */}
                     <div className="bg-white/80 backdrop-blur-2xl rounded-[2.4rem] overflow-hidden w-full h-full relative z-10">
                         <div className="p-8 md:p-10">
-                            <div className="text-center mb-10">
+                            <div className="text-center mb-8">
                                 <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Create an Account</h2>
-                        <p className="text-gray-500 mt-2">Register as a patient to book appointments</p>
-                    </div>
-
-                    {(error || localError) && (
-                        <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm font-medium border border-red-100 flex items-center">
-                            <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
-                            {localError || error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Personal Details */}
-                            <div className="space-y-6">
-                                <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Personal Details</h3>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-                                        <input type="text" name="firstName" required value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-                                        <input type="text" name="lastName" required value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">NIC *</label>
-                                    <input type="text" name="nic" required value={formData.nic} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                                        <select name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <option value="">Select</option>
-                                            <option value="MALE">Male</option>
-                                            <option value="FEMALE">Female</option>
-                                            <option value="OTHER">Other</option>
-                                        </select>
-                                    </div>
+                                <p className="text-gray-500 mt-2">Join Smart Hospital to manage your healthcare journey</p>
+                            </div>
+                            
+                            {/* Role Toggle */}
+                            <div className="flex justify-center mb-10">
+                                <div className="bg-slate-100 p-1.5 rounded-2xl inline-flex relative shadow-inner">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole('PATIENT')}
+                                        className={`relative z-10 flex items-center px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${role === 'PATIENT' ? 'text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <User size={18} className="mr-2" /> Patient
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole('DOCTOR')}
+                                        className={`relative z-10 flex items-center px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${role === 'DOCTOR' ? 'text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <Stethoscope size={18} className="mr-2" /> Doctor
+                                    </button>
+                                    {/* Animated Pill */}
+                                    <div 
+                                        className="absolute top-1.5 bottom-1.5 w-1/2 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out z-0"
+                                        style={{ transform: role === 'PATIENT' ? 'translateX(0)' : 'translateX(100%)', left: '6px', width: 'calc(50% - 6px)' }}
+                                    ></div>
                                 </div>
                             </div>
 
-                            {/* Account & Contact Details */}
-                            <div className="space-y-6">
-                                <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Account & Contact</h3>
+                            {(error || localError) && (
+                                <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm font-medium border border-red-100 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+                                    {localError || error}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Personal Details - Common */}
+                                    <div className="space-y-6">
+                                        <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Personal Details</h3>
+                                        
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                                                <input type="text" name="firstName" required value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                                                <input type="text" name="lastName" required value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            </div>
+                                        </div>
+
+                                        {role === 'PATIENT' ? (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">NIC *</label>
+                                                    <input type="text" name="nic" required value={formData.nic} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                                        <select name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                            <option value="">Select</option>
+                                                            <option value="MALE">Male</option>
+                                                            <option value="FEMALE">Female</option>
+                                                            <option value="OTHER">Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Medical Reg No. *</label>
+                                                    <input type="text" name="registrationNumber" required value={formData.registrationNumber} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Specialization *</label>
+                                                    <input type="text" name="specialization" required value={formData.specialization} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. Cardiologist" />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Account & Contact Details - Common */}
+                                    <div className="space-y-6">
+                                        <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Account & Contact</h3>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                                            <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                                                <div className="relative">
+                                                    <input type={showPassword ? "text" : "password"} name="password" minLength="6" required value={formData.password} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                                                <div className="relative">
+                                                    <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" minLength="6" required value={formData.confirmPassword} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                                                <input type="text" name="phone" required value={formData.phone} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            </div>
+                                            {role === 'PATIENT' ? (
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                                                    <input type="text" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                                                    <select name="departmentId" required value={formData.departmentId} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        <option value="">Select Department</option>
+                                                        {departments.map(dept => (
+                                                            <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                                 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-                                    <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                                        <div className="relative">
-                                            <input type={showPassword ? "text" : "password"} name="password" minLength="6" required value={formData.password} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                            </button>
+                                {role === 'DOCTOR' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Experience (Years) *</label>
+                                                <input type="number" name="experienceYears" required min="0" value={formData.experienceYears} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Consult Fee ($) *</label>
+                                                <input type="number" name="consultationFee" required min="0" step="0.01" value={formData.consultationFee} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Qualifications</label>
+                                            <input type="text" name="qualification" value={formData.qualification} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. MBBS, MD" />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
-                                        <div className="relative">
-                                            <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" minLength="6" required value={formData.confirmPassword} onChange={handleChange} className="w-full pl-4 pr-12 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                )}
 
-                                <div className="grid grid-cols-2 gap-4">
+                                {role === 'PATIENT' && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                        <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                        <textarea name="address" rows="2" value={formData.address} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
-                                        <input type="text" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                    </div>
+                                )}
+
+                                <div className="pt-4 border-t">
+                                    <button 
+                                        type="submit" 
+                                        disabled={isLoading}
+                                        className="w-full py-4 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transform transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoading ? 'Registering...' : `Register as ${role === 'DOCTOR' ? 'Doctor' : 'Patient'}`}
+                                    </button>
                                 </div>
+                            </form>
+
+                            <div className="mt-8 text-center text-sm text-gray-500">
+                                Already have an account? <Link to="/login" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">Sign In here</Link>
                             </div>
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <textarea name="address" rows="2" value={formData.address} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        </div>
-
-                        <div className="pt-4 border-t">
-                            <button 
-                                type="submit" 
-                                disabled={isLoading}
-                                className="w-full py-4 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transform transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? 'Registering...' : 'Complete Registration'}
-                            </button>
-                        </div>
-                    </form>
-
-                    <div className="mt-8 text-center text-sm text-gray-500">
-                        Already have an account? <Link to="/login" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">Sign In here</Link>
-                    </div>
                     </div>
                 </div>
-            </div>
-        </motion.div>
-    </div>
+            </motion.div>
+        </div>
     );
 };
 

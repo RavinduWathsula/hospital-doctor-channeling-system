@@ -32,8 +32,8 @@ const Schedules = () => {
         setIsLoading(true);
         try {
             const [docsRes, schedsRes] = await Promise.all([
-                fetch('http://localhost:5000/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } }),
-                fetch('http://localhost:5000/api/schedules', { headers: { 'Authorization': `Bearer ${token}` } })
+                fetch('/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch('/api/schedules', { headers: { 'Authorization': `Bearer ${token}` } })
             ]);
             const docs = await docsRes.json();
             const scheds = await schedsRes.json();
@@ -49,7 +49,7 @@ const Schedules = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/schedules', {
+            const res = await fetch('/api/schedules', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(formData)
@@ -69,7 +69,7 @@ const Schedules = () => {
     const handleDelete = async (id) => {
         if(!window.confirm('Are you sure you want to delete this schedule?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/schedules/${id}`, {
+            const res = await fetch(`/api/schedules/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

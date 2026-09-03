@@ -31,7 +31,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/patients/me', {
+                const res = await fetch('/api/patients/me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -74,7 +74,7 @@ const Profile = () => {
         e.preventDefault();
         setIsSavingProfile(true);
         try {
-            const res = await fetch('http://localhost:5000/api/patients/me', {
+            const res = await fetch('/api/patients/me', {
                 method: 'PUT',
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -111,7 +111,7 @@ const Profile = () => {
 
         setIsSavingPassword(true);
         try {
-            const res = await fetch('http://localhost:5000/api/patients/me/password', {
+            const res = await fetch('/api/patients/me/password', {
                 method: 'PUT',
                 headers: { 
                     'Authorization': `Bearer ${token}`,

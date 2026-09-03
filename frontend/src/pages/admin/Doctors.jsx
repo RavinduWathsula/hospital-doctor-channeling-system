@@ -31,7 +31,7 @@ const Doctors = () => {
 
     const fetchDoctors = () => {
         setIsLoading(true);
-        fetch('http://localhost:5000/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('/api/doctors', { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => { if(data.success) setDoctors(data.data); })
             .catch(() => toast.error('Error fetching doctors'))
@@ -39,7 +39,7 @@ const Doctors = () => {
     };
 
     const fetchDepartments = () => {
-        fetch('http://localhost:5000/api/departments', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('/api/departments', { headers: { 'Authorization': `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => { if(data.success) setDepartments(data.data); })
             .catch(() => toast.error('Error fetching departments'));
@@ -47,7 +47,7 @@ const Doctors = () => {
 
     const toggleStatus = async (id, currentStatus) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/doctors/${id}/status`, {
+            const res = await fetch(`/api/doctors/${id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ isActive: !currentStatus })
@@ -68,7 +68,7 @@ const Doctors = () => {
         if (!doctorToDelete) return;
         setIsDeleting(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/doctors/${doctorToDelete}`, {
+            const res = await fetch(`/api/doctors/${doctorToDelete}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -125,7 +125,7 @@ const Doctors = () => {
         e.preventDefault();
         try {
             const method = currentDocId ? 'PUT' : 'POST';
-            const url = currentDocId ? `http://localhost:5000/api/doctors/${currentDocId}` : 'http://localhost:5000/api/doctors';
+            const url = currentDocId ? `/api/doctors/${currentDocId}` : '/api/doctors';
             
             const payload = new FormData();
             Object.keys(formData).forEach(key => {

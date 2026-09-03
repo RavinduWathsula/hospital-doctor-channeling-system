@@ -20,7 +20,7 @@ const DoctorQueue = () => {
     const fetchQueue = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/queues/doctor', {
+            const res = await fetch('/api/queues/doctor', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -36,7 +36,7 @@ const DoctorQueue = () => {
 
     const handleStatusUpdate = async (id, status) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${id}/status`, {
+            const res = await fetch(`/api/appointments/${id}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

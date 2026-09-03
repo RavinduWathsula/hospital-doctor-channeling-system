@@ -17,7 +17,7 @@ export default function Prescriptions() {
 
     const fetchPrescriptions = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/prescriptions/patient', {
+            const res = await fetch('/api/prescriptions/patient', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

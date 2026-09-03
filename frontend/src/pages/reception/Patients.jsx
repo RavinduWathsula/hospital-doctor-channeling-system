@@ -24,7 +24,7 @@ const ReceptionPatients = () => {
     const fetchPatients = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/patients', {
+            const res = await fetch('/api/patients', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -41,7 +41,7 @@ const ReceptionPatients = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/auth/register', {
+            const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(regForm)
@@ -75,7 +75,7 @@ const ReceptionPatients = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`http://localhost:5000/api/patients/${editForm.id}`, {
+            const res = await fetch(`/api/patients/${editForm.id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

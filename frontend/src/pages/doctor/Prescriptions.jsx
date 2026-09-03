@@ -24,7 +24,7 @@ export default function Prescriptions() {
 
     const fetchPrescriptions = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/prescriptions/doctor', {
+            const res = await fetch('/api/prescriptions/doctor', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -40,7 +40,7 @@ export default function Prescriptions() {
 
     const fetchPatients = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/patients', {
+            const res = await fetch('/api/patients', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -80,7 +80,7 @@ export default function Prescriptions() {
         }
 
         try {
-            const res = await fetch('http://localhost:5000/api/prescriptions', {
+            const res = await fetch('/api/prescriptions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

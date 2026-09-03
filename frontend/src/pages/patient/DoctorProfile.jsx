@@ -20,7 +20,7 @@ const DoctorProfile = () => {
     useEffect(() => {
         const fetchDoctor = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/doctors/${id}`, {
+                const res = await fetch(`/api/doctors/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -33,7 +33,7 @@ const DoctorProfile = () => {
                 }
 
                 // Fetch schedules
-                const schedRes = await fetch(`http://localhost:5000/api/doctors/${id}/availability`, {
+                const schedRes = await fetch(`/api/doctors/${id}/availability`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const schedData = await schedRes.json();

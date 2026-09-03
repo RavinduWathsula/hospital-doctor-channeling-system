@@ -18,7 +18,7 @@ const ReceptionCheckIn = () => {
             setLoading(true);
             setAppointment(null);
             
-            const res = await fetch('http://localhost:5000/api/appointments', {
+            const res = await fetch('/api/appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -48,7 +48,7 @@ const ReceptionCheckIn = () => {
         if (!appointment) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${appointment.id}/admin-status`, {
+            const res = await fetch(`/api/appointments/${appointment.id}/admin-status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

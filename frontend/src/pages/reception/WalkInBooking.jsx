@@ -48,7 +48,7 @@ const WalkInBooking = () => {
 
     const fetchPatients = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/patients', {
+            const res = await fetch('/api/patients', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -62,7 +62,7 @@ const WalkInBooking = () => {
 
     const fetchDepartments = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/departments');
+            const res = await fetch('/api/departments');
             const data = await res.json();
             if (data.success) {
                 setDepartments(data.data);
@@ -74,7 +74,7 @@ const WalkInBooking = () => {
 
     const fetchDoctors = async (deptId) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/doctors?department=${deptId}`);
+            const res = await fetch(`/api/doctors?department=${deptId}`);
             const data = await res.json();
             if (data.success) {
                 setDoctors(data.data);
@@ -87,7 +87,7 @@ const WalkInBooking = () => {
     const fetchAvailableSlots = async () => {
         setFetchingSlots(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/slots?doctorId=${selectedDoctorId}&date=${appointmentDate}`);
+            const res = await fetch(`/api/slots?doctorId=${selectedDoctorId}&date=${appointmentDate}`);
             const data = await res.json();
             if (data.success) {
                 setAvailableSlots(data.data);
@@ -108,7 +108,7 @@ const WalkInBooking = () => {
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/appointments/walk-in', {
+            const res = await fetch('/api/appointments/walk-in', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

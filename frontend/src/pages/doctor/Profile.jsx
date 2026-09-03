@@ -27,7 +27,7 @@ const DoctorProfile = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/doctors/me', {
+            const res = await fetch('/api/doctors/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -51,7 +51,7 @@ const DoctorProfile = () => {
         
         setPasswordLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/me/password', {
+            const res = await fetch('/api/auth/me/password', {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const DoctorProfile = () => {
         e.preventDefault();
         setEditLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/doctors/me', {
+            const res = await fetch('/api/doctors/me', {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

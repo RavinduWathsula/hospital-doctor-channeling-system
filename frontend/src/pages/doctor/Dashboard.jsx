@@ -43,7 +43,7 @@ const DoctorDashboard = () => {
             const todayStr = localToday.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' in local time
             
             // Fetch Appointments
-            const appRes = await fetch('http://localhost:5000/api/appointments/doctor-appointments', {
+            const appRes = await fetch('/api/appointments/doctor-appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const appData = await appRes.json();
@@ -61,7 +61,7 @@ const DoctorDashboard = () => {
             }
 
             // Fetch Queue
-            const qRes = await fetch('http://localhost:5000/api/queues/doctor', {
+            const qRes = await fetch('/api/queues/doctor', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const qData = await qRes.json();
@@ -80,7 +80,7 @@ const DoctorDashboard = () => {
             setCurrentPatient(current);
 
             // Fetch Doctor details for Schedule
-            const docRes = await fetch('http://localhost:5000/api/doctors/me', {
+            const docRes = await fetch('/api/doctors/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const docData = await docRes.json();
@@ -88,7 +88,7 @@ const DoctorDashboard = () => {
                 const doctorId = docData.data.id;
                 
                 // Fetch Schedule
-                const schedRes = await fetch(`http://localhost:5000/api/schedules/doctor/${doctorId}`, {
+                const schedRes = await fetch(`/api/schedules/doctor/${doctorId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const schedData = await schedRes.json();

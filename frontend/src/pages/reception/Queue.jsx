@@ -17,7 +17,7 @@ const ReceptionQueue = () => {
     const fetchQueues = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/queues', {
+            const res = await fetch('/api/queues', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

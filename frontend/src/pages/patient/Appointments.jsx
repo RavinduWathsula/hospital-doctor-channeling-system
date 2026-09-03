@@ -22,7 +22,7 @@ const Appointments = () => {
 
     const fetchAppointments = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/appointments/my-appointments', {
+            const res = await fetch('/api/appointments/my-appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -45,7 +45,7 @@ const Appointments = () => {
         if (!id) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/appointments/${id}/cancel`, {
+            const res = await fetch(`/api/appointments/${id}/cancel`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
