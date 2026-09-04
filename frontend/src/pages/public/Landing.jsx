@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 import {
     Stethoscope, Calendar, Heart, Shield, Users, Activity, Clock,
     ChevronRight, Star, Quote, Play, ArrowRight, MapPin, Phone, Mail,
@@ -57,6 +58,7 @@ const FAQItem = ({ question, answer }) => {
 };
 
 const Landing = () => {
+    const { user, logout } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -189,15 +191,41 @@ const Landing = () => {
                             </div>
 
                             <div className="flex items-center gap-3 shrink-0">
-                                <Link to="/login" className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden md:block px-2 whitespace-nowrap">
-                                    Login
-                                </Link>
-                                <Link to="/register" className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden md:block px-2 border-r border-slate-300 pr-4 whitespace-nowrap">
-                                    Register
-                                </Link>
-                                <Link to="/register" className="group relative bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden hidden sm:block whitespace-nowrap">
-                                    Book Appointment
-                                </Link>
+                                {user ? (
+                                    <>
+                                        <Link to={
+                                            user.role === 'ADMIN' ? '/admin/dashboard' :
+                                            user.role === 'DOCTOR' ? '/doctor/dashboard' :
+                                            user.role === 'RECEPTIONIST' ? '/reception/dashboard' :
+                                            '/patient/dashboard'
+                                        } className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden md:block px-2 whitespace-nowrap">
+                                            Dashboard
+                                        </Link>
+                                        <button onClick={logout} className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors hidden md:block px-2 border-l border-slate-300 pl-4 whitespace-nowrap cursor-pointer">
+                                            Logout
+                                        </button>
+                                        <Link to={
+                                            user.role === 'ADMIN' ? '/admin/dashboard' :
+                                            user.role === 'DOCTOR' ? '/doctor/dashboard' :
+                                            user.role === 'RECEPTIONIST' ? '/reception/dashboard' :
+                                            '/patient/dashboard'
+                                        } className="group relative bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden hidden sm:block whitespace-nowrap">
+                                            Go to Portal
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link to="/login" className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden md:block px-2 whitespace-nowrap">
+                                            Login
+                                        </Link>
+                                        <Link to="/register" className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors hidden md:block px-2 border-r border-slate-300 pr-4 whitespace-nowrap">
+                                            Register
+                                        </Link>
+                                        <Link to="/register" className="group relative bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-xl shadow-blue-600/20 hover:shadow-blue-600/40 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden hidden sm:block whitespace-nowrap">
+                                            Book Appointment
+                                        </Link>
+                                    </>
+                                )}
                                 <button className="xl:hidden text-slate-700 hover:text-blue-600 p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                                     {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                                 </button>
@@ -219,11 +247,31 @@ const Landing = () => {
                                         </a>
                                     ))}
                                     <div className="border-t border-slate-100 pt-4 mt-2 flex flex-col gap-2">
-                                        <div className="flex gap-2">
-                                            <Link to="/login" className="flex-1 px-4 py-3 text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl">Login</Link>
-                                            <Link to="/register" className="flex-1 px-4 py-3 text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl">Register</Link>
-                                        </div>
-                                        <Link to="/register" className="bg-blue-600 text-white px-4 py-3 text-center font-bold rounded-xl shadow-md">Book Appointment</Link>
+                                        {user ? (
+                                            <>
+                                                <Link to={
+                                                    user.role === 'ADMIN' ? '/admin/dashboard' :
+                                                    user.role === 'DOCTOR' ? '/doctor/dashboard' :
+                                                    user.role === 'RECEPTIONIST' ? '/reception/dashboard' :
+                                                    '/patient/dashboard'
+                                                } className="flex-1 px-4 py-3 text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl">Dashboard</Link>
+                                                <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="flex-1 px-4 py-3 text-center font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl cursor-pointer">Logout</button>
+                                                <Link to={
+                                                    user.role === 'ADMIN' ? '/admin/dashboard' :
+                                                    user.role === 'DOCTOR' ? '/doctor/dashboard' :
+                                                    user.role === 'RECEPTIONIST' ? '/reception/dashboard' :
+                                                    '/patient/dashboard'
+                                                } className="bg-blue-600 text-white px-4 py-3 text-center font-bold rounded-xl shadow-md">Go to Portal</Link>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <Link to="/login" className="flex-1 px-4 py-3 text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl">Login</Link>
+                                                    <Link to="/register" className="flex-1 px-4 py-3 text-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl">Register</Link>
+                                                </div>
+                                                <Link to="/register" className="bg-blue-600 text-white px-4 py-3 text-center font-bold rounded-xl shadow-md">Book Appointment</Link>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>
